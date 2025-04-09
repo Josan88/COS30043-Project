@@ -4,89 +4,8 @@
 
 // Wait for DOM to be loaded before initializing the app
 document.addEventListener('DOMContentLoaded', () => {
-  // Create Sample Products Data
-  const productData = [
-    {
-      id: 1,
-      name: 'Smartphone X',
-      price: 899.99,
-      description: 'The latest smartphone with an amazing camera and long battery life.',
-      image: 'https://via.placeholder.com/300x300?text=Smartphone',
-      category: 'electronics',
-      rating: 4.5,
-      inStock: true
-    },
-    {
-      id: 2,
-      name: 'Laptop Pro',
-      price: 1299.99,
-      description: 'Powerful laptop for professionals and gamers with high-end specs.',
-      image: 'https://via.placeholder.com/300x300?text=Laptop',
-      category: 'electronics',
-      rating: 4.8,
-      inStock: true
-    },
-    {
-      id: 3,
-      name: 'Wireless Headphones',
-      price: 159.99,
-      description: 'Noise-canceling headphones with crystal clear sound quality.',
-      image: 'https://via.placeholder.com/300x300?text=Headphones',
-      category: 'electronics',
-      rating: 4.3,
-      inStock: true
-    },
-    {
-      id: 4,
-      name: 'Smart Watch',
-      price: 249.99,
-      description: 'Track your fitness and stay connected with this elegant smartwatch.',
-      image: 'https://via.placeholder.com/300x300?text=SmartWatch',
-      category: 'wearables',
-      rating: 4.0,
-      inStock: true
-    },
-    {
-      id: 5,
-      name: 'Wireless Earbuds',
-      price: 129.99,
-      description: 'True wireless earbuds with amazing sound quality and long battery life.',
-      image: 'https://via.placeholder.com/300x300?text=Earbuds',
-      category: 'electronics',
-      rating: 4.7,
-      inStock: true
-    },
-    {
-      id: 6,
-      name: 'Gaming Console',
-      price: 499.99,
-      description: 'Next-generation gaming console for the ultimate gaming experience.',
-      image: 'https://via.placeholder.com/300x300?text=GamingConsole',
-      category: 'gaming',
-      rating: 4.9,
-      inStock: false
-    },
-    {
-      id: 7,
-      name: 'Fitness Tracker',
-      price: 89.99,
-      description: 'Track your steps, heart rate, and more with this sleek fitness band.',
-      image: 'https://via.placeholder.com/300x300?text=FitnessTracker',
-      category: 'wearables',
-      rating: 4.2,
-      inStock: true
-    },
-    {
-      id: 8,
-      name: 'Tablet Ultra',
-      price: 649.99,
-      description: 'High-resolution tablet perfect for work and entertainment.',
-      image: 'https://via.placeholder.com/300x300?text=Tablet',
-      category: 'electronics',
-      rating: 4.6,
-      inStock: true
-    }
-  ];
+  // Declare productData variable at a scope accessible to the Vue app
+  let productData = [];
 
   // Setup Vue Router
   const routes = [
@@ -99,9 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
     { path: '/purchases', component: PurchasesPage, meta: { requiresAuth: true } }
   ];
 
-  const router = new VueRouter({
-    routes,
-    mode: 'hash' // Use hash mode for better compatibility
+  // Create router instance using Vue Router 4 syntax
+  const router = VueRouter.createRouter({
+    history: VueRouter.createWebHashHistory(),
+    routes
   });
 
   // Navigation guards for protected routes
@@ -122,20 +42,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Create Vue app using Vue 3 API
+  // Create Vue 3 app
   const app = Vue.createApp({
-    components: {
-      'app-navbar': Navbar,
-      'app-footer': Footer
-    },
     data() {
       return {
-        store: Store // Add this line to make Store accessible via $root.store
+        store: Store // Make Store accessible via $root.store
       }
     },
     computed: {
       isAuthenticated() {
         return Store.state.isAuthenticated;
+      },
+      notifications() {
+        return Store.state.notifications;
       }
     },
     methods: {
@@ -163,19 +82,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Authentication methods
       login(email, password) {
-        // Simple mock authentication for demo purposes
-        if (email === 'demo@example.com' && password === 'password') {
-          Store.mutations.login({
-            name: 'Demo User',
-            email: email,
-            avatar: 'https://via.placeholder.com/64x64'
-          });
-          this.showNotification('Login successful', 'success');
-          return true;
-        } else {
-          this.showNotification('Invalid credentials', 'error');
-          return false;
-        }
+        return new Promise((resolve, reject) => {
+          // Simple mock authentication for demo purposes
+          if (email === 'demo@example.com' && password === 'password') {
+            Store.mutations.login({
+              name: 'Demo User',
+              email: email,
+              avatar: 'https://via.placeholder.com/64x64'
+            });
+            this.showNotification('Login successful', 'success');
+            resolve();
+          } else {
+            this.showNotification('Invalid credentials', 'error');
+            reject('Invalid email or password');
+          }
+        });
       },
 
       logout() {
@@ -244,12 +165,76 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Use the plugins
-  ShopEasePlugins.install(app);
+  // Define custom directives
+  app.directive('lazy-load', {
+    mounted(el, binding) {
+      // Create a function to handle image loading
+      function loadImage() {
+        // Set a placeholder or loading image initially
+        const originalSrc = binding.value;
+        
+        // Create new Image object to load the image
+        const img = new Image();
+        
+        // When image successfully loads, update the element's src
+        img.onload = function() {
+          el.src = originalSrc;
+          el.classList.add('loaded');
+        };
+        
+        // Handle image loading errors
+        img.onerror = function() {
+          // Set a fallback image on error
+          el.src = 'https://via.placeholder.com/300x300?text=Image+Not+Found';
+          console.error(`Failed to load image: ${originalSrc}`);
+        };
+        
+        // Start loading the image
+        img.src = originalSrc;
+      }
+      
+      // Use Intersection Observer API if available to load images only when they come into view
+      if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              loadImage();
+              observer.unobserve(el);
+            }
+          });
+        });
+        
+        observer.observe(el);
+      } else {
+        // Fallback for browsers that don't support Intersection Observer
+        loadImage();
+      }
+    }
+  });
 
-  // Use the router
+  // Register a11y click directive for enhanced keyboard accessibility
+  app.directive('a11y-click', {
+    mounted(el, binding) {
+      el.addEventListener('keydown', (e) => {
+        // Trigger click on Enter or Space key
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (typeof binding.value === 'function') {
+            binding.value();
+          } else {
+            el.click();
+          }
+        }
+      });
+    }
+  });
+
+  // Register components
+  app.component('app-navbar', Navbar);
+  app.component('app-footer', Footer);
+
+  // Use router
   app.use(router);
-
-  // Mount the app
+  
   app.mount('#app');
 });

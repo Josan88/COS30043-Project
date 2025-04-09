@@ -35,7 +35,7 @@ const Navbar = {
                 </li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
-                  <a class="dropdown-item" href="#" @click.prevent="$root.logout">Logout</a>
+                  <a class="dropdown-item" href="#" @click.prevent="logout">Logout</a>
                 </li>
               </ul>
             </div>
@@ -67,6 +67,12 @@ const Navbar = {
       return this.$root.store && this.$root.store.cart 
         ? this.$root.store.cart.reduce((total, item) => total + item.quantity, 0)
         : 0;
+    }
+  },
+
+  methods: {
+    logout() {
+      this.$root.logout();
     }
   }
 };

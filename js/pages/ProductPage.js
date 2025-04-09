@@ -271,7 +271,8 @@ const ProductPage = {
       reviewPage: 1,
       reviewsPerPage: 3,
       hasMoreReviews: false,
-      relatedProducts: []
+      relatedProducts: [],
+      allProductReviews: []
     };
   },
   
@@ -306,197 +307,162 @@ const ProductPage = {
       this.quantity = 1;
       this.selectedOptions = {};
       
-      // Simulate API call delay
-      setTimeout(() => {
-        // Mock data for demonstration purposes
-        const productData = this.getMockProduct(this.productId);
-        
-        if (productData) {
-          this.product = productData;
-          this.fetchReviews();
-          this.fetchRelatedProducts();
-          this.checkWishlist();
-        } else {
-          this.error = "Product not found. It may have been removed or is no longer available.";
-        }
-        
-        this.loading = false;
-      }, 1000);
-    },
-    
-    getMockProduct(id) {
-      // Mock product data
-      const products = {
-        1: {
-          id: 1,
-          name: "Premium Bluetooth Headphones",
-          price: 129.99,
-          originalPrice: 159.99,
-          onSale: true,
-          image: "https://via.placeholder.com/500x500?text=Headphones",
-          additionalImages: [
-            "https://via.placeholder.com/500x500?text=Headphones+Side",
-            "https://via.placeholder.com/500x500?text=Headphones+Back"
-          ],
-          category: "Electronics",
-          categoryId: 1,
-          rating: 4.5,
-          reviewCount: 124,
-          sku: "BT-HP-001",
-          availability: true,
-          description: "Experience premium sound quality with these wireless Bluetooth headphones. Features include active noise cancellation, 30-hour battery life, and comfortable over-ear design.",
-          details: {
-            "Brand": "AudioTech",
-            "Model": "BT-5000",
-            "Color": "Black/Silver",
-            "Connectivity": "Bluetooth 5.0",
-            "Battery Life": "30 hours",
-            "Charging Time": "2 hours",
-            "Weight": "280g"
-          },
-          options: {
-            "Color": ["Black", "Silver", "Blue"],
-            "Warranty": ["Standard 1-Year", "Extended 2-Year (+$19.99)"]
-          },
-          maxQuantity: 5
-        },
-        2: {
-          id: 2,
-          name: "Smartwatch Pro",
-          price: 199.99,
-          originalPrice: 199.99,
-          onSale: false,
-          image: "https://via.placeholder.com/500x500?text=Smartwatch",
-          additionalImages: [
-            "https://via.placeholder.com/500x500?text=Smartwatch+Side",
-            "https://via.placeholder.com/500x500?text=Smartwatch+Band"
-          ],
-          category: "Electronics",
-          categoryId: 1,
-          rating: 4.0,
-          reviewCount: 86,
-          sku: "SW-PRO-002",
-          availability: true,
-          description: "Stay connected with the Smartwatch Pro. Track your fitness goals, receive notifications, and more with this sleek and stylish smartwatch.",
-          details: {
-            "Brand": "TechWear",
-            "Model": "Pro X2",
-            "Display": "1.4 inch AMOLED",
-            "Water Resistance": "5 ATM",
-            "Battery Life": "Up to 7 days",
-            "Sensors": "Heart rate, Accelerometer, Gyroscope",
-            "Compatibility": "iOS 12+ / Android 6.0+"
-          },
-          options: {
-            "Band Color": ["Black", "Blue", "Red"],
-            "Size": ["Standard", "Large"]
-          },
-          maxQuantity: 3
-        }
-      };
-      
-      return products[id] || null;
-    },
-    
-    fetchReviews() {
-      // Mock review data
-      const allReviews = [
-        {
-          id: 1,
-          productId: this.productId,
-          author: "John D.",
-          date: "2025-03-15",
-          rating: 5,
-          title: "Excellent product!",
-          content: "I've been using this product for a month now and I'm very impressed with the quality. The sound is crystal clear and the battery lasts forever. Highly recommend!"
-        },
-        {
-          id: 2,
-          productId: this.productId,
-          author: "Sarah M.",
-          date: "2025-02-28",
-          rating: 4,
-          title: "Great value for money",
-          content: "Good quality product for the price. Comfortable to wear for long periods. The only downside is that the controls can be a bit finnicky."
-        },
-        {
-          id: 3,
-          productId: this.productId,
-          author: "Michael T.",
-          date: "2025-02-10",
-          rating: 5,
-          title: "Perfect!",
-          content: "Exactly what I was looking for. Fast delivery and the product exceeds my expectations."
-        },
-        {
-          id: 4,
-          productId: this.productId,
-          author: "Emma L.",
-          date: "2025-01-22",
-          rating: 3,
-          title: "Good but could be better",
-          content: "The product itself is good quality but I expected more features for the price. Customer service was helpful when I had questions."
-        },
-        {
-          id: 5,
-          productId: this.productId,
-          author: "Robert K.",
-          date: "2025-01-05",
-          rating: 4,
-          title: "Solid purchase",
-          content: "Very happy with this product. It's durable and performs well. I would buy from this brand again."
-        }
-      ];
-      
-      this.reviews = allReviews.slice(0, this.reviewsPerPage);
-      this.hasMoreReviews = allReviews.length > this.reviewsPerPage;
-      
-      // Build the ratings distribution (for mock data)
-      this.product.ratingCounts = {
-        5: 45,
-        4: 38,
-        3: 20,
-        2: 12,
-        1: 9
-      };
+      // Fetch product data from JSON file
+      fetch('./data/products.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Find the product with matching ID
+          const product = data.find(p => p.id === this.productId);
+          
+          if (product) {
+            // Enhance product with additional details needed for display
+            this.product = {
+              ...product,
+              originalPrice: product.price * 1.2, // Simulate original price
+              onSale: Math.random() > 0.5, // Randomly set sale status
+              reviewCount: Math.floor(Math.random() * 200) + 10, // Simulate review count
+              // Add additional fields that might not be in the JSON
+              additionalImages: [
+                product.image, // Use main image as first additional image
+                `https://via.placeholder.com/500x500?text=${product.name}+Side`,
+                `https://via.placeholder.com/500x500?text=${product.name}+Back`
+              ],
+              categoryId: 1, // Default category ID
+              sku: `SKU-${product.id.toString().padStart(4, '0')}`,
+              availability: product.inStock || false,
+              // Add more detailed product information
+              details: {
+                "Brand": "TechBrand",
+                "Model": `Model-${product.id}`,
+                "Color": "Black/Silver",
+                "Weight": `${Math.floor(Math.random() * 500) + 100}g`,
+                "Dimensions": `${Math.floor(Math.random() * 10) + 10} x ${Math.floor(Math.random() * 5) + 5} x ${Math.floor(Math.random() * 2) + 1} cm`
+              },
+              options: {
+                "Color": ["Black", "Silver", "White"],
+                "Size": ["Standard", "Large"]
+              },
+              maxQuantity: Math.floor(Math.random() * 10) + 1
+            };
+            
+            // Apply actual sale discount for products on sale
+            if (this.product.onSale) {
+              this.product.originalPrice = this.product.price;
+              this.product.price = parseFloat((this.product.price * 0.85).toFixed(2)); // 15% discount
+            }
+            
+            // After product is set, fetch reviews and related products
+            this.fetchReviews();
+            this.fetchRelatedProducts();
+            this.checkWishlist();
+          } else {
+            this.error = "Product not found. It may have been removed or is no longer available.";
+          }
+          
+          this.loading = false;
+        })
+        .catch(error => {
+          console.error('Error fetching product data:', error);
+          this.error = "Failed to load product data. Please try again later.";
+          this.loading = false;
+        });
     },
     
     fetchRelatedProducts() {
-      // Mock related products
-      this.relatedProducts = [
-        {
-          id: 3,
-          name: "Wireless Earbuds",
-          price: 79.99,
-          originalPrice: 99.99,
-          onSale: true,
-          image: "https://via.placeholder.com/200x200?text=Earbuds"
-        },
-        {
-          id: 4,
-          name: "Bluetooth Speaker",
-          price: 49.99,
-          originalPrice: 49.99,
-          onSale: false,
-          image: "https://via.placeholder.com/200x200?text=Speaker"
-        },
-        {
-          id: 5,
-          name: "Noise Cancelling Earphones",
-          price: 149.99,
-          originalPrice: 179.99,
-          onSale: true,
-          image: "https://via.placeholder.com/200x200?text=Earphones"
-        },
-        {
-          id: 6,
-          name: "Audio Adapter",
-          price: 19.99,
-          originalPrice: 19.99,
-          onSale: false,
-          image: "https://via.placeholder.com/200x200?text=Adapter"
+      // Fetch related products from the same JSON file
+      fetch('./data/products.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Find products in the same category
+          const relatedProducts = data
+            .filter(p => p.id !== this.productId && p.category === this.product.category)
+            .slice(0, 4); // Limit to 4 related products
+            
+          // If not enough products in the same category, add some random ones
+          if (relatedProducts.length < 4) {
+            const randomProducts = data
+              .filter(p => p.id !== this.productId && !relatedProducts.find(rp => rp.id === p.id))
+              .slice(0, 4 - relatedProducts.length);
+              
+            relatedProducts.push(...randomProducts);
+          }
+          
+          // Add sales information to related products
+          this.relatedProducts = relatedProducts.map(p => ({
+            ...p,
+            originalPrice: Math.random() > 0.5 ? p.price * 1.2 : p.price,
+            onSale: Math.random() > 0.5
+          })).map(p => {
+            // Apply actual sale discount for products on sale
+            if (p.onSale) {
+              p.originalPrice = p.price;
+              p.price = parseFloat((p.price * 0.85).toFixed(2));
+            }
+            return p;
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching related products:', error);
+        });
+    },
+    
+    fetchReviews() {
+      // Fetch reviews from the reviews.json file
+      fetch('./data/reviews.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(allReviews => {
+          // Filter reviews for the current product
+          const productReviews = allReviews.filter(review => review.productId === this.productId);
+          
+          // Display the first page of reviews
+          this.reviews = productReviews.slice(0, this.reviewsPerPage);
+          this.hasMoreReviews = productReviews.length > this.reviewsPerPage;
+          
+          // Store all reviews for this product for pagination
+          this.allProductReviews = productReviews;
+          
+          // Build the ratings distribution
+          this.buildRatingsDistribution(productReviews);
+        })
+        .catch(error => {
+          console.error('Error fetching reviews:', error);
+        });
+    },
+    
+    buildRatingsDistribution(reviews) {
+      // Initialize rating counts
+      const ratingCounts = {
+        5: 0,
+        4: 0,
+        3: 0,
+        2: 0,
+        1: 0
+      };
+      
+      // Count reviews for each rating
+      reviews.forEach(review => {
+        if (ratingCounts[review.rating] !== undefined) {
+          ratingCounts[review.rating]++;
         }
-      ];
+      });
+      
+      // Set rating counts
+      this.product.ratingCounts = ratingCounts;
     },
     
     selectImage(image) {
@@ -580,81 +546,14 @@ const ProductPage = {
     },
     
     loadMoreReviews() {
-      // Simulating loading more reviews
-      const allReviews = [
-        {
-          id: 1,
-          productId: this.productId,
-          author: "John D.",
-          date: "2025-03-15",
-          rating: 5,
-          title: "Excellent product!",
-          content: "I've been using this product for a month now and I'm very impressed with the quality. The sound is crystal clear and the battery lasts forever. Highly recommend!"
-        },
-        {
-          id: 2,
-          productId: this.productId,
-          author: "Sarah M.",
-          date: "2025-02-28",
-          rating: 4,
-          title: "Great value for money",
-          content: "Good quality product for the price. Comfortable to wear for long periods. The only downside is that the controls can be a bit finnicky."
-        },
-        {
-          id: 3,
-          productId: this.productId,
-          author: "Michael T.",
-          date: "2025-02-10",
-          rating: 5,
-          title: "Perfect!",
-          content: "Exactly what I was looking for. Fast delivery and the product exceeds my expectations."
-        },
-        {
-          id: 4,
-          productId: this.productId,
-          author: "Emma L.",
-          date: "2025-01-22",
-          rating: 3,
-          title: "Good but could be better",
-          content: "The product itself is good quality but I expected more features for the price. Customer service was helpful when I had questions."
-        },
-        {
-          id: 5,
-          productId: this.productId,
-          author: "Robert K.",
-          date: "2025-01-05",
-          rating: 4,
-          title: "Solid purchase",
-          content: "Very happy with this product. It's durable and performs well. I would buy from this brand again."
-        },
-        {
-          id: 6,
-          productId: this.productId,
-          author: "Lisa J.",
-          date: "2024-12-18",
-          rating: 2,
-          title: "Disappointed",
-          content: "Not as described. The quality doesn't match what I expected based on the description and price."
-        },
-        {
-          id: 7,
-          productId: this.productId,
-          author: "David H.",
-          date: "2024-12-05",
-          rating: 5,
-          title: "Excellent purchase",
-          content: "One of the best purchases I've made. Works flawlessly and great customer service when I had a question about setup."
-        }
-      ];
-      
-      this.reviewPage++;
-      const newReviews = allReviews.slice(
-        (this.reviewPage - 1) * this.reviewsPerPage,
-        this.reviewPage * this.reviewsPerPage
+      // Load next page of reviews from the stored allProductReviews array
+      const newReviews = this.allProductReviews.slice(
+        this.reviews.length,
+        this.reviews.length + this.reviewsPerPage
       );
       
       this.reviews = [...this.reviews, ...newReviews];
-      this.hasMoreReviews = this.reviews.length < allReviews.length;
+      this.hasMoreReviews = this.reviews.length < this.allProductReviews.length;
     },
     
     getRatingPercentage(star) {

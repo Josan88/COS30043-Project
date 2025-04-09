@@ -32,16 +32,26 @@ const LoginPage = {
                   
                   <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <input 
-                      type="password" 
-                      id="password" 
-                      v-model="password" 
-                      class="form-control"
-                      :class="{ 'is-invalid': submitted && passwordError }"
-                      required
-                      aria-required="true"
-                      autocomplete="current-password"
-                    >
+                    <div class="input-group">
+                      <input 
+                        :type="showPassword ? 'text' : 'password'" 
+                        id="password" 
+                        v-model="password" 
+                        class="form-control"
+                        :class="{ 'is-invalid': submitted && passwordError }"
+                        required
+                        aria-required="true"
+                        autocomplete="current-password"
+                      >
+                      <button 
+                        type="button" 
+                        class="btn btn-outline-secondary password-toggle" 
+                        @click="togglePassword"
+                        :aria-label="showPassword ? 'Hide password' : 'Show password'"
+                      >
+                        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                      </button>
+                    </div>
                     <div v-if="submitted && passwordError" class="invalid-feedback" role="alert">
                       {{ passwordError }}
                     </div>
@@ -94,7 +104,8 @@ const LoginPage = {
       rememberMe: false,
       submitted: false,
       isLoading: false,
-      errorMessage: ''
+      errorMessage: '',
+      showPassword: false
     };
   },
   
@@ -123,6 +134,10 @@ const LoginPage = {
   },
   
   methods: {
+    togglePassword() {
+      this.showPassword = !this.showPassword;
+    },
+    
     login() {
       this.submitted = true;
       this.errorMessage = '';

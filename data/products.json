@@ -1,0 +1,81 @@
+[
+    {
+        "id": 1,
+        "name": "Smartphone X",
+        "price": 899.99,
+        "description": "The latest smartphone with an amazing camera and long battery life.",
+        "image": "https://media.ldlc.com/r374/ld/products/00/04/65/16/LD0004651600_2.jpg",
+        "category": "electronics",
+        "rating": 4.5,
+        "inStock": true
+    },
+    {
+        "id": 2,
+        "name": "Laptop Pro",
+        "price": 1299.99,
+        "description": "Powerful laptop for professionals and gamers with high-end specs.",
+        "image": "https://via.placeholder.com/300x300?text=Laptop",
+        "category": "electronics",
+        "rating": 4.8,
+        "inStock": true
+    },
+    {
+        "id": 3,
+        "name": "Wireless Headphones",
+        "price": 159.99,
+        "description": "Noise-canceling headphones with crystal clear sound quality.",
+        "image": "https://via.placeholder.com/300x300?text=Headphones",
+        "category": "electronics",
+        "rating": 4.3,
+        "inStock": true
+    },
+    {
+        "id": 4,
+        "name": "Smart Watch",
+        "price": 249.99,
+        "description": "Track your fitness and stay connected with this elegant smartwatch.",
+        "image": "https://via.placeholder.com/300x300?text=SmartWatch",
+        "category": "wearables",
+        "rating": 4.0,
+        "inStock": true
+    },
+    {
+        "id": 5,
+        "name": "Wireless Earbuds",
+        "price": 129.99,
+        "description": "True wireless earbuds with amazing sound quality and long battery life.",
+        "image": "https://via.placeholder.com/300x300?text=Earbuds",
+        "category": "electronics",
+        "rating": 4.7,
+        "inStock": true
+    },
+    {
+        "id": 6,
+        "name": "Gaming Console",
+        "price": 499.99,
+        "description": "Next-generation gaming console for the ultimate gaming experience.",
+        "image": "https://via.placeholder.com/300x300?text=GamingConsole",
+        "category": "gaming",
+        "rating": 4.9,
+        "inStock": false
+    },
+    {
+        "id": 7,
+        "name": "Fitness Tracker",
+        "price": 89.99,
+        "description": "Track your steps, heart rate, and more with this sleek fitness band.",
+        "image": "https://via.placeholder.com/300x300?text=FitnessTracker",
+        "category": "wearables",
+        "rating": 4.2,
+        "inStock": true
+    },
+    {
+        "id": 8,
+        "name": "Tablet Ultra",
+        "price": 649.99,
+        "description": "High-resolution tablet perfect for work and entertainment.",
+        "category": "electronics",
+        "rating": 4.6,
+        "inStock": true
+    }
+]
