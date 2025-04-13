@@ -1,0 +1,243 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "MacBook Pro 16-inch",
+      "price": 2399.99,
+      "discount": 10,
+      "category": "laptops",
+      "image": "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Apple M2 Pro chip, 16GB unified memory, 512GB SSD storage. The most powerful MacBook Pro ever.",
+      "rating": 5,
+      "reviewCount": 128,
+      "features": [
+        "16-inch Retina display with True Tone",
+        "Apple M2 Pro chip",
+        "16GB unified memory",
+        "512GB SSD storage",
+        "Up to 22 hours of battery life",
+        "Three Thunderbolt 4 ports, HDMI port, SDXC card slot"
+      ],
+      "stock": 25
+    },
+    {
+      "id": 2,
+      "name": "iPhone 15 Pro",
+      "price": 999.99,
+      "discount": 0,
+      "category": "smartphones",
+      "image": "https://images.unsplash.com/photo-1591337676887-a217a6970a8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "A17 Pro chip. Titanium design. 48MP camera. Action button. Dynamic Island. The most Pro iPhone ever.",
+      "rating": 4.9,
+      "reviewCount": 243,
+      "features": [
+        "6.1-inch Super Retina XDR display",
+        "A17 Pro chip for unprecedented performance",
+        "Pro camera system with 48MP main camera",
+        "Up to 29 hours of battery life",
+        "Ceramic Shield front, titanium design"
+      ],
+      "stock": 42
+    },
+    {
+      "id": 3,
+      "name": "Samsung Galaxy S24 Ultra",
+      "price": 1199.99,
+      "discount": 15,
+      "category": "smartphones",
+      "image": "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Snapdragon 8 Gen 3 processor. 200MP camera. S Pen included. The ultimate Galaxy experience with AI features.",
+      "rating": 4.8,
+      "reviewCount": 187,
+      "features": [
+        "6.8-inch Dynamic AMOLED 2X display",
+        "Snapdragon 8 Gen 3 processor",
+        "200MP main camera with 100x Space Zoom",
+        "12GB RAM, up to 1TB storage",
+        "5000mAh battery with fast charging",
+        "S Pen included"
+      ],
+      "stock": 38
+    },
+    {
+      "id": 4,
+      "name": "Dell XPS 15",
+      "price": 1799.99,
+      "discount": 5,
+      "category": "laptops",
+      "image": "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Intel Core i9, 32GB RAM, 1TB SSD, NVIDIA GeForce RTX 4070. Powerful performance meets stunning design.",
+      "rating": 4.7,
+      "reviewCount": 95,
+      "features": [
+        "15.6-inch 4K UHD+ (3840 x 2400) InfinityEdge touch display",
+        "12th Gen Intel Core i9 processor",
+        "32GB DDR5 RAM",
+        "1TB M.2 PCIe NVMe SSD",
+        "NVIDIA GeForce RTX 4070 8GB GDDR6",
+        "Backlit keyboard, fingerprint reader"
+      ],
+      "stock": 17
+    },
+    {
+      "id": 5,
+      "name": "Sony WH-1000XM5",
+      "price": 349.99,
+      "discount": 20,
+      "category": "audio",
+      "image": "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Industry-leading noise cancellation. Crystal clear calls. Up to 30-hour battery life. The new standard for premium wireless headphones.",
+      "rating": 4.9,
+      "reviewCount": 162,
+      "features": [
+        "Industry-leading noise cancellation with two processors",
+        "Magnificent sound, engineered to perfection",
+        "Crystal clear hands-free calling with 4 beamforming microphones",
+        "Up to 30-hour battery life with quick charging",
+        "Lightweight, comfortable design optimized for all-day wearing",
+        "Multipoint connection allows pairing with two Bluetooth devices"
+      ],
+      "stock": 45
+    },
+    {
+      "id": 6,
+      "name": "Apple Watch Series 9",
+      "price": 399.99,
+      "discount": 0,
+      "category": "wearables",
+      "image": "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "The most powerful Apple Watch yet. New S9 chip, brighter display, and faster charging. Stay connected, track your health, and more.",
+      "rating": 4.7,
+      "reviewCount": 118,
+      "features": [
+        "GPS + Cellular connectivity",
+        "Always-On Retina display that's bright and clear",
+        "Advanced health sensors for ECG, Blood Oxygen, and temperature",
+        "Crash Detection and Fall Detection",
+        "Water resistant to 50 meters",
+        "Up to 18 hours of battery life"
+      ],
+      "stock": 29
+    },
+    {
+      "id": 7,
+      "name": "Samsung 49-inch Odyssey G9 Gaming Monitor",
+      "price": 1299.99,
+      "discount": 25,
+      "category": "accessories",
+      "image": "https://images.unsplash.com/photo-1616370173834-fd2932c65192?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Dual QHD, 1000R curved display with 240Hz refresh rate and 1ms response time. The ultimate gaming experience.",
+      "rating": 4.8,
+      "reviewCount": 73,
+      "features": [
+        "49-inch QLED display with Dual QHD resolution (5120 x 1440)",
+        "1000R curvature for immersive gaming",
+        "240Hz refresh rate, 1ms response time",
+        "NVIDIA G-SYNC and AMD FreeSync Premium Pro",
+        "HDR1000 with 1000 nits peak brightness",
+        "Picture-by-Picture allows simultaneous multiple input sources"
+      ],
+      "stock": 12
+    },
+    {
+      "id": 8,
+      "name": "Google Pixel 8 Pro",
+      "price": 899.99,
+      "discount": 10,
+      "category": "smartphones",
+      "image": "https://images.unsplash.com/photo-1598327105854-c8674faddf79?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Google Tensor G3 chip, 50MP camera, and advanced AI features. Experience Android at its purest and most powerful.",
+      "rating": 4.6,
+      "reviewCount": 89,
+      "features": [
+        "6.7-inch Smooth Display with up to 120Hz refresh rate",
+        "Google Tensor G3 chip with Titan M2 security",
+        "50MP main camera with enhanced Night Sight",
+        "12GB RAM, up to 512GB storage",
+        "24-hour battery life with Extreme Battery Saver",
+        "7 years of OS and security updates"
+      ],
+      "stock": 31
+    },
+    {
+      "id": 9,
+      "name": "AirPods Pro (2nd generation)",
+      "price": 249.99,
+      "discount": 15,
+      "category": "audio",
+      "image": "https://images.unsplash.com/photo-1606741965292-8306bf5c494c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Active Noise Cancellation, Transparency mode, Personalized Spatial Audio, and all-day battery life. Magic reimagined.",
+      "rating": 4.8,
+      "reviewCount": 156,
+      "features": [
+        "Active Noise Cancellation blocks outside noise",
+        "Transparency mode to hear the world around you",
+        "Personalized Spatial Audio with dynamic head tracking",
+        "Up to 6 hours of listening time with ANC enabled",
+        "Touch control with new swipe gestures",
+        "Sweat and water resistant (IPX4)"
+      ],
+      "stock": 55
+    },
+    {
+      "id": 10,
+      "name": "Logitech MX Master 3S Mouse",
+      "price": 99.99,
+      "discount": 0,
+      "category": "accessories",
+      "image": "https://images.unsplash.com/photo-1585770536735-27993a080586?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "8K DPI tracking, quiet clicks, and MagSpeed electromagnetic scrolling. Designed for ultimate performance and precision.",
+      "rating": 4.9,
+      "reviewCount": 107,
+      "features": [
+        "8K DPI optical sensor for precise tracking on any surface, including glass",
+        "Quiet clicks with same satisfying feel, 90% less click noise",
+        "MagSpeed electromagnetic scrolling - precise enough to stop on a pixel",
+        "Ergonomic design with thumb wheel and programmable buttons",
+        "Connect up to 3 devices and switch between them",
+        "USB-C quick charging (3 hours from 1-minute charge)"
+      ],
+      "stock": 68
+    },
+    {
+      "id": 11,
+      "name": "ASUS ROG Zephyrus G14 Gaming Laptop",
+      "price": 1499.99,
+      "discount": 15,
+      "category": "laptops",
+      "image": "https://images.unsplash.com/photo-1603302576837-37561b2e2302?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "AMD Ryzen 9, NVIDIA GeForce RTX 4060, 16GB RAM, 1TB SSD. Portable gaming powerhouse with AniMe Matrix display.",
+      "rating": 4.7,
+      "reviewCount": 83,
+      "features": [
+        "14-inch QHD 165Hz display",
+        "AMD Ryzen 9 7940HS processor",
+        "NVIDIA GeForce RTX 4060 8GB GDDR6",
+        "16GB DDR5 RAM, 1TB PCIe NVMe SSD",
+        "AniMe Matrix LED display on lid",
+        "Up to 10 hours battery life"
+      ],
+      "stock": 19
+    },
+    {
+      "id": 12,
+      "name": "Samsung Galaxy Watch 6",
+      "price": 299.99,
+      "discount": 10,
+      "category": "wearables",
+      "image": "https://images.unsplash.com/photo-1579586337278-3befd40fd17a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      "description": "Advanced fitness tracking, health monitoring, and smartphone notifications. The smartwatch that helps you practice wellness.",
+      "rating": 4.6,
+      "reviewCount": 65,
+      "features": [
+        "Exynos W930 processor for fast performance",
+        "Bioactive sensor for Body Composition, ECG, and Heart Rate",
+        "Advanced sleep coaching with Sleep Score",
+        "Auto workout detection for over 90 exercise types",
+        "IP68 water and dust resistance",
+        "Up to 40 hours battery life"
+      ],
+      "stock": 42
+    }
+  ]
+}
