@@ -4,6 +4,11 @@
 
 // Wait for DOM to be loaded before initializing the app
 document.addEventListener('DOMContentLoaded', () => {
+  // Initialize database
+  ShopEaseDB.init()
+    .then(() => console.log('Database ready'))
+    .catch(err => console.error('Database initialization error:', err));
+
   // Declare productData variable at a scope accessible to the Vue app
   let productData = [];
 
@@ -83,19 +88,20 @@ document.addEventListener('DOMContentLoaded', () => {
       // Authentication methods
       login(email, password) {
         return new Promise((resolve, reject) => {
-          // Simple mock authentication for demo purposes
-          if (email === 'demo@example.com' && password === 'password') {
-            Store.mutations.login({
-              name: 'Demo User',
-              email: email,
-              avatar: 'https://via.placeholder.com/64x64'
+          console.log('Login attempt with email:', email);
+          // Use database authentication
+          ShopEaseDB.users.authenticate(email, password)
+            .then(user => {
+              console.log('Login successful, updating store with user:', user.name);
+              Store.mutations.login(user);
+              this.showNotification('Login successful', 'success');
+              resolve();
+            })
+            .catch(error => {
+              console.error('Login failed:', error);
+              this.showNotification('Invalid credentials', 'error');
+              reject('Invalid email or password');
             });
-            this.showNotification('Login successful', 'success');
-            resolve();
-          } else {
-            this.showNotification('Invalid credentials', 'error');
-            reject('Invalid email or password');
-          }
         });
       },
 
@@ -106,14 +112,26 @@ document.addEventListener('DOMContentLoaded', () => {
       },
 
       register(name, email, password) {
-        // Simple mock registration
-        Store.mutations.login({
-          name: name,
-          email: email,
-          avatar: 'https://via.placeholder.com/64x64'
+        return new Promise((resolve, reject) => {
+          const userData = {
+            name,
+            email,
+            password,
+            avatar: 'https://via.placeholder.com/64x64',
+          };
+
+          ShopEaseDB.users.add(userData)
+            .then(newUser => {
+              // Login the user after successful registration
+              Store.mutations.login(newUser);
+              this.showNotification('Registration successful', 'success');
+              resolve(newUser);
+            })
+            .catch(error => {
+              this.showNotification(error, 'error');
+              reject(error);
+            });
         });
-        this.showNotification('Registration successful', 'success');
-        return true;
       },
 
       // Purchase methods
@@ -172,27 +190,27 @@ document.addEventListener('DOMContentLoaded', () => {
       function loadImage() {
         // Set a placeholder or loading image initially
         const originalSrc = binding.value;
-        
+
         // Create new Image object to load the image
         const img = new Image();
-        
+
         // When image successfully loads, update the element's src
-        img.onload = function() {
+        img.onload = function () {
           el.src = originalSrc;
           el.classList.add('loaded');
         };
-        
+
         // Handle image loading errors
-        img.onerror = function() {
+        img.onerror = function () {
           // Set a fallback image on error
           el.src = 'https://via.placeholder.com/300x300?text=Image+Not+Found';
           console.error(`Failed to load image: ${originalSrc}`);
         };
-        
+
         // Start loading the image
         img.src = originalSrc;
       }
-      
+
       // Use Intersection Observer API if available to load images only when they come into view
       if ('IntersectionObserver' in window) {
         const observer = new IntersectionObserver((entries) => {
@@ -203,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           });
         });
-        
+
         observer.observe(el);
       } else {
         // Fallback for browsers that don't support Intersection Observer
@@ -235,6 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Use router
   app.use(router);
-  
+
   app.mount('#app');
 });

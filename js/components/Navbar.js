@@ -18,13 +18,16 @@ const Navbar = {
             <li class="nav-item">
               <router-link class="nav-link" to="/products">Products</router-link>
             </li>
+            <li class="nav-item" v-if="isAuthenticated">
+              <router-link class="nav-link" to="/account">My Account</router-link>
+            </li>
           </ul>
           
           <div class="navbar-nav ms-auto">
-            <div class="nav-item dropdown" v-if="$root.isAuthenticated">
+            <div class="nav-item dropdown" v-if="isAuthenticated">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                 data-bs-toggle="dropdown" aria-expanded="false">
-                {{ $root.store.user ? $root.store.user.name : 'Account' }}
+                {{ user ? user.name : 'Account' }}
               </a>
               <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li>
@@ -63,10 +66,17 @@ const Navbar = {
   `,
   
   computed: {
+    isAuthenticated() {
+      console.log('Navbar: Checking authentication state:', Store.state.isAuthenticated);
+      return Store.state.isAuthenticated;
+    },
+    
+    user() {
+      return Store.state.user;
+    },
+    
     cartCount() {
-      return this.$root.store && this.$root.store.cart 
-        ? this.$root.store.cart.reduce((total, item) => total + item.quantity, 0)
-        : 0;
+      return Store.state.cart ? Store.state.cart.reduce((total, item) => total + item.quantity, 0) : 0;
     }
   },
 

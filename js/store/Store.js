@@ -75,13 +75,17 @@ const Store = {
     },
     
     login(userData) {
+      console.log('Store: login mutation called with user:', userData.name);
       Store.state.isAuthenticated = true;
       Store.state.user = userData;
+      console.log('Authentication state updated:', Store.state.isAuthenticated);
     },
     
     logout() {
+      console.log('Store: logout mutation called');
       Store.state.isAuthenticated = false;
       Store.state.user = null;
+      console.log('Authentication state updated:', Store.state.isAuthenticated);
     },
     
     addNotification(message) {
