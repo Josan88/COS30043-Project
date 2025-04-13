@@ -3,7 +3,7 @@
 
 // Initialize IndexedDB for client-side storage
 const DB_NAME = 'shopease_db';
-const DB_VERSION = 2; // Increased version to force schema update
+const DB_VERSION = 1;
 
 // Database object that will be exported
 const Database = {
@@ -39,7 +39,6 @@ const Database = {
         
         // Check if we need to create a default test user
         this.createDefaultUserIfNeeded().then(() => {
-          console.log('Default user check completed');
           resolve(this.db);
         }).catch(error => {
           console.error('Error creating default user:', error);
@@ -57,15 +56,13 @@ const Database = {
   // Create a default test user if no users exist
   async createDefaultUserIfNeeded() {
     try {
-      console.log('Checking if we need to create a default user...');
       // Check if users table is empty
-      const transaction = this.db.transaction(['users'], 'readwrite'); // Changed to readwrite to allow adding user
+      const transaction = this.db.transaction(['users'], 'readonly');
       const store = transaction.objectStore('users');
       const countRequest = store.count();
       
       return new Promise((resolve, reject) => {
         countRequest.onsuccess = () => {
-          console.log('Current user count:', countRequest.result);
           if (countRequest.result === 0) {
             console.log('No users found, creating default test user');
             
@@ -77,26 +74,16 @@ const Database = {
               avatar: 'https://via.placeholder.com/64x64'
             };
             
-            // Add the user directly to avoid circular dependency
-            const hashedPassword = this.users.hashPassword(defaultUser.password);
-            const secureUser = {
-              ...defaultUser,
-              password: hashedPassword,
-              createdAt: new Date().toISOString()
-            };
-            
-            const addRequest = store.add(secureUser);
-            
-            addRequest.onsuccess = () => {
-              console.log('Default test user created successfully with email:', defaultUser.email);
-              const { password, ...userWithoutPassword } = secureUser;
-              resolve(userWithoutPassword);
-            };
-            
-            addRequest.onerror = (event) => {
-              console.error('Failed to create default user:', event.target.error);
-              reject(event.target.error);
-            };
+            // Use the add method to create the user
+            this.users.add(defaultUser)
+              .then(result => {
+                console.log('Default test user created successfully');
+                resolve(result);
+              })
+              .catch(error => {
+                console.error('Failed to create default user:', error);
+                reject(error);
+              });
           } else {
             console.log('Users already exist, skipping default user creation');
             resolve();
@@ -144,7 +131,7 @@ const Database = {
         const request = store.add(secureUser);
         
         request.onsuccess = () => {
-          console.log('User added successfully:', userData.email);
+          console.log('User added successfully');
           // Return user data without the password
           const { password, ...userWithoutPassword } = secureUser;
           resolve(userWithoutPassword);
@@ -172,12 +159,10 @@ const Database = {
         
         request.onsuccess = () => {
           if (request.result) {
-            console.log('User found:', email);
             // Return user without password
             const { password, ...userWithoutPassword } = request.result;
             resolve(userWithoutPassword);
           } else {
-            console.log('User not found:', email);
             resolve(null);
           }
         };
@@ -194,26 +179,16 @@ const Database = {
       await Database.init();
       
       return new Promise((resolve, reject) => {
-        console.log('Attempting to authenticate user:', email);
         const transaction = Database.db.transaction(['users'], 'readonly');
         const store = transaction.objectStore('users');
         const request = store.get(email);
         
         request.onsuccess = () => {
           const user = request.result;
-          console.log('Authentication result:', user ? 'User found' : 'User not found');
-          
-          if (user) {
-            const isPasswordValid = this.verifyPassword(password, user.password);
-            console.log('Password verification:', isPasswordValid ? 'Success' : 'Failed');
-            
-            if (isPasswordValid) {
-              // Return user without password
-              const { password, ...userWithoutPassword } = user;
-              resolve(userWithoutPassword);
-            } else {
-              reject('Invalid email or password');
-            }
+          if (user && this.verifyPassword(password, user.password)) {
+            // Return user without password
+            const { password, ...userWithoutPassword } = user;
+            resolve(userWithoutPassword);
           } else {
             reject('Invalid email or password');
           }
@@ -243,10 +218,3 @@ const Database = {
 
 // Add a global reference
 window.ShopEaseDB = Database;
-
-// Initialize the database immediately when this file loads
-Database.init().then(() => {
-  console.log('Database initialized on page load');
-}).catch(err => {
-  console.error('Failed to initialize database on page load:', err);
-});

@@ -88,17 +88,14 @@ document.addEventListener('DOMContentLoaded', () => {
       // Authentication methods
       login(email, password) {
         return new Promise((resolve, reject) => {
-          console.log('Login attempt with email:', email);
           // Use database authentication
           ShopEaseDB.users.authenticate(email, password)
             .then(user => {
-              console.log('Login successful, updating store with user:', user.name);
               Store.mutations.login(user);
               this.showNotification('Login successful', 'success');
               resolve();
             })
             .catch(error => {
-              console.error('Login failed:', error);
               this.showNotification('Invalid credentials', 'error');
               reject('Invalid email or password');
             });
