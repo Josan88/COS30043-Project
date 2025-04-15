@@ -21,11 +21,11 @@ window.app.component('app-footer', {
           <div class="col-6 col-md-2 mb-3">
             <h5>Shop</h5>
             <ul class="nav flex-column">
-              <li class="nav-item mb-2"><router-link to="/products?category=laptops" class="nav-link p-0 text-white">Laptops</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=smartphones" class="nav-link p-0 text-white">Smartphones</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/products?category=pc" class="nav-link p-0 text-white">PCs</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/products?category=phones" class="nav-link p-0 text-white">Phones</router-link></li>
               <li class="nav-item mb-2"><router-link to="/products?category=accessories" class="nav-link p-0 text-white">Accessories</router-link></li>
               <li class="nav-item mb-2"><router-link to="/products?category=audio" class="nav-link p-0 text-white">Audio</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=wearables" class="nav-link p-0 text-white">Wearables</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/products?category=watches" class="nav-link p-0 text-white">Watches</router-link></li>
             </ul>
           </div>
 

@@ -103,42 +103,42 @@ const PurchasesPage = {
                         <img :src="item.image" :alt="item.name" width="50" class="img-thumbnail">
                       </td>
                       <td>{{ item.name }}</td>
-                      <td>{{ item.price | currency }}</td>
+                      <td>{{ $filters.currency(item.price) }}</td>
                       <td class="text-center">{{ item.quantity }}</td>
-                      <td>{{ (item.price * item.quantity) | currency }}</td>
+                      <td>{{ $filters.currency(item.price * item.quantity) }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                      <td>{{ order.totals.subtotal | currency }}</td>
+                      <td>{{ $filters.currency(order.totals.subtotal) }}</td>
                     </tr>
                     <tr v-if="order.bulkDiscount">
                       <td colspan="4" class="text-end text-success"><strong>Bulk Discount:</strong></td>
-                      <td class="text-success">-{{ order.bulkDiscount.amount | currency }}</td>
+                      <td class="text-success">-{{ $filters.currency(order.bulkDiscount.amount) }}</td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Shipping:</strong></td>
                       <td>
-                        <span v-if="order.totals.shipping > 0">{{ order.totals.shipping | currency }}</span>
+                        <span v-if="order.totals.shipping > 0">{{ $filters.currency(order.totals.shipping) }}</span>
                         <span v-else class="text-success">FREE</span>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Tax:</strong></td>
-                      <td>{{ order.totals.tax | currency }}</td>
+                      <td>{{ $filters.currency(order.totals.tax) }}</td>
                     </tr>
                     <tr v-if="order.promoCode">
                       <td colspan="4" class="text-end text-success"><strong>Promo ({{ order.promoCode.code }}):</strong></td>
                       <td class="text-success">
                         <span v-if="order.promoCode.type === 'percentage'">-{{ order.promoCode.value }}%</span>
-                        <span v-else-if="order.promoCode.type === 'fixed'">-{{ order.promoCode.value | currency }}</span>
+                        <span v-else-if="order.promoCode.type === 'fixed'">-{{ $filters.currency(order.promoCode.value) }}</span>
                         <span v-else>Free Shipping</span>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                      <td><strong>{{ order.totals.total | currency }}</strong></td>
+                      <td><strong>{{ $filters.currency(order.totals.total) }}</strong></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -195,7 +195,7 @@ const PurchasesPage = {
             <div class="card-footer bg-white d-flex justify-content-between" v-if="!expandedOrders.includes(order.id)">
               <div>
                 <span class="text-muted">{{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }} | Total: </span>
-                <span class="fw-bold">{{ order.totals.total | currency }}</span>
+                <span class="fw-bold">{{ $filters.currency(order.totals.total) }}</span>
               </div>
               <button class="btn btn-sm btn-outline" @click="toggleOrderDetails(order.id)">
                 View Details <i class="fas fa-chevron-down ms-1"></i>
@@ -213,7 +213,7 @@ const PurchasesPage = {
               <h5 class="modal-title">{{ isNewOrder ? 'Add New Purchase' : 'Edit Purchase' }}</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" v-if="editedOrder">
               <form @submit.prevent="saveOrder">
                 <!-- Status -->
                 <div class="mb-3">
@@ -337,6 +337,9 @@ const PurchasesPage = {
                   <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
               </form>
+            </div>
+            <div class="modal-body" v-else>
+              <p>Loading order details...</p>
             </div>
           </div>
         </div>

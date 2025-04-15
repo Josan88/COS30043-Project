@@ -246,15 +246,46 @@ const AccountPage = {
                 
                 <!-- Order History Tab -->
                 <div v-if="activeTab === 'orders'" class="orders-tab">
-                  <div class="text-center py-5">
+                  <div v-if="userOrders.length === 0" class="text-center py-5">
                     <div class="mb-3">
                       <i class="fas fa-shopping-bag fa-3x text-muted"></i>
                     </div>
-                    <h5>No orders yet</h5>
+                    <h5>No purchases yet</h5>
                     <p class="text-muted">You haven't made any purchases yet.</p>
-                    <router-link to="/" class="btn btn-primary mt-2">
+                    <router-link to="/products" class="btn btn-primary mt-2">
                       <i class="fas fa-shopping-cart me-2"></i> Start Shopping
                     </router-link>
+                  </div>
+                  <div v-else>
+                    <div class="list-group">
+                      <div v-for="order in userOrders" :key="order.id" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between align-items-center">
+                          <div>
+                            <h6 class="mb-1">Order #{{ order.id.toString().slice(-8) }}</h6>
+                            <p class="small text-muted mb-0">
+                              {{ new Date(order.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+                            </p>
+                          </div>
+                          <div class="d-flex align-items-center">
+                            <span class="badge me-2" :class="getStatusBadgeClass(order.status)">
+                              {{ order.status }}
+                            </span>
+                            <router-link :to="'/purchases'" class="btn btn-sm btn-outline-primary">
+                              View Details
+                            </router-link>
+                          </div>
+                        </div>
+                        <div class="mt-2">
+                          <span class="text-muted">{{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }} | Total: </span>
+                          <span class="fw-bold">{{ $filters.currency(order.totals.total) }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mt-3 text-center">
+                      <router-link to="/purchases" class="btn btn-primary">
+                        <i class="fas fa-history me-2"></i> View All Purchase History
+                      </router-link>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -295,7 +326,7 @@ const AccountPage = {
       tabs: [
         { id: 'profile', name: 'Profile Information', icon: 'user' },
         { id: 'security', name: 'Security Settings', icon: 'lock' },
-        { id: 'orders', name: 'Order History', icon: 'shopping-bag' }
+        { id: 'orders', name: 'Purchase History', icon: 'shopping-bag' }
       ],
       
       // Profile form
@@ -329,7 +360,10 @@ const AccountPage = {
       showConfirmPassword: false,
       
       // Logout modal
-      showLogoutModal: false
+      showLogoutModal: false,
+
+      // User orders
+      userOrders: []
     };
   },
   computed: {
@@ -359,6 +393,7 @@ const AccountPage = {
   created() {
     // Load user data when component is created
     this.loadUserData();
+    this.loadUserOrders();
   },
   methods: {
     // Load user data from AuthService
@@ -380,6 +415,16 @@ const AccountPage = {
         phone: user.phone || '',
         address: user.address || ''
       };
+    },
+
+    // Load user orders from CartService
+    async loadUserOrders() {
+      try {
+        const orders = await CartService.getUserOrders();
+        this.userOrders = orders || [];
+      } catch (error) {
+        console.error('Failed to load user orders:', error);
+      }
     },
     
     // Validate profile form
@@ -535,6 +580,20 @@ const AccountPage = {
       AuthService.logout();
       this.showLogoutModal = false;
       this.$router.push('/login');
+    },
+
+    // Get badge class for order status
+    getStatusBadgeClass(status) {
+      switch (status) {
+        case 'Pending':
+          return 'bg-warning text-dark';
+        case 'Completed':
+          return 'bg-success';
+        case 'Cancelled':
+          return 'bg-danger';
+        default:
+          return 'bg-secondary';
+      }
     }
   }
 };

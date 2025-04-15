@@ -32,24 +32,5 @@ window.app.directive('focus', {
   }
 });
 
-// Register global filters
-window.app.config.globalProperties.$filters = {
-  // Format price to currency
-  currency(value) {
-    if (typeof value !== 'number') {
-      return value;
-    }
-    return 'RM' + value.toFixed(2);
-  },
-  
-  // Truncate text if it's too long
-  truncate(text, length, suffix) {
-    if (text.length <= length) {
-      return text;
-    }
-    return text.substring(0, length) + (suffix || '...');
-  }
-};
-
 // The router will be used once it's loaded
 // The app is mounted in router.js after the router is fully configured

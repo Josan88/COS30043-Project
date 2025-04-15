@@ -230,21 +230,25 @@ const ProductPage = {
                   <p class="card-text text-muted">{{ $filters.truncate(product.description, 80) }}</p>
                   
                   <div class="mt-auto">
-                    <div v-if="product.discount" class="d-flex align-items-center mb-2">
-                      <span class="text-decoration-line-through text-muted me-2">
-                        {{ $filters.currency(product.price) }}
+                    <!-- Consolidated price display -->
+                    <div class="mb-3">
+                      <span v-if="product.discount > 0">
+                        <span class="text-muted text-decoration-line-through me-2">
+                          {{ $filters.currency(product.price) }}
+                        </span>
+                        <span class="price text-danger fw-bold h4">
+                          {{ $filters.currency(calculateDiscountedPrice(product)) }}
+                        </span>
+                        <span class="badge bg-danger ms-2">{{ product.discount }}% OFF</span>
                       </span>
-                      <span class="price fw-bold">
-                        {{ $filters.currency(calculateDiscountedPrice(product)) }}
+                      <span v-else>
+                        <span class="price fw-bold h4">{{ $filters.currency(product.price) }}</span>
                       </span>
-                    </div>
-                    <div v-else class="mb-2">
-                      <span class="price fw-bold">{{ $filters.currency(product.price) }}</span>
                     </div>
                     
                     <div class="d-grid gap-2">
                       <router-link 
-                        :to="'/products/' + product.id" 
+                        :to="'/product/' + product.id" 
                         class="btn btn-outline-primary"
                       >
                         View Details
@@ -470,11 +474,12 @@ const ProductPage = {
       showAdvancedFilters: false,
       quantity: 1,
       categoryMap: {
-        'laptops': 'Laptops',
-        'smartphones': 'Smartphones',
-        'accessories': 'Accessories',
-        'audio': 'Audio Devices',
-        'wearables': 'Wearables'
+        'pc': 'PCs',
+        'phones': 'Phones',
+        'tablets': 'Tablets',
+        'watches': 'Watches',
+        'audio': 'Audio',
+        'accessories': 'Accessories'
       },
       sortOptions: {
         'default': 'Featured',
@@ -600,6 +605,28 @@ const ProductPage = {
              this.minRating > 0 ||
              this.onlyDiscount ||
              this.onlyInStock;
+    },
+    
+    // Calculate the discounted price for the current product
+    discountedPrice() {
+      if (!this.currentProduct) return 0;
+      if (!this.currentProduct.discount) return this.currentProduct.price.toFixed(2);
+      
+      return (this.currentProduct.price - (this.currentProduct.price * this.currentProduct.discount / 100)).toFixed(2);
+    },
+    
+    // Calculate how much the user saves with the discount
+    savedAmount() {
+      if (!this.currentProduct || !this.currentProduct.discount) return 0;
+      
+      return (this.currentProduct.price * this.currentProduct.discount / 100).toFixed(2);
+    },
+    
+    // Get the category name for breadcrumb navigation
+    categoryName() {
+      if (!this.currentProduct || !this.currentProduct.category) return '';
+      
+      return this.categoryMap[this.currentProduct.category] || this.currentProduct.category;
     }
   },
   watch: {

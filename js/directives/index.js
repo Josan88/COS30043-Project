@@ -31,9 +31,9 @@ window.app.directive('currency', {
       
       // Format as currency
       if (value !== '') {
-        const formatter = new Intl.NumberFormat('en-US', {
+        const formatter = new Intl.NumberFormat('en-MY', {
           style: 'currency',
-          currency: 'USD',
+          currency: 'MYR',
           minimumFractionDigits: 2
         });
         

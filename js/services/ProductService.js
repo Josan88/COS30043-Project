@@ -6,6 +6,16 @@ const ProductService = {
   // Product data storage
   products: [],
   
+  // Category mapping
+  categoryMap: {
+    'pc': 'PCs',
+    'phones': 'Phones',
+    'tablets': 'Tablets',
+    'watches': 'Watches',
+    'audio': 'Audio',
+    'accessories': 'Accessories'
+  },
+  
   // Initialize product data
   init() {
     // Try to load products from the JSON file
@@ -98,6 +108,35 @@ const ProductService = {
     }
     
     return relevantProducts;
+  },
+
+  // Get available categories with product counts
+  getCategories() {
+    const categoryCounts = {};
+    
+    // Initialize all categories with zero count
+    Object.keys(this.categoryMap).forEach(category => {
+      categoryCounts[category] = {
+        id: category,
+        name: this.categoryMap[category],
+        count: 0
+      };
+    });
+    
+    // Count products in each category
+    this.products.forEach(product => {
+      if (product.category && categoryCounts[product.category]) {
+        categoryCounts[product.category].count++;
+      }
+    });
+    
+    // Convert to array and sort by count (descending)
+    return Object.values(categoryCounts).sort((a, b) => b.count - a.count);
+  },
+  
+  // Get category name from category ID
+  getCategoryName(categoryId) {
+    return this.categoryMap[categoryId] || categoryId;
   }
 };
 

@@ -6,9 +6,6 @@ window.app.component('nav-bar', {
   template: `
     <nav class="navbar navbar-expand-md">
       <div class="container">
-        <!-- Accessibility: Skip to main content link -->
-        <a href="#main-content" class="skip-link">Skip to main content</a>
-        
         <router-link to="/" class="navbar-brand">
           <i class="fas fa-laptop"></i> TechWorld
         </router-link>

@@ -8,9 +8,10 @@ function formatCurrency(value) {
   if (typeof value !== 'number') {
     return value;
   }
-  const formatter = new Intl.NumberFormat('en-US', {
+  const formatter = new Intl.NumberFormat('en-MY', {
     style: 'currency',
-    currency: 'MYR'
+    currency: 'MYR',
+    currencyDisplay: 'symbol'
   });
   return formatter.format(value);
 }

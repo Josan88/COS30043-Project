@@ -58,12 +58,12 @@ const ShoppingCart = {
                           <td>
                             <div v-if="item.originalPrice && item.originalPrice !== item.price">
                               <span class="text-decoration-line-through text-muted small">
-                                {{ item.originalPrice | currency }}
+                                {{ $filters.currency(item.originalPrice) }}
                               </span><br>
-                              <span class="text-danger">{{ item.price | currency }}</span>
+                              <span class="text-danger">{{ $filters.currency(item.price) }}</span>
                             </div>
                             <div v-else>
-                              {{ item.price | currency }}
+                              {{ $filters.currency(item.price) }}
                             </div>
                           </td>
                           <td>
@@ -98,7 +98,7 @@ const ShoppingCart = {
                               Only {{ getMaxQuantity(item.id) }} in stock
                             </div>
                           </td>
-                          <td class="fw-bold">{{ getItemTotal(item) | currency }}</td>
+                          <td class="fw-bold">{{ $filters.currency(getItemTotal(item)) }}</td>
                           <td>
                             <button 
                               @click="removeFromCart(item.id)" 
@@ -117,7 +117,7 @@ const ShoppingCart = {
                               <i class="fas fa-tag me-1"></i> Bulk discount applied
                             </span>
                           </td>
-                          <td class="text-danger">-{{ discountAmount | currency }}</td>
+                          <td class="text-danger">-{{ $filters.currency(discountAmount) }}</td>
                           <td></td>
                         </tr>
                       </tfoot>
@@ -141,12 +141,12 @@ const ShoppingCart = {
                             <div>
                               <div v-if="item.originalPrice && item.originalPrice !== item.price">
                                 <span class="text-decoration-line-through text-muted small me-2">
-                                  {{ item.originalPrice | currency }}
+                                  {{ $filters.currency(item.originalPrice) }}
                                 </span>
-                                <span class="text-danger">{{ item.price | currency }}</span>
+                                <span class="text-danger">{{ $filters.currency(item.price) }}</span>
                               </div>
                               <div v-else>
-                                {{ item.price | currency }}
+                                {{ $filters.currency(item.price) }}
                               </div>
                             </div>
                             <button 
@@ -184,7 +184,7 @@ const ShoppingCart = {
                             </div>
                           </div>
                           <div class="mt-2 text-end fw-bold">
-                            Total: {{ getItemTotal(item) | currency }}
+                            Total: {{ $filters.currency(getItemTotal(item)) }}
                           </div>
                         </div>
                       </div>
@@ -194,7 +194,7 @@ const ShoppingCart = {
                         <span class="text-success">
                           <i class="fas fa-tag me-1"></i> Bulk discount applied
                         </span>
-                        <span class="text-danger">-{{ discountAmount | currency }}</span>
+                        <span class="text-danger">-{{ $filters.currency(discountAmount) }}</span>
                       </div>
                     </div>
                   </div>
@@ -234,7 +234,7 @@ const ShoppingCart = {
                         </div>
                         <span>
                           <span v-if="option.price === 0 && cartTotals.subtotal >= 50" class="text-success">FREE</span>
-                          <span v-else>{{ option.price | currency }}</span>
+                          <span v-else>{{ $filters.currency(option.price) }}</span>
                         </span>
                       </label>
                     </div>
@@ -252,43 +252,43 @@ const ShoppingCart = {
                 <div class="card-body">
                   <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal ({{ cartTotals.itemCount }} {{ cartTotals.itemCount === 1 ? 'item' : 'items' }}):</span>
-                    <span>{{ cartTotals.subtotal | currency }}</span>
+                    <span>{{ $filters.currency(cartTotals.subtotal) }}</span>
                   </div>
                   
                   <div v-if="bulkDiscountApplied" class="d-flex justify-content-between mb-2 text-success">
                     <span>Bulk Discount:</span>
-                    <span>-{{ discountAmount | currency }}</span>
+                    <span>-{{ $filters.currency(discountAmount) }}</span>
                   </div>
                   
                   <div class="d-flex justify-content-between mb-2">
                     <span>Shipping:</span>
-                    <span v-if="cartTotals.shipping > 0">{{ cartTotals.shipping | currency }}</span>
+                    <span v-if="cartTotals.shipping > 0">{{ $filters.currency(cartTotals.shipping) }}</span>
                     <span v-else class="text-success">FREE</span>
                   </div>
                   
                   <div class="d-flex justify-content-between mb-2">
                     <span>Tax ({{ taxRate * 100 }}%):</span>
-                    <span>{{ cartTotals.tax | currency }}</span>
+                    <span>{{ $filters.currency(cartTotals.tax) }}</span>
                   </div>
                   
                   <div v-if="promoCodeApplied" class="d-flex justify-content-between mb-2 text-success">
                     <span>Promo Code ({{ activePromoCode.code }}):</span>
-                    <span>-{{ promoDiscount | currency }}</span>
+                    <span>-{{ $filters.currency(promoDiscount) }}</span>
                   </div>
                   
                   <hr>
                   <div class="d-flex justify-content-between mb-3">
                     <strong>Total:</strong>
-                    <strong class="text-primary h4">{{ cartTotals.total | currency }}</strong>
+                    <strong class="text-primary h4">{{ $filters.currency(cartTotals.total) }}</strong>
                   </div>
                   
                   <!-- Savings Summary -->
                   <div v-if="totalSavings > 0" class="alert alert-success small mb-3">
-                    <div class="fw-bold">Your Savings: {{ totalSavings | currency }}</div>
+                    <div class="fw-bold">Your Savings: {{ $filters.currency(totalSavings) }}</div>
                     <ul class="mb-0 ps-3">
-                      <li v-if="bulkDiscountApplied">Bulk discount: {{ discountAmount | currency }}</li>
-                      <li v-if="cartTotals.shipping === 0 && getSelectedShipping().standardPrice > 0">Free shipping: {{ getSelectedShipping().standardPrice | currency }}</li>
-                      <li v-if="promoCodeApplied">Promo code: {{ promoDiscount | currency }}</li>
+                      <li v-if="bulkDiscountApplied">Bulk discount: {{ $filters.currency(discountAmount) }}</li>
+                      <li v-if="cartTotals.shipping === 0 && getSelectedShipping().standardPrice > 0">Free shipping: {{ $filters.currency(getSelectedShipping().standardPrice) }}</li>
+                      <li v-if="promoCodeApplied">Promo code: {{ $filters.currency(promoDiscount) }}</li>
                     </ul>
                   </div>
                   
