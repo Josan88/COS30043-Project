@@ -19,7 +19,7 @@ const ProductService = {
   // Initialize product data
   init() {
     // Try to load products from the JSON file
-    fetch('/js/data/products.json')
+    fetch('./js/data/products.json')
       .then(response => {
         if (!response.ok) {
           throw new Error('Network response was not ok');
