@@ -136,14 +136,7 @@ const HomePage = {
     return {
       featuredProducts: [],
       saleProducts: [],
-      categories: [
-        { id: 'pc', name: 'PCs', icon: 'fas fa-laptop' },
-        { id: 'phones', name: 'Phones', icon: 'fas fa-mobile-alt' },
-        { id: 'tablets', name: 'Tablets', icon: 'fas fa-tablet-alt' },
-        { id: 'watches', name: 'Watches', icon: 'fas fa-clock' },
-        { id: 'audio', name: 'Audio', icon: 'fas fa-headphones' },
-        { id: 'accessories', name: 'Accessories', icon: 'fas fa-plug' }
-      ],
+      categories: [],
       latestNews: [
         { title: 'New iPhone 16 Pro Rumored Features', date: 'April 8, 2025' },
         { title: 'AMD Launches Next-Gen Processors', date: 'April 5, 2025' },
@@ -170,6 +163,24 @@ const HomePage = {
 
       // Get products on sale
       this.saleProducts = ProductService.getProductsOnSale().slice(0, 4);
+
+      // Get categories and add icons
+      this.categories = ProductService.getCategories().map(category => {
+        // Add appropriate Font Awesome icons based on category id
+        const iconMap = {
+          'pc': 'fas fa-laptop',
+          'phones': 'fas fa-mobile-alt',
+          'tablets': 'fas fa-tablet-alt',
+          'watches': 'fas fa-clock',
+          'audio': 'fas fa-headphones',
+          'accessories': 'fas fa-keyboard'
+        };
+        
+        return {
+          ...category,
+          icon: iconMap[category.id] || 'fas fa-box'
+        };
+      });
     },
     truncateDescription(text) {
       return this.$filters.truncate(text, 80);

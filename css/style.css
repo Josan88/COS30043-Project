@@ -561,6 +561,32 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
   background-color: #f8f9fa;
 }
 
+/* Clickable product card styles */
+.product-card-clickable {
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.product-card-clickable:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  border-color: var(--primary-color);
+}
+
+.product-card-clickable:hover .btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.product-card-clickable .card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.product-card-clickable:hover .card-img-top {
+  transform: scale(1.05);
+}
+
 /* Display utilities */
 .display-4 {
   font-size: 2.5rem;

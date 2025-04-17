@@ -41,7 +41,9 @@ const ProductPage = {
                 aria-label="Filter by category"
               >
                 <option value="">All Categories</option>
-                <option v-for="(label, value) in categoryMap" :key="value" :value="value">{{ label }}</option>
+                <option v-for="category in categories" :key="category.id" :value="category.id">
+                  {{ category.name }} ({{ category.count }})
+                </option>
               </select>
             </div>
             <div class="col-md-3">
@@ -71,7 +73,7 @@ const ProductPage = {
             <div class="d-flex flex-wrap align-items-center gap-2">
               <span class="text-muted">Active filters:</span>
               <span v-if="selectedCategory" class="badge bg-primary">
-                Category: {{ categoryMap[selectedCategory] }}
+                Category: {{ getCategoryLabel(selectedCategory) }}
                 <button class="btn-close btn-close-white ms-2" @click="clearCategoryFilter" aria-label="Clear category filter"></button>
               </span>
               <span v-if="searchQuery" class="badge bg-primary">
@@ -91,7 +93,7 @@ const ProductPage = {
           
           <!-- Category Title & Count -->
           <div v-if="filteredProducts.length > 0" class="mb-4 d-flex justify-content-between align-items-center">
-            <h2 v-if="selectedCategory">{{ categoryMap[selectedCategory] }}</h2>
+            <h2 v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</h2>
             <h2 v-else>All Products</h2>
             <p class="text-muted mb-0">{{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'product' : 'products' }} found</p>
           </div>
@@ -186,85 +188,74 @@ const ProductPage = {
               :key="product.id" 
               class="col-12 col-sm-6 col-lg-4 col-xl-3 mb-4"
             >
-              <div class="card product-card h-100">
-                <div class="position-relative">
-                  <img :src="product.image" :alt="product.name" class="card-img-top">
-                  <span 
-                    v-if="product.discount" 
-                    class="badge bg-danger position-absolute top-0 end-0 m-2"
-                  >
-                    {{ product.discount }}% OFF
-                  </span>
-                  <span 
-                    v-if="product.stock <= 5 && product.stock > 0" 
-                    class="badge bg-warning position-absolute top-0 start-0 m-2"
-                  >
-                    Only {{ product.stock }} left
-                  </span>
-                  <span 
-                    v-if="product.stock === 0" 
-                    class="badge bg-secondary position-absolute top-0 start-0 m-2"
-                  >
-                    Out of Stock
-                  </span>
-                </div>
-                
-                <div class="card-body d-flex flex-column">
-                  <div class="mb-1">
-                    <span class="badge bg-info">{{ categoryMap[product.category] }}</span>
+              <router-link :to="'/product/' + product.id" class="text-decoration-none">
+                <div class="card product-card-clickable h-100">
+                  <div class="position-relative">
+                    <img :src="product.image" :alt="product.name" class="card-img-top">
+                    <span 
+                      v-if="product.discount" 
+                      class="badge bg-danger position-absolute top-0 end-0 m-2"
+                    >
+                      {{ product.discount }}% OFF
+                    </span>
+                    <span 
+                      v-if="product.stock <= 5 && product.stock > 0" 
+                      class="badge bg-warning position-absolute top-0 start-0 m-2"
+                    >
+                      Only {{ product.stock }} left
+                    </span>
+                    <span 
+                      v-if="product.stock === 0" 
+                      class="badge bg-secondary position-absolute top-0 start-0 m-2"
+                    >
+                      Out of Stock
+                    </span>
                   </div>
-                  <h3 class="card-title h5">{{ $filters.truncate(product.name, 30) }}</h3>
                   
-                  <div class="mb-2">
-                    <div class="ratings">
-                      <i 
-                        v-for="star in 5" 
-                        :key="star" 
-                        class="fas fa-star" 
-                        :class="{ 'text-warning': star <= product.rating, 'text-muted': star > product.rating }"
-                      ></i>
-                      <span class="ms-1 text-muted">({{ product.reviewCount }})</span>
+                  <div class="card-body d-flex flex-column">
+                    <div class="mb-1">
+                      <span class="badge bg-info">{{ getCategoryLabel(product.category) }}</span>
                     </div>
-                  </div>
-                  
-                  <p class="card-text text-muted">{{ $filters.truncate(product.description, 80) }}</p>
-                  
-                  <div class="mt-auto">
-                    <!-- Consolidated price display -->
-                    <div class="mb-3">
-                      <span v-if="product.discount > 0">
-                        <span class="text-muted text-decoration-line-through me-2">
-                          {{ $filters.currency(product.price) }}
-                        </span>
-                        <span class="price text-danger fw-bold h4">
-                          {{ $filters.currency(calculateDiscountedPrice(product)) }}
-                        </span>
-                        <span class="badge bg-danger ms-2">{{ product.discount }}% OFF</span>
-                      </span>
-                      <span v-else>
-                        <span class="price fw-bold h4">{{ $filters.currency(product.price) }}</span>
-                      </span>
+                    <h3 class="card-title h5">{{ $filters.truncate(product.name, 30) }}</h3>
+                    
+                    <div class="mb-2">
+                      <div class="ratings">
+                        <i 
+                          v-for="star in 5" 
+                          :key="star" 
+                          class="fas fa-star" 
+                          :class="{ 'text-warning': star <= product.rating, 'text-muted': star > product.rating }"
+                        ></i>
+                        <span class="ms-1 text-muted">({{ product.reviewCount }})</span>
+                      </div>
                     </div>
                     
-                    <div class="d-grid gap-2">
-                      <router-link 
-                        :to="'/product/' + product.id" 
-                        class="btn btn-outline-primary"
-                      >
-                        View Details
-                      </router-link>
-                      <button 
-                        class="btn btn-primary" 
-                        @click="quickAddToCart(product)"
-                        :disabled="product.stock === 0"
-                      >
-                        <i class="fas fa-cart-plus me-1"></i> 
-                        {{ product.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
-                      </button>
+                    <p class="card-text text-muted">{{ $filters.truncate(product.description, 80) }}</p>
+                    
+                    <div class="mt-auto">
+                      <!-- Consolidated price display -->
+                      <div class="mb-3">
+                        <span v-if="product.discount > 0">
+                          <span class="text-muted text-decoration-line-through me-2">
+                            {{ $filters.currency(product.price) }}
+                          </span>
+                          <span class="price text-danger fw-bold h4">
+                            {{ $filters.currency(calculateDiscountedPrice(product)) }}
+                          </span>
+                          <span class="badge bg-danger ms-2">{{ product.discount }}% OFF</span>
+                        </span>
+                        <span v-else>
+                          <span class="price fw-bold h4">{{ $filters.currency(product.price) }}</span>
+                        </span>
+                      </div>
+                      
+                      <div class="text-center">
+                        <span class="btn btn-outline-primary w-100">View Details</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </router-link>
             </div>
           </div>
           
@@ -473,14 +464,7 @@ const ProductPage = {
       onlyInStock: false,
       showAdvancedFilters: false,
       quantity: 1,
-      categoryMap: {
-        'pc': 'PCs',
-        'phones': 'Phones',
-        'tablets': 'Tablets',
-        'watches': 'Watches',
-        'audio': 'Audio',
-        'accessories': 'Accessories'
-      },
+      categories: [],
       sortOptions: {
         'default': 'Featured',
         'price-asc': 'Price: Low to High',
@@ -626,7 +610,7 @@ const ProductPage = {
     categoryName() {
       if (!this.currentProduct || !this.currentProduct.category) return '';
       
-      return this.categoryMap[this.currentProduct.category] || this.currentProduct.category;
+      return this.getCategoryLabel(this.currentProduct.category);
     }
   },
   watch: {
@@ -655,6 +639,9 @@ const ProductPage = {
     loadData() {
       // Get all products (using the ProductService to fetch JSON data)
       this.products = ProductService.getAllProducts();
+      
+      // Get categories from ProductService
+      this.categories = ProductService.getCategories();
       
       // If id is provided in route, load specific product
       if (this.id || this.$route.params.id) {
@@ -801,15 +788,9 @@ const ProductPage = {
       return this.sortOptions[sortOption] || 'Featured';
     },
     
-    // Quick add to cart from listing page
-    quickAddToCart(product) {
-      if (product.stock === 0) return;
-      
-      // Add to cart with quantity of 1
-      CartService.addToCart(product, 1);
-      
-      // Show success notification
-      alert(`${product.name} added to cart!`);
+    getCategoryLabel(categoryId) {
+      const category = this.categories.find(cat => cat.id === categoryId);
+      return category ? category.name : ProductService.getCategoryName(categoryId);
     },
     
     // Product detail methods (handled by existing code)
