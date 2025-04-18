@@ -11,8 +11,16 @@ const ProductPage = {
   },
   template: `
     <div class="product-page">
+      <!-- Loading State -->
+      <div v-if="isLoading" class="container text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading products...</p>
+      </div>
+
       <!-- Product Listing View -->
-      <div v-if="!currentProduct" class="product-listing">
+      <div v-else-if="!currentProduct" class="product-listing">
         <div class="container">
           <h1 class="mb-4">Products</h1>
           
@@ -319,7 +327,7 @@ const ProductPage = {
           </div>
           
           <!-- No Products Found -->
-          <div v-if="filteredProducts.length === 0" class="text-center py-5">
+          <div v-if="filteredProducts.length === 0 && !isLoading" class="text-center py-5">
             <i class="fas fa-search fa-3x mb-3 text-muted"></i>
             <h3>No products found</h3>
             <p>Try adjusting your search or filter to find what you're looking for.</p>
@@ -336,7 +344,7 @@ const ProductPage = {
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
               <li class="breadcrumb-item"><router-link to="/product">Products</router-link></li>
-              <li class="breadcrumb-item"><router-link :to="'/products?category=' + currentProduct.category">{{ categoryName }}</router-link></li>
+              <li class="breadcrumb-item"><router-link :to="'/product?category=' + currentProduct.category">{{ categoryName }}</router-link></li>
               <li class="breadcrumb-item active" aria-current="page">{{ currentProduct.name }}</li>
             </ol>
           </nav>
@@ -448,6 +456,7 @@ const ProductPage = {
   data() {
     return {
       products: [],
+      isLoading: true,
       currentProduct: null,
       relatedProducts: [],
       searchQuery: '',
@@ -620,7 +629,22 @@ const ProductPage = {
     }
   },
   created() {
-    this.loadData();
+    // Check if products are already loaded 
+    if (ProductService.isReady()) {
+      this.loadData();
+      this.isLoading = false;
+    } else {
+      // Initialize the product service if needed
+      ProductService.init()
+        .then(() => {
+          this.loadData();
+          this.isLoading = false;
+        })
+        .catch(error => {
+          console.error('Error loading products:', error);
+          this.isLoading = false;
+        });
+    }
     
     // Check for query parameters in URL
     if (this.$route.query.category) {
@@ -634,6 +658,13 @@ const ProductPage = {
     if (this.$route.query.page) {
       this.currentPage = parseInt(this.$route.query.page) || 1;
     }
+    
+    // Listen for products loaded event
+    window.addEventListener('products-loaded', this.handleProductsLoaded);
+  },
+  beforeDestroy() {
+    // Clean up event listener
+    window.removeEventListener('products-loaded', this.handleProductsLoaded);
   },
   methods: {
     loadData() {
@@ -667,11 +698,17 @@ const ProductPage = {
       }
     },
     
+    // Handle products loaded event
+    handleProductsLoaded() {
+      this.loadData();
+      this.isLoading = false;
+    },
+    
     // Filter methods
     searchProducts() {
       // Update URL and reset pagination
       this.$router.push({
-        path: '/products',
+        path: '/product',
         query: {
           ...this.$route.query,
           search: this.searchQuery || undefined,
@@ -684,7 +721,7 @@ const ProductPage = {
     filterByCategory() {
       // Update URL and reset pagination
       this.$router.push({
-        path: '/products',
+        path: '/product',
         query: {
           ...this.$route.query,
           category: this.selectedCategory || undefined,
@@ -741,7 +778,7 @@ const ProductPage = {
       this.onlyInStock = false;
       
       // Reset URL
-      this.$router.push('/products');
+      this.$router.push('/product');
     },
     
     // Pagination methods
@@ -752,7 +789,7 @@ const ProductPage = {
       
       // Update URL with new page number
       this.$router.push({
-        path: '/products',
+        path: '/product',
         query: {
           ...this.$route.query,
           page: page === 1 ? undefined : page

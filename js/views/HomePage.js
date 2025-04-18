@@ -1,31 +1,42 @@
 /**
  * HomePage Component
- * Main landing page for the application with context view grouping
+ * Demonstrates use of template functionality and Vue features
  */
 const HomePage = {
   template: `
     <div class="home-page">
-      <!-- Hero Section - Full Width Context -->
-      <section class="hero mb-5">
+      <!-- Hero Banner -->
+      <div class="hero">
         <div class="container">
-          <div class="row justify-content-center">
-            <div class="col-md-10 text-center py-5">
-              <h1 class="display-4">Welcome to TechWorld</h1>
-              <p class="lead">Your one-stop destination for the latest and greatest technology products.</p>
-              <router-link to="/product" class="btn btn-secondary btn-lg">Shop Now</router-link>
+          <h1>Welcome to TechWorld</h1>
+          <p>Your one-stop shop for the latest tech products</p>
+          <router-link to="/product" class="btn btn-secondary">Shop Now</router-link>
+        </div>
+      </div>
+      
+      <!-- Content Grid System - Above the fold -->
+      <div class="container mb-5">
+        <!-- Context Group: Categories -->
+        <div class="context-group">
+          <div class="row mb-4">
+            <div class="col">
+              <h2>Browse Categories</h2>
             </div>
           </div>
-        </div>
-      </section>
-
-      <!-- Categories Banner - Horizontal Layout -->
-      <div class="row mb-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
+          
+          <div class="row">
+            <div class="col-12">
               <div class="row">
-                <div v-for="category in categories" :key="category.id" class="col-6 col-sm-4 col-md-2 mb-3">
-                  <router-link :to="'/products?category=' + category.id" class="category-card text-decoration-none">
+                <!-- Loading state for categories -->
+                <div v-if="isLoading && categories.length === 0" class="col-12 text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p class="mt-2">Loading categories...</p>
+                </div>
+                
+                <div v-for="category in categories" :key="category.id" class="col-4 col-md-2 mb-4">
+                  <router-link :to="'/product?category=' + category.id" class="category-card text-decoration-none">
                     <div class="card h-100 text-center border-0 shadow-sm">
                       <div class="card-body d-flex flex-column justify-content-center py-2">
                         <i :class="category.icon + ' fa-2x mb-2'"></i>
@@ -51,6 +62,14 @@ const HomePage = {
                 <h2 class="h4 mb-0">Featured Products</h2>
               </div>
               <div class="card-body">
+                <!-- Loading state for featured products -->
+                <div v-if="isLoading && featuredProducts.length === 0" class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p class="mt-2">Loading featured products...</p>
+                </div>
+                
                 <div class="row">
                   <div v-for="product in featuredProducts" :key="product.id" class="col-12 col-sm-6 col-md-3 mb-4">
                     <product-card :product="product"></product-card>
@@ -74,6 +93,14 @@ const HomePage = {
                 <span class="badge bg-danger">Limited Time</span>
               </div>
               <div class="card-body">
+                <!-- Loading state for sale products -->
+                <div v-if="isLoading && saleProducts.length === 0" class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <p class="mt-2">Loading special offers...</p>
+                </div>
+                
                 <div class="row">
                   <div v-for="product in saleProducts" :key="product.id" class="col-12 col-sm-6 col-md-3 mb-4">
                     <product-card :product="product"></product-card>
@@ -108,16 +135,16 @@ const HomePage = {
             </div>
           </div>
           
-          <!-- Latest Tech News - 1/3 Width -->
+          <!-- Latest News - 1/3 Width -->
           <div class="col-md-4 mb-4">
             <div class="card h-100">
               <div class="card-header bg-white">
-                <h2 class="h4 mb-0">Latest Tech News</h2>
+                <h2 class="h4 mb-0">Latest News</h2>
               </div>
-              <div class="card-body">
+              <div class="card-body p-0">
                 <ul class="list-group list-group-flush">
-                  <li v-for="(news, index) in latestNews" :key="index" class="list-group-item px-0">
-                    <h5 class="h6">{{ news.title }}</h5>
+                  <li v-for="(news, index) in latestNews" :key="index" class="list-group-item">
+                    <a href="#" class="text-decoration-none">{{ news.title }}</a>
                     <p class="small text-muted mb-0">{{ news.date }}</p>
                   </li>
                 </ul>
@@ -137,6 +164,7 @@ const HomePage = {
       featuredProducts: [],
       saleProducts: [],
       categories: [],
+      isLoading: true,
       latestNews: [
         { title: 'New iPhone 16 Pro Rumored Features', date: 'April 8, 2025' },
         { title: 'AMD Launches Next-Gen Processors', date: 'April 5, 2025' },
@@ -146,15 +174,29 @@ const HomePage = {
     };
   },
   created() {
-    // Initial attempt to load products
-    this.loadProducts();
+    // Check if products are already loaded
+    if (ProductService.isReady()) {
+      this.loadProducts();
+      this.isLoading = false;
+    } else {
+      // Initialize the product service if needed
+      ProductService.init()
+        .then(() => {
+          this.loadProducts();
+          this.isLoading = false;
+        })
+        .catch(error => {
+          console.error('Error loading products:', error);
+          this.isLoading = false;
+        });
+    }
 
-    // Listen for when products are loaded
-    window.addEventListener('products-loaded', this.loadProducts);
+    // Listen for when products are loaded (in case we missed the initial load)
+    window.addEventListener('products-loaded', this.handleProductsLoaded);
   },
   beforeDestroy() {
     // Clean up event listener
-    window.removeEventListener('products-loaded', this.loadProducts);
+    window.removeEventListener('products-loaded', this.handleProductsLoaded);
   },
   methods: {
     loadProducts() {
@@ -182,6 +224,12 @@ const HomePage = {
         };
       });
     },
+    
+    handleProductsLoaded() {
+      this.loadProducts();
+      this.isLoading = false;
+    },
+    
     truncateDescription(text) {
       return this.$filters.truncate(text, 80);
     }

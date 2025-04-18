@@ -6,6 +6,12 @@ const ProductService = {
   // Product data storage
   products: [],
   
+  // Loading state flag
+  isLoading: false,
+  
+  // Initialization promise to track loading status
+  initPromise: null,
+  
   // Category mapping
   categoryMap: {
     'pc': 'PCs',
@@ -18,36 +24,61 @@ const ProductService = {
   
   // Initialize product data
   init() {
-    // Try to load products from the JSON file
-    fetch('./js/data/products.json')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        this.products = data.products;
-        console.log('Products loaded successfully:', this.products.length);
-        
-        // Dispatch an event to notify that products are loaded
-        window.dispatchEvent(new Event('products-loaded'));
-      })
-      .catch(error => {
-        console.error('Error loading products:', error);
-        // If loading fails, use backup products (empty array for now)
-        this.products = [];
-      });
+    // If already initializing, return existing promise
+    if (this.initPromise) {
+      return this.initPromise;
+    }
+    
+    console.log('Initializing ProductService...');
+    this.isLoading = true;
+    
+    // Create and store the promise
+    this.initPromise = new Promise((resolve, reject) => {
+      fetch('./js/data/products.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          this.products = data.products;
+          console.log('Products loaded successfully:', this.products.length);
+          
+          // Dispatch an event to notify that products are loaded
+          window.dispatchEvent(new Event('products-loaded'));
+          
+          this.isLoading = false;
+          resolve(this.products);
+        })
+        .catch(error => {
+          console.error('Error loading products:', error);
+          this.products = [];
+          this.isLoading = false;
+          reject(error);
+        });
+    });
+    
+    return this.initPromise;
   },
   
-  // Get all products
+  // Check if products are loaded and ready
+  isReady() {
+    return this.products.length > 0;
+  },
+  
+  // Get all products (with loading check)
   getAllProducts() {
+    if (!this.isReady() && !this.isLoading) {
+      console.log('Products not loaded yet, initializing...');
+      this.init();
+    }
     return this.products;
   },
   
   // Get products by category
   getProductsByCategory(category) {
-    if (!category) return this.products;
+    if (!category) return this.getAllProducts();
     return this.products.filter(product => product.category === category);
   },
   
@@ -58,7 +89,7 @@ const ProductService = {
   
   // Search products
   searchProducts(query) {
-    if (!query) return this.products;
+    if (!query) return this.getAllProducts();
     
     query = query.toLowerCase();
     return this.products.filter(product => {
@@ -72,14 +103,14 @@ const ProductService = {
   
   // Get featured products (just getting some based on rating in this example)
   getFeaturedProducts(count = 4) {
-    return [...this.products]
+    return [...this.getAllProducts()]
       .sort((a, b) => b.rating - a.rating)
       .slice(0, count);
   },
   
   // Get products on sale
   getProductsOnSale() {
-    return this.products.filter(product => product.discount > 0);
+    return this.getAllProducts().filter(product => product.discount > 0);
   },
   
   // Get recommended products based on categories, excluding specific product IDs
@@ -90,7 +121,7 @@ const ProductService = {
     }
     
     // Filter products by matching categories and not in exclude list
-    const relevantProducts = this.products.filter(product => {
+    const relevantProducts = this.getAllProducts().filter(product => {
       return (
         (categories.length === 0 || categories.includes(product.category)) && 
         !excludeIds.includes(product.id)
@@ -124,7 +155,7 @@ const ProductService = {
     });
     
     // Count products in each category
-    this.products.forEach(product => {
+    this.getAllProducts().forEach(product => {
       if (product.category && categoryCounts[product.category]) {
         categoryCounts[product.category].count++;
       }
