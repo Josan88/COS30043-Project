@@ -13,7 +13,7 @@ const PurchasesPage = {
           <i class="fas fa-shopping-bag fa-4x mb-3 text-muted"></i>
           <h3>No purchases yet</h3>
           <p>You haven't made any purchases yet.</p>
-          <router-link to="/products" class="btn btn-primary mt-3">
+          <router-link to="/product" class="btn btn-primary mt-3">
             <i class="fas fa-shopping-cart"></i> Shop Now
           </router-link>
         </div>

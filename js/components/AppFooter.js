@@ -21,11 +21,11 @@ window.app.component('app-footer', {
           <div class="col-6 col-md-2 mb-3">
             <h5>Shop</h5>
             <ul class="nav flex-column">
-              <li class="nav-item mb-2"><router-link to="/products?category=pc" class="nav-link p-0 text-white">PCs</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=phones" class="nav-link p-0 text-white">Phones</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=accessories" class="nav-link p-0 text-white">Accessories</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=audio" class="nav-link p-0 text-white">Audio</router-link></li>
-              <li class="nav-item mb-2"><router-link to="/products?category=watches" class="nav-link p-0 text-white">Watches</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/product?category=pc" class="nav-link p-0 text-white">PCs</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/product?category=phones" class="nav-link p-0 text-white">Phones</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/product?category=accessories" class="nav-link p-0 text-white">Accessories</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/product?category=audio" class="nav-link p-0 text-white">Audio</router-link></li>
+              <li class="nav-item mb-2"><router-link to="/product?category=watches" class="nav-link p-0 text-white">Watches</router-link></li>
             </ul>
           </div>
 

@@ -12,7 +12,7 @@ const HomePage = {
             <div class="col-md-10 text-center py-5">
               <h1 class="display-4">Welcome to TechWorld</h1>
               <p class="lead">Your one-stop destination for the latest and greatest technology products.</p>
-              <router-link to="/products" class="btn btn-secondary btn-lg">Shop Now</router-link>
+              <router-link to="/product" class="btn btn-secondary btn-lg">Shop Now</router-link>
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@ const HomePage = {
                   </div>
                 </div>
                 <div class="text-center mt-3">
-                  <router-link to="/products" class="btn btn-outline">View All Products</router-link>
+                  <router-link to="/product" class="btn btn-outline">View All Products</router-link>
                 </div>
               </div>
             </div>
@@ -95,7 +95,7 @@ const HomePage = {
                     <h2>Free Shipping on Orders Over RM50</h2>
                     <p class="lead">Get your tech delivered to your doorstep for free! Conditions apply.</p>
                     <div>
-                      <router-link to="/products" class="btn btn-primary">Shop Now</router-link>
+                      <router-link to="/product" class="btn btn-primary">Shop Now</router-link>
                     </div>
                   </div>
                   <div class="col-md-6">

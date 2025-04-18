@@ -13,7 +13,7 @@ const ShoppingCart = {
           <i class="fas fa-shopping-cart fa-4x mb-3 text-muted"></i>
           <h3>Your cart is empty</h3>
           <p>Looks like you haven't added any products to your cart yet.</p>
-          <router-link to="/products" class="btn btn-primary mt-3">
+          <router-link to="/product" class="btn btn-primary mt-3">
             <i class="fas fa-shopping-bag"></i> Continue Shopping
           </router-link>
         </div>
@@ -45,12 +45,12 @@ const ShoppingCart = {
                       <tbody>
                         <tr v-for="item in cartItems" :key="item.id" class="align-middle">
                           <td>
-                            <router-link :to="'/products/' + item.id">
+                            <router-link :to="'/product/' + item.id">
                               <img :src="item.image" :alt="item.name" width="60" class="img-thumbnail">
                             </router-link>
                           </td>
                           <td>
-                            <router-link :to="'/products/' + item.id" class="text-decoration-none">
+                            <router-link :to="'/product/' + item.id" class="text-decoration-none">
                               {{ item.name }}
                             </router-link>
                             <span v-if="item.discount" class="badge bg-danger ms-2">{{ item.discount }}% OFF</span>
@@ -128,12 +128,12 @@ const ShoppingCart = {
                   <div class="d-md-none">
                     <div v-for="item in cartItems" :key="item.id" class="p-3 border-bottom">
                       <div class="d-flex mb-3">
-                        <router-link :to="'/products/' + item.id" class="me-3">
+                        <router-link :to="'/product/' + item.id" class="me-3">
                           <img :src="item.image" :alt="item.name" width="80" class="img-thumbnail">
                         </router-link>
                         <div>
                           <h6>
-                            <router-link :to="'/products/' + item.id" class="text-decoration-none">
+                            <router-link :to="'/product/' + item.id" class="text-decoration-none">
                               {{ item.name }}
                             </router-link>
                           </h6>
@@ -201,7 +201,7 @@ const ShoppingCart = {
                 </div>
                 <div class="card-footer bg-white">
                   <div class="d-flex justify-content-between">
-                    <router-link to="/products" class="btn btn-outline">
+                    <router-link to="/product" class="btn btn-outline">
                       <i class="fas fa-arrow-left"></i> Continue Shopping
                     </router-link>
                     <button @click="clearCart" class="btn btn-danger">

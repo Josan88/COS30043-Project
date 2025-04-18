@@ -22,7 +22,7 @@ window.app.component('nav-bar', {
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/products" class="nav-link" aria-label="Products">
+              <router-link to="/product" class="nav-link" aria-label="Products">
                 <i class="fas fa-shopping-bag"></i> Products
               </router-link>
             </li>

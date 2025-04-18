@@ -335,7 +335,7 @@ const ProductPage = {
           <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><router-link to="/">Home</router-link></li>
-              <li class="breadcrumb-item"><router-link to="/products">Products</router-link></li>
+              <li class="breadcrumb-item"><router-link to="/product">Products</router-link></li>
               <li class="breadcrumb-item"><router-link :to="'/products?category=' + currentProduct.category">{{ categoryName }}</router-link></li>
               <li class="breadcrumb-item active" aria-current="page">{{ currentProduct.name }}</li>
             </ol>

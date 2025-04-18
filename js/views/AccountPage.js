@@ -252,7 +252,7 @@ const AccountPage = {
                     </div>
                     <h5>No purchases yet</h5>
                     <p class="text-muted">You haven't made any purchases yet.</p>
-                    <router-link to="/products" class="btn btn-primary mt-2">
+                    <router-link to="/product" class="btn btn-primary mt-2">
                       <i class="fas fa-shopping-cart me-2"></i> Start Shopping
                     </router-link>
                   </div>
