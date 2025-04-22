@@ -22,11 +22,11 @@ window.app.component('product-card', {
           <h5 class="card-title">{{ product.name }}</h5>
           <div class="mb-2">
             <template v-if="product.discount">
-                <span class="text-decoration-line-through text-muted me-2">RM{{ product.price.toFixed(2) }}</span>
-                <span class="price">RM{{ discountedPrice }}</span>
+                <div class="text-decoration-line-through text-muted">RM{{ product.price.toFixed(2) }}</div>
+                <div class="price text-danger">RM{{ discountedPrice }}</div>
             </template>
             <template v-else>
-              <span class="price">RM{{ product.price.toFixed(2) }}</span>
+              <div class="price">RM{{ product.price.toFixed(2) }}</div>
             </template>
           </div>
           <div class="mb-2">
