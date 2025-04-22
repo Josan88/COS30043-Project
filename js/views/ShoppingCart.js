@@ -389,7 +389,7 @@ const ShoppingCart = {
       promoCodeApplied: false,
       activePromoCode: null,
       selectedShipping: 'standard',
-      taxRate: 0.07, // 7% tax rate
+      taxRate: 0.06, // 6% tax rate
       shippingOptions: [
         {
           id: 'standard',
@@ -573,7 +573,7 @@ const ShoppingCart = {
       // Calculate subtotal after all discounts except tax
       const discountedSubtotal = subtotal - bulkDiscountAmount - promoDiscountAmount;
       
-      // Calculate tax (assuming 7% tax rate)
+      // Calculate tax (6% tax rate)
       const tax = discountedSubtotal * this.taxRate;
       
       // Calculate grand total

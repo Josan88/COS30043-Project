@@ -533,8 +533,8 @@ const PurchasesPage = {
           return count + item.quantity;
         }, 0);
         
-        // Calculate tax (7%)
-        const tax = subtotal * 0.07;
+        // Calculate tax (6%)
+        const tax = subtotal * 0.06;
         
         // Calculate total
         const total = subtotal + this.editedOrder.shipping.price + tax;

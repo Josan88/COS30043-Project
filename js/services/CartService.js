@@ -131,8 +131,8 @@ const CartService = {
     // Calculate shipping cost (free shipping over RM50)
     const shipping = subtotal > 50 ? 0 : 5.99;
     
-    // Calculate tax (assuming 7% tax rate)
-    const tax = subtotal * 0.07;
+    // Calculate tax (6% tax rate)
+    const tax = subtotal * 0.06;
     
     // Calculate grand total
     const total = subtotal + shipping + tax;
