@@ -14,43 +14,6 @@ const HomePage = {
         </div>
       </div>
       
-      <!-- Content Grid System - Above the fold -->
-      <div class="container mb-5">
-        <!-- Context Group: Categories -->
-        <div class="context-group">
-          <div class="row mb-4">
-            <div class="col">
-              <h2>Browse Categories</h2>
-            </div>
-          </div>
-          
-          <div class="row">
-            <div class="col-12">
-              <div class="row">
-                <!-- Loading state for categories -->
-                <div v-if="isLoading && categories.length === 0" class="col-12 text-center py-4">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                  <p class="mt-2">Loading categories...</p>
-                </div>
-                
-                <div v-for="category in categories" :key="category.id" class="col-4 col-md-2 mb-4">
-                  <router-link :to="'/product?category=' + category.id" class="category-card text-decoration-none">
-                    <div class="card h-100 text-center border-0 shadow-sm">
-                      <div class="card-body d-flex flex-column justify-content-center py-2">
-                        <i :class="category.icon + ' fa-2x mb-2'"></i>
-                        <h5 class="card-title h6">{{ category.name }}</h5>
-                      </div>
-                    </div>
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <!-- Content Grid System - Main Container -->
       <div class="container mb-5">
         <!-- Context Group 1: Featured Products -->
