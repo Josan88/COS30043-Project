@@ -319,6 +319,7 @@ const ProductPage = {
                 @change="resetPagination"
               >
                 <option>4</option>
+                <option>6</option>
                 <option>8</option>
                 <option>12</option>
                 <option>16</option>
@@ -463,7 +464,7 @@ const ProductPage = {
       selectedCategory: '',
       sortOption: 'default',
       currentPage: 1,
-      pageSize: 8,
+      pageSize: 6,
       priceRange: {
         min: 0,
         max: 3000

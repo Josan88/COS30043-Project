@@ -17,11 +17,6 @@ window.app.component('nav-bar', {
         <div class="collapse navbar-collapse" :class="{ 'd-block': isNavOpen }">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link to="/" class="nav-link" aria-label="Home">
-                <i class="fas fa-home"></i> Home
-              </router-link>
-            </li>
-            <li class="nav-item">
               <router-link to="/product" class="nav-link" aria-label="Products">
                 <i class="fas fa-shopping-bag"></i> Products
               </router-link>

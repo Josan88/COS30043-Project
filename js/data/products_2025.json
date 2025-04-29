@@ -1,0 +1,1010 @@
+[
+    {
+        "status": "success",
+        "total_results": 90,
+        "total_results_per_page": 50,
+        "total_pages": 2,
+        "page": 0,
+        "data": [
+            {
+                "Product": {
+                    "id": "6788e744e1b9ccac5ed909ed",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 4G",
+                    "Version": "24117RN76G / 24117RN76E"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "677e5b40382419809ec4dc32",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco M7 Pro 5G",
+                    "Version": "2409FPCC4G"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c2e94f0b0e16816408597f",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra  5G",
+                    "Version": "SM-S938U / SM-S938V"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d8014a8a6434204ad400ae",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931J / SCG31"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "677e5b40382419809ec4dc3d",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 5G",
+                    "Version": "24094RAD4G"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d2bf946a82b2822f13ecf3",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook X G1a",
+                    "Version": "B69D5ET#ABH"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678e2d383b7136dd0b976b83",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco M7 5G",
+                    "Version": "24108PCE2I"
+                },
+                "Release Date": "2025-02-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d55e37bac3c2988aa618a9",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931W"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678cdbbbd8fde35c12cf7523",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi 14C 5G",
+                    "Version": "2411DRN47I"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cec6c7278f5494873d53f7",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931B"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c2e94f0b0e16816408597c",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra  5G",
+                    "Version": "SM-S938U / SM-S938A"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b1c9da275b90f4489e604a",
+                    "Brand": "Samsung",
+                    "Category": "Laptops",
+                    "Model": "Samsung Galaxy Book  NP960QHA-KG1IT",
+                    "Version": "NP960QHA-KG1IT"
+                },
+                "Release Date": "2025-01-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b46c9254fc9056c29c728d",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook 835 G11",
+                    "Version": "9G119ET#UUG"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b46c9254fc9056c29c728c",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook 835 G11",
+                    "Version": "9G119ET#ABH"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678a38b76b12f64f5334f750",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco X7 5G",
+                    "Version": "24095PCADG"
+                },
+                "Release Date": "2025-01-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "676008b23c7c9ce023fef90b",
+                    "Brand": "Sharp",
+                    "Category": "Smartphones",
+                    "Model": "Sharp Aquos R9 Pro 5G",
+                    "Version": "SH-M30ID"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678a38b76b12f64f5334f763",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco X7 Pro 5G",
+                    "Version": "2412DPC0AI"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678a38b76b12f64f5334f752",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco X7 5G",
+                    "Version": "24095PCADI"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d55e37bac3c2988aa618a5",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931N"
+                },
+                "Release Date": "2025-01-26",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb51e",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936W"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678e2d383b7136dd0b976b82",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi 14C 5G",
+                    "Version": "2411DRN47R"
+                },
+                "Release Date": "2025-03-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e98c",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938Q"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b46c9254fc9056c29c728b",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook 835 G11",
+                    "Version": "9G120ET#UUG"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6788e744e1b9ccac5ed909ee",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 4G",
+                    "Version": "24117RN76L"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32f7",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U / SM-S931T"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32f5",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U / SM-S931A"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c58c4ef890861cfa551375",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S9380"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cd754f5c5476f5b2ca745d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931B/DS"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e988",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938N"
+                },
+                "Release Date": "2025-01-26",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b5be01bc6ff4d4d2ffb950",
+                    "Brand": "Samsung",
+                    "Category": "Laptops",
+                    "Model": "Samsung Galaxy Book4  NP754XGK-KG1UK",
+                    "Version": "NP754XGK-KG1UK"
+                },
+                "Release Date": "2025-02-13",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67bef4c3ad71acb0aaef3034",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938B/DS"
+                },
+                "Release Date": "2025-02-03",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e98f",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938D / SC-52F"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c2e94f0b0e16816408597d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra  5G",
+                    "Version": "SM-S938U / SM-S938T"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c82f5d3961c12d7f63336f",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938W"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb515",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936U / SM-G936R4"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb51b",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936N"
+                },
+                "Release Date": "2025-01-26",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678a38b76b12f64f5334f761",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Turbo 4 5G",
+                    "Version": "24129RT7CC"
+                },
+                "Release Date": "2025-01-03",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c2e94f0b0e168164085984",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra  5G",
+                    "Version": "SM-S938U1"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "677e5b40382419809ec4dc39",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 Pro+ 5G",
+                    "Version": "24115RA8EG"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32f3",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "2201117SG\n2201117PG\nZ528\n\nSM-S901B/DS\nF-01L\n21121119SG\nSM-S908U / SM-S908T\n\nPCHT00\n1920\nLMK920AM\nV2135"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb513",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936U / SM-G936T"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678e2d383b7136dd0b976b81",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi 14C 5G",
+                    "Version": "2411DRN47G"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb519",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936U1"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6788e744e1b9ccac5ed909e2",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 Pro 5G",
+                    "Version": "24090RA29G"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67f648cfeaf3af3a6e505a3f",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook Duo UX8406CA-PZ032W",
+                    "Version": "90NB14X1-M007J0"
+                },
+                "Release Date": "2025-01-06",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d2bf946a82b2822f13ecf2",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook X G1a",
+                    "Version": "B69D5ET#UUG"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32fc",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U1"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb50d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936B/DS"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6788e744e1b9ccac5ed909eb",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 4G NFC",
+                    "Version": "24117RN76O"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32fb",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U / SM-S931R4"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            }
+        ]
+    },
+    {
+        "status": "success",
+        "total_results": 90,
+        "total_results_per_page": 40,
+        "total_pages": 2,
+        "page": 1,
+        "data": [
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32fc",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U1"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb50d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936B/DS"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e994",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938J / SCG32"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6788e744e1b9ccac5ed909eb",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 4G NFC",
+                    "Version": "24117RN76O"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d55e37bac3c2988aa618a3",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931D / SC-51F"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6793733f9d490731e028eec3",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Redmi Note 14 Pro 4G",
+                    "Version": "24116RACCG"
+                },
+                "Release Date": "2025-01-16",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67f8ebe0eef544fed6bc0bb7",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Vivobook 14 Flip TP3407SA-QL064W",
+                    "Version": "90NB14Y1-M00550"
+                },
+                "Release Date": "2025-01-15",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d8014a8a6434204ad400b3",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy A25 5G",
+                    "Version": "SM-A253J"
+                },
+                "Release Date": "2025-02-27",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67fa3d3e25429a7079ce0edb",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook A14 UX3407QA-QD220W",
+                    "Version": "90NB1502-M00L80"
+                },
+                "Release Date": "2025-01-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c82f5d3961c12d7f63336d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938B"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb51d",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S9360"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "678a38b76b12f64f5334f765",
+                    "Brand": "Xiaomi",
+                    "Category": "Smartphones",
+                    "Model": "Xiaomi Poco X7 Pro 5G",
+                    "Version": "2412DPC0AG"
+                },
+                "Release Date": "2025-01-01",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d55e37bac3c2988aa618a7",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S9310"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d2bf946a82b2822f13ecf5",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook Ultra G1i",
+                    "Version": "B69D3ET#ABH"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb50f",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936B"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67f79a94d86f71f4d99c3d03",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP OmniBook 5 NGAI 16-ag1500sa",
+                    "Version": "BL1L2EA"
+                },
+                "Release Date": "2025-03-25",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67f79a94d86f71f4d99c3d02",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP OmniBook 5 NGAI 16-ag1503sa",
+                    "Version": "BL1D6EA"
+                },
+                "Release Date": "2025-03-25",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67fa3d3e25429a7079ce0ede",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Vivobook S 16 OLED S5606CA-RI045W",
+                    "Version": "90NB1553-M007T0"
+                },
+                "Release Date": "2025-01-06",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67f79a94d86f71f4d99c3d01",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP OmniBook 5 NGAI 16-ag1001na",
+                    "Version": "BG3K7EA"
+                },
+                "Release Date": "2025-03-18",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb517",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936U / SM-G936V"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67b46c9254fc9056c29c728a",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook 835 G11",
+                    "Version": "9G120ET#ABH"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d2bf946a82b2822f13ecf4",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP EliteBook Ultra G1i",
+                    "Version": "B69D3ET#UUG"
+                },
+                "Release Date": "2025-02-11",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e991",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G",
+                    "Version": "SM-S938Z"
+                },
+                "Release Date": "2025-02-14",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6802265a0555d623a32cfd43",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook 14 OLED UX3405CA-QL367W",
+                    "Version": "90NB14W3-M00FK0"
+                },
+                "Release Date": "2025-01-06",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67cad25552a738cec18cb511",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25+ 5G",
+                    "Version": "SM-S936U / SM-G936A"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67fa3d3e25429a7079ce0ee2",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Vivobook 16 X1607QA-MB046W",
+                    "Version": "90NB15Z1-M004N0"
+                },
+                "Release Date": "2025-01-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67ff834e1ec7fc2077bc20d7",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Vivobook Pro 15 OLED N6506CU-MA040WS",
+                    "Version": "90NB15E3-M002H0"
+                },
+                "Release Date": "2025-01-15",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6800d1a421245802e4bf0fe6",
+                    "Brand": "Motorola",
+                    "Category": "Smartphones",
+                    "Model": "Motorola Moto G15 NFC",
+                    "Version": "XT2521-3"
+                },
+                "Release Date": "2025-02-12",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6800d1a421245802e4bf0fdd",
+                    "Brand": "Motorola",
+                    "Category": "Smartphones",
+                    "Model": "Motorola Moto G05 (2025)",
+                    "Version": "XT2523-4"
+                },
+                "Release Date": "2025-01-22",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d169bb0c4e4232c65d32f9",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 5G",
+                    "Version": "SM-S931U / SM-S931V"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c2e94f0b0e168164085981",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra  5G",
+                    "Version": "SM-S938U / SM-S938R4"
+                },
+                "Release Date": "2025-02-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6800d1a421245802e4bf0fe8",
+                    "Brand": "Motorola",
+                    "Category": "Smartphones",
+                    "Model": "Motorola Moto G15 NFC (2025)",
+                    "Version": "XT2521-2"
+                },
+                "Release Date": "2025-01-22",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6800d5149265ef8bc72375c6",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook A14 UX3407QA-QD237W",
+                    "Version": "90NB1502-M00MH0"
+                },
+                "Release Date": "2025-01-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67c43ae605d7a5c36831e989",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy S25 Ultra 5G  Jet Black",
+                    "Version": "SM-S938N"
+                },
+                "Release Date": "2025-01-26",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d8014a8a6434204ad400b2",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy A25 5G",
+                    "Version": "SM-A253Q"
+                },
+                "Release Date": "2025-02-27",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6800d1a421245802e4bf0fdc",
+                    "Brand": "Motorola",
+                    "Category": "Smartphones",
+                    "Model": "Motorola Moto G05",
+                    "Version": "XT2523-4"
+                },
+                "Release Date": "2025-01-22",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67d8014a8a6434204ad400b4",
+                    "Brand": "Samsung",
+                    "Category": "Smartphones",
+                    "Model": "Samsung Galaxy A25 5G",
+                    "Version": "SM-A253D"
+                },
+                "Release Date": "2025-02-27",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67de9d26e298f04db5cec5bb",
+                    "Brand": "HP",
+                    "Category": "Laptops",
+                    "Model": "HP ProBook 450 G10",
+                    "Version": "AK9R0AT"
+                },
+                "Release Date": "2025-03-18",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "67ff834e1ec7fc2077bc20d0",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook 14 OLED UM3406KA-QD132W",
+                    "Version": "90NB14U1-M00720"
+                },
+                "Release Date": "2025-01-06",
+                "Image": "Please upgrade your plan to get access to product images"
+            },
+            {
+                "Product": {
+                    "id": "6802265a0555d623a32cfd42",
+                    "Brand": "ASUS",
+                    "Category": "Laptops",
+                    "Model": "ASUS Zenbook A14 UX3407RA-QD906W",
+                    "Version": "90NB16G1-M002E0"
+                },
+                "Release Date": "2025-01-07",
+                "Image": "Please upgrade your plan to get access to product images"
+            }
+        ]
+    }
+]

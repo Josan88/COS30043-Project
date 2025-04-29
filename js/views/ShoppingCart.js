@@ -46,7 +46,7 @@ const ShoppingCart = {
                         <tr v-for="item in cartItems" :key="item.id" class="align-middle">
                           <td>
                             <router-link :to="'/product/' + item.id">
-                              <img :src="item.image" :alt="item.name" width="60" class="img-thumbnail">
+                              <img :src="item.image" :alt="item.name" class="img-thumbnail product-thumbnail-img">
                             </router-link>
                           </td>
                           <td>
@@ -129,7 +129,7 @@ const ShoppingCart = {
                     <div v-for="item in cartItems" :key="item.id" class="p-3 border-bottom">
                       <div class="d-flex mb-3">
                         <router-link :to="'/product/' + item.id" class="me-3">
-                          <img :src="item.image" :alt="item.name" width="80" class="img-thumbnail">
+                          <img :src="item.image" :alt="item.name" class="img-thumbnail product-thumbnail-img">
                         </router-link>
                         <div>
                           <h6>

@@ -100,7 +100,7 @@ const PurchasesPage = {
                   <tbody>
                     <tr v-for="item in order.items" :key="item.id">
                       <td>
-                        <img :src="item.image" :alt="item.name" width="50" class="img-thumbnail">
+                        <img :src="item.image" :alt="item.name" class="img-thumbnail product-thumbnail-img">
                       </td>
                       <td>{{ item.name }}</td>
                       <td>{{ $filters.currency(item.price) }}</td>

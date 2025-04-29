@@ -405,8 +405,12 @@ a:hover {
 
 .product-image {
   max-width: 100%;
-  height: auto;
+  height: 400px; /* Set a fixed height */
+  object-fit: contain; /* Ensure the image fits without distortion */
+  background-color: #fff; /* Optional: background for padding */
   border-radius: var(--border-radius);
+  display: block; /* Ensure it behaves like a block element */
+  margin: 0 auto; /* Center the image if container is wider */
 }
 
 .product-image-container {
@@ -603,6 +607,14 @@ a:focus, button:focus, input:focus, select:focus, textarea:focus {
 
 .product-card-clickable:hover .card-img-top {
   transform: scale(1.05);
+}
+
+/* Thumbnail image consistency */
+.product-thumbnail-img {
+  height: 60px; /* Consistent height for thumbnails */
+  width: 60px;  /* Consistent width for thumbnails */
+  object-fit: contain; /* Ensure image fits without distortion */
+  background-color: #f8f9fa; /* Optional: Add background for padding */
 }
 
 /* Display utilities */
