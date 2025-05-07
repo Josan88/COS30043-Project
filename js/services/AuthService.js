@@ -172,3 +172,6 @@ const AuthService = {
     }
   }
 };
+
+// Register the AuthService as a global variable
+window.AuthService = AuthService;

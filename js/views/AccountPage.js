@@ -328,7 +328,7 @@ const AccountPage = {
         { id: 'security', name: 'Security Settings', icon: 'lock' },
         { id: 'orders', name: 'Purchase History', icon: 'shopping-bag' }
       ],
-      
+
       // Profile form
       profileForm: {
         firstName: '',
@@ -341,7 +341,7 @@ const AccountPage = {
       isProfileSubmitting: false,
       profileSuccess: null,
       profileError: null,
-      
+
       // Password form
       passwordForm: {
         currentPassword: '',
@@ -353,12 +353,12 @@ const AccountPage = {
       isPasswordSubmitting: false,
       securitySuccess: null,
       securityError: null,
-      
+
       // Password visibility toggles
       showCurrentPassword: false,
       showNewPassword: false,
       showConfirmPassword: false,
-      
+
       // Logout modal
       showLogoutModal: false,
 
@@ -372,13 +372,13 @@ const AccountPage = {
       if (!this.user.firstName || !this.user.lastName) return '?';
       return `${this.user.firstName.charAt(0)}${this.user.lastName.charAt(0)}`;
     },
-    
+
     // Get title of active tab
     activeTabTitle() {
       const tab = this.tabs.find(t => t.id === this.activeTab);
       return tab ? tab.name : '';
     },
-    
+
     // Get formatted date for account creation
     formattedDate() {
       if (!this.user.createdAt) return 'Unknown';
@@ -398,16 +398,16 @@ const AccountPage = {
   methods: {
     // Load user data from AuthService
     loadUserData() {
-      const user = AuthService.getCurrentUser();
-      
+      const user = window.AuthService.getCurrentUser();
+
       if (!user) {
         // Redirect to login if not logged in
         this.$router.push('/login?redirect=/account');
         return;
       }
-      
+
       this.user = user;
-      
+
       // Initialize profile form with user data
       this.profileForm = {
         firstName: user.firstName || '',
@@ -420,62 +420,67 @@ const AccountPage = {
     // Load user orders from CartService
     async loadUserOrders() {
       try {
-        const orders = await CartService.getUserOrders();
-        this.userOrders = orders || [];
+        const user = window.AuthService.getCurrentUser();
+        if (user && user.id) {
+          const orders = await window.CartService.getUserOrders(user.id);
+          this.userOrders = orders || [];
+        } else {
+          this.userOrders = [];
+        }
       } catch (error) {
         console.error('Failed to load user orders:', error);
       }
     },
-    
+
     // Validate profile form
     validateProfileForm() {
       const errors = {};
       this.profileSubmitted = true;
-      
+
       // First name validation
       if (!this.profileForm.firstName) {
         errors.firstName = 'First name is required';
       } else if (this.profileForm.firstName.length < 2) {
         errors.firstName = 'First name must be at least 2 characters';
       }
-      
+
       // Last name validation
       if (!this.profileForm.lastName) {
         errors.lastName = 'Last name is required';
       } else if (this.profileForm.lastName.length < 2) {
         errors.lastName = 'Last name must be at least 2 characters';
       }
-      
+
       // Phone validation (optional)
       if (this.profileForm.phone && !/^[0-9+\-\s()]{8,20}$/.test(this.profileForm.phone)) {
         errors.phone = 'Please enter a valid phone number';
       }
-      
+
       this.profileValidationErrors = errors;
       return Object.keys(errors).length === 0;
     },
-    
+
     // Update profile information
     async updateProfile() {
       // Clear previous messages
       this.profileSuccess = null;
       this.profileError = null;
-      
+
       // Validate form
       if (!this.validateProfileForm()) return;
-      
+
       // Set submitting state
       this.isProfileSubmitting = true;
-      
+
       try {
         // Call AuthService to update profile
-        const response = await AuthService.updateProfile(this.profileForm);
-        
+        const response = await window.AuthService.updateProfile(this.profileForm);
+
         if (response.success) {
           // Update local user data
           this.user = response.user;
           this.profileSuccess = 'Your profile has been updated successfully.';
-          
+
           // Reset form state but keep form values
           this.profileSubmitted = false;
         } else {
@@ -488,17 +493,17 @@ const AccountPage = {
         this.isProfileSubmitting = false;
       }
     },
-    
+
     // Validate password form
     validatePasswordForm() {
       const errors = {};
       this.passwordSubmitted = true;
-      
+
       // Current password validation
       if (!this.passwordForm.currentPassword) {
         errors.currentPassword = 'Current password is required';
       }
-      
+
       // New password validation
       if (!this.passwordForm.newPassword) {
         errors.newPassword = 'New password is required';
@@ -507,40 +512,40 @@ const AccountPage = {
       } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(this.passwordForm.newPassword)) {
         errors.newPassword = 'Password must include uppercase, lowercase, and numbers';
       }
-      
+
       // Confirm password validation
       if (!this.passwordForm.confirmPassword) {
         errors.confirmPassword = 'Please confirm your new password';
       } else if (this.passwordForm.newPassword !== this.passwordForm.confirmPassword) {
         errors.confirmPassword = 'Passwords do not match';
       }
-      
+
       this.passwordValidationErrors = errors;
       return Object.keys(errors).length === 0;
     },
-    
+
     // Update password
     async updatePassword() {
       // Clear previous messages
       this.securitySuccess = null;
       this.securityError = null;
-      
+
       // Validate form
       if (!this.validatePasswordForm()) return;
-      
+
       // Set submitting state
       this.isPasswordSubmitting = true;
-      
+
       try {
         // Call AuthService to update password
-        const response = await AuthService.updatePassword(
+        const response = await window.AuthService.updatePassword(
           this.passwordForm.currentPassword,
           this.passwordForm.newPassword
         );
-        
+
         if (response.success) {
           this.securitySuccess = 'Your password has been updated successfully.';
-          
+
           // Reset form
           this.passwordForm = {
             currentPassword: '',
@@ -558,7 +563,7 @@ const AccountPage = {
         this.isPasswordSubmitting = false;
       }
     },
-    
+
     // Toggle password visibility
     togglePasswordVisibility(field) {
       if (field === 'current') {
@@ -569,15 +574,15 @@ const AccountPage = {
         this.showConfirmPassword = !this.showConfirmPassword;
       }
     },
-    
+
     // Show logout confirmation modal
     confirmLogout() {
       this.showLogoutModal = true;
     },
-    
+
     // Logout user
     logout() {
-      AuthService.logout();
+      window.AuthService.logout();
       this.showLogoutModal = false;
       this.$router.push('/login');
     },

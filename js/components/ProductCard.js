@@ -1,6 +1,6 @@
 /**
  * ProductCard Component
- * Reusable component for displaying product information in a card format
+ * Reusable component for displaying food item information in a card format
  */
 window.app.component('product-card', {
   props: {
@@ -13,10 +13,15 @@ window.app.component('product-card', {
     <router-link :to="'/product/' + product.id" class="text-decoration-none">
       <div class="card h-100 product-card-clickable">
         <div class="position-relative">
-          <img :src="product.image" :alt="product.name" class="card-img-top">
+          <img :src="product.image" :alt="product.name" class="card-img-top food-image">
           <span v-if="product.discount" class="badge bg-danger position-absolute top-0 end-0 m-2">
             {{ product.discount }}% OFF
           </span>
+          <div v-if="product.dietaryOptions && product.dietaryOptions.length > 0" class="position-absolute bottom-0 start-0 m-2">
+            <span v-for="option in product.dietaryOptions" :key="option" class="badge bg-success me-1">
+              {{ option }}
+            </span>
+          </div>
         </div>
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">{{ product.name }}</h5>
@@ -29,13 +34,21 @@ window.app.component('product-card', {
               <div class="price">RM{{ product.price.toFixed(2) }}</div>
             </template>
           </div>
-          <div class="mb-2">
+          <div class="mb-2 d-flex justify-content-between">
             <div class="ratings">
               <i v-for="i in 5" :key="i" class="fas fa-star" :class="{ 'text-warning': i <= product.rating, 'text-muted': i > product.rating }"></i>
               <span class="ms-1 text-muted">({{ product.reviewCount }})</span>
             </div>
+            <div class="preparation-time">
+              <i class="far fa-clock me-1"></i>{{ product.preparationTime }} min
+            </div>
           </div>
           <p class="card-text flex-grow-1">{{ truncatedDescription }}</p>
+          <div class="mt-2">
+            <small class="text-muted">
+              <i class="fas fa-fire-alt me-1"></i>{{ product.calories }} cal
+            </small>
+          </div>
           <div class="mt-auto text-center">
             <span class="btn btn-outline-primary w-100">View Details</span>
           </div>

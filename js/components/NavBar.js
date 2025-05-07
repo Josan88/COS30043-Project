@@ -1,13 +1,13 @@
 /**
  * NavBar Component
- * Main navigation bar for the application
+ * Main navigation bar for the in-restaurant food ordering application
  */
 window.app.component('nav-bar', {
   template: `
     <nav class="navbar navbar-expand-md">
       <div class="container">
         <router-link to="/" class="navbar-brand">
-          <i class="fas fa-laptop"></i> TechWorld
+          <i class="fas fa-utensils"></i> FoodNow
         </router-link>
         
         <button class="navbar-toggler" type="button" @click="toggleNav" aria-label="Toggle navigation">
@@ -17,12 +17,12 @@ window.app.component('nav-bar', {
         <div class="collapse navbar-collapse" :class="{ 'd-block': isNavOpen }">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link to="/product" class="nav-link" aria-label="Products">
-                <i class="fas fa-shopping-bag"></i> Products
+              <router-link to="/product" class="nav-link" aria-label="Menu">
+                <i class="fas fa-book-open"></i> Menu
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link to="/cart" class="nav-link" aria-label="Shopping Cart">
+              <router-link to="/cart" class="nav-link" aria-label="Order Cart">
                 <i class="fas fa-shopping-cart"></i> Cart <span v-if="cartItemCount" class="badge bg-danger">{{ cartItemCount }}</span>
               </router-link>
             </li>
@@ -36,10 +36,17 @@ window.app.component('nav-bar', {
                 <i class="fas fa-user-plus"></i> Register
               </router-link>
             </li>
-            <li class="nav-item" v-if="isLoggedIn">
-              <router-link to="/account" class="nav-link" aria-label="My Account">
+            <li class="nav-item dropdown" v-if="isLoggedIn">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
+                 data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-user-circle"></i> My Account
-              </router-link>
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                <li><router-link to="/account" class="dropdown-item">Profile</router-link></li>
+                <li><router-link to="/purchases" class="dropdown-item">Order History</router-link></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" @click.prevent="logout">Sign Out</a></li>
+              </ul>
             </li>
           </ul>
         </div>

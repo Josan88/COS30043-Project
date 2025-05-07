@@ -1,8 +1,8 @@
 /**
- * TechWorld E-Commerce Store - Router Configuration
+ * FoodNow - In-Restaurant Food Ordering Platform - Router Configuration
  * 
  * This file configures the Vue Router with all application routes.
- * It sets up the 7 main pages and any additional sub-routes.
+ * It sets up the main pages for the digital menu and ordering system.
  */
 
 // Define routes
@@ -12,15 +12,15 @@ const routes = [
     name: 'Home',
     component: window.HomePage,
     meta: {
-      title: 'TechWorld - Your Technology Destination'
+      title: 'FoodNow - Digital Restaurant Menu'
     }
   },
   {
     path: '/product',
-    name: 'Products',
+    name: 'Menu',
     component: window.ProductPage,
     meta: {
-      title: 'Products - TechWorld'
+      title: 'Our Menu - FoodNow'
     }
   },
   {
@@ -29,7 +29,7 @@ const routes = [
     component: window.ProductPage,
     props: true,
     meta: {
-      title: 'Product Details - TechWorld'
+      title: 'Menu Item Details - FoodNow'
     }
   },
   {
@@ -37,7 +37,7 @@ const routes = [
     name: 'ShoppingCart',
     component: window.ShoppingCart,
     meta: {
-      title: 'Your Cart - TechWorld'
+      title: 'Your Order - FoodNow'
     }
   },
   {
@@ -45,7 +45,7 @@ const routes = [
     name: 'Register',
     component: window.RegisterPage,
     meta: {
-      title: 'Create Account - TechWorld',
+      title: 'Create Account - FoodNow',
       guest: true
     }
   },
@@ -54,7 +54,7 @@ const routes = [
     name: 'Login',
     component: window.LoginPage,
     meta: {
-      title: 'Sign In - TechWorld',
+      title: 'Sign In - FoodNow',
       guest: true
     }
   },
@@ -63,7 +63,7 @@ const routes = [
     name: 'Account',
     component: window.AccountPage,
     meta: {
-      title: 'My Account - TechWorld',
+      title: 'My Account - FoodNow',
       requiresAuth: true
     }
   },
@@ -72,7 +72,7 @@ const routes = [
     name: 'Purchases',
     component: window.PurchasesPage,
     meta: {
-      title: 'My Purchases - TechWorld',
+      title: 'My Order History - FoodNow',
       requiresAuth: true
     }
   },
@@ -89,7 +89,7 @@ const routes = [
       `
     },
     meta: {
-      title: 'Page Not Found - TechWorld'
+      title: 'Page Not Found - FoodNow'
     }
   }
 ];
@@ -107,7 +107,7 @@ const router = VueRouter.createRouter({
 // Navigation guards for authentication and title updates
 router.beforeEach((to, from, next) => {
   // Update page title
-  document.title = to.meta.title || 'TechWorld';
+  document.title = to.meta.title || 'FoodNow - Digital Restaurant Menu';
   
   // Check if route requires authentication
   if (to.matched.some(record => record.meta.requiresAuth)) {

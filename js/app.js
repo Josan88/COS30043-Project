@@ -1,5 +1,5 @@
 /**
- * TechWorld E-Commerce Store - Main Application
+ * FoodNow Food Ordering Website - Main Application
  * 
  * This is the main entry point for the Vue 3 application.
  * It initializes the Vue app, registers components, and mounts the app to the DOM.
@@ -10,7 +10,7 @@ window.app = Vue.createApp({
   data() {
     return {
       // Global app state can go here if needed
-      appName: 'TechWorld',
+      appName: 'FoodNow',
       isLoading: false
     };
   },
