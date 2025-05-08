@@ -373,7 +373,7 @@ const ProductPage = {
                   <p class="text-success">You save: RM{{ savedAmount }}</p>
                 </template>
                 <template v-else>
-                  <p class="price h3">RM{{ currentProduct.price.toFixed(2) }}</p>
+                  <p class="price h3">RM{{ (currentProduct.price + (currentProduct.customization?.extraPrice || 0)).toFixed(2) }}</p>
                 </template>
               </div>
               
@@ -403,19 +403,58 @@ const ProductPage = {
                 <p>{{ currentProduct.description }}</p>
               </div>
               
-              <!-- Ingredients -->
+              <!-- Ingredients with Customization -->
               <div v-if="currentProduct.ingredients && currentProduct.ingredients.length > 0" class="mb-4">
-                <h4>Ingredients</h4>
-                <p class="mb-2">
-                  <span v-for="(ingredient, index) in currentProduct.ingredients" :key="index">
-                    {{ ingredient }}{{ index < currentProduct.ingredients.length - 1 ? ', ' : '' }}
-                  </span>
-                </p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <h4>Ingredients</h4>
+                  <button @click="showCustomizationModal = true" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-utensils me-1"></i> Customize
+                  </button>
+                </div>
+                
+                <div class="ingredients-display p-3 bg-light rounded mt-2">
+                  <!-- Base Ingredients -->
+                  <div>
+                    <p class="fw-medium mb-1">Base Ingredients:</p>
+                    <ul class="ingredient-list">
+                      <template v-for="(ing, i) in displayedIngredients" :key="i">
+                        <li v-if="!isRemovedIngredient(ing)" class="ingredient-item">{{ getIngredientName(ing) }}</li>
+                      </template>
+                    </ul>
+                  </div>
+                  
+                  <!-- Removed Ingredients -->
+                  <div v-if="hasRemovedIngredients" class="mt-2">
+                    <p class="fw-medium mb-1 text-danger">Removed:</p>
+                    <ul class="ingredient-list removed">
+                      <li v-for="(ing, i) in currentProduct.customization.removedIngredients" :key="'removed-'+i" 
+                          class="ingredient-item removed">
+                        <s>{{ ing }}</s>
+                      </li>
+                    </ul>
+                  </div>
+                  
+                  <!-- Added Ingredients -->
+                  <div v-if="hasAddedIngredients" class="mt-2">
+                    <p class="fw-medium mb-1 text-success">Added:</p>
+                    <ul class="ingredient-list added">
+                      <li v-for="(ing, i) in currentProduct.customization.addedIngredients" :key="'added-'+i" 
+                          class="ingredient-item added">
+                        {{ ing.name }} <span v-if="ing.price > 0" class="extra-price">(+RM{{ ing.price.toFixed(2) }})</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
               
               <!-- Special Instructions -->
               <div class="mb-4">
-                <label for="special-instructions" class="form-label">Special Instructions</label>
+                <div class="d-flex justify-content-between align-items-center">
+                  <label for="special-instructions" class="form-label">Special Instructions</label>
+                  <span v-if="hasCustomization" class="text-primary small cursor-pointer" @click="showCustomizationModal = true">
+                    <i class="fas fa-edit me-1"></i>Edit
+                  </span>
+                </div>
                 <textarea 
                   id="special-instructions" 
                   class="form-control" 
@@ -448,8 +487,8 @@ const ProductPage = {
                 >
                   <i class="fas fa-cart-plus"></i> Add to Order
                 </button>
-                <button class="btn btn-outline btn-lg">
-                  <i class="far fa-heart"></i> Save for Later
+                <button class="btn btn-outline btn-lg" @click="showCustomizationModal = true">
+                  <i class="fas fa-sliders-h"></i> Customize
                 </button>
               </div>
             </div>
@@ -465,6 +504,14 @@ const ProductPage = {
             </div>
           </div>
         </div>
+        
+        <!-- Customization Modal -->
+        <customization-modal 
+          :product="currentProduct" 
+          :show="showCustomizationModal"
+          @close="showCustomizationModal = false"
+          @save="applyCustomization"
+        ></customization-modal>
       </div>
     </div>
   `,
@@ -506,7 +553,8 @@ const ProductPage = {
         'rating-desc': 'Highest Rated',
         'name-asc': 'Name: A to Z',
         'name-desc': 'Name: Z to A'
-      }
+      },
+      showCustomizationModal: false
     };
   },
   computed: {
@@ -656,16 +704,60 @@ const ProductPage = {
     // Calculate the discounted price for the current product
     discountedPrice() {
       if (!this.currentProduct) return 0;
-      if (!this.currentProduct.discount) return this.currentProduct.price.toFixed(2);
       
-      return (this.currentProduct.price - (this.currentProduct.price * this.currentProduct.discount / 100)).toFixed(2);
+      let basePrice = this.currentProduct.price;
+      // Add extra ingredient prices if customized
+      if (this.currentProduct.customization && this.currentProduct.customization.extraPrice) {
+        basePrice += this.currentProduct.customization.extraPrice;
+      }
+      
+      if (!this.currentProduct.discount) return basePrice.toFixed(2);
+      
+      return (basePrice - (basePrice * this.currentProduct.discount / 100)).toFixed(2);
     },
     
     // Calculate how much the user saves with the discount
     savedAmount() {
       if (!this.currentProduct || !this.currentProduct.discount) return 0;
       
-      return (this.currentProduct.price * this.currentProduct.discount / 100).toFixed(2);
+      let basePrice = this.currentProduct.price;
+      // Add extra ingredient prices if customized
+      if (this.currentProduct.customization && this.currentProduct.customization.extraPrice) {
+        basePrice += this.currentProduct.customization.extraPrice;
+      }
+      
+      return (basePrice * this.currentProduct.discount / 100).toFixed(2);
+    },
+    
+    // Display ingredients with customization taken into account
+    displayedIngredients() {
+      if (!this.currentProduct || !this.currentProduct.ingredients) return [];
+      return this.currentProduct.ingredients;
+    },
+    
+    // Check if the product has removed ingredients
+    hasRemovedIngredients() {
+      return this.currentProduct && 
+             this.currentProduct.customization && 
+             this.currentProduct.customization.removedIngredients && 
+             this.currentProduct.customization.removedIngredients.length > 0;
+    },
+    
+    // Check if the product has added ingredients
+    hasAddedIngredients() {
+      return this.currentProduct && 
+             this.currentProduct.customization && 
+             this.currentProduct.customization.addedIngredients && 
+             this.currentProduct.customization.addedIngredients.length > 0;
+    },
+    
+    // Check if the product has any customization
+    hasCustomization() {
+      return this.hasRemovedIngredients || 
+             this.hasAddedIngredients || 
+             (this.currentProduct && 
+              this.currentProduct.customization && 
+              this.currentProduct.customization.specialInstructions);
     },
     
     // Get the category name for breadcrumb navigation
@@ -679,6 +771,16 @@ const ProductPage = {
     // Watch for route changes
     $route(to, from) {
       this.loadData();
+    },
+    
+    // Update special instructions when current product changes
+    currentProduct: {
+      immediate: true,
+      handler(newProduct) {
+        if (newProduct) {
+          this.specialInstructions = newProduct.customization?.specialInstructions || '';
+        }
+      }
     }
   },
   async created() {
@@ -912,20 +1014,76 @@ const ProductPage = {
         this.quantity--;
       }
     },
+    
+    // Check if ingredient is in the removed list
+    isRemovedIngredient(ingredient) {
+      if (!this.currentProduct || !this.currentProduct.customization || !this.currentProduct.customization.removedIngredients) {
+        return false;
+      }
+      
+      const name = this.getIngredientName(ingredient);
+      return this.currentProduct.customization.removedIngredients.includes(name);
+    },
+    
+    // Get ingredient name whether it's a string or object
+    getIngredientName(ingredient) {
+      return typeof ingredient === 'string' ? ingredient : ingredient.name;
+    },
+    
+    // Apply customization from modal
+    applyCustomization(customization) {
+      if (!this.currentProduct) return;
+      
+      // Update the product with the customization
+      this.currentProduct = {
+        ...this.currentProduct,
+        customization: customization
+      };
+      
+      // Update special instructions field
+      this.specialInstructions = customization.specialInstructions;
+    },
+    
     addToCart() {
       if (!this.currentProduct) return;
       
-      // Create a product with special instructions
-      const productWithInstructions = {
+      // Update special instructions in customization
+      const customization = this.currentProduct.customization || {};
+      customization.specialInstructions = this.specialInstructions;
+      
+      // Create a product with customization
+      const productToAdd = {
         ...this.currentProduct,
-        specialInstructions: this.specialInstructions
+        customization: customization
+      };
+      
+      // Calculate final price with customization
+      let finalPrice = this.currentProduct.price;
+      if (customization.extraPrice) {
+        finalPrice += customization.extraPrice;
+      }
+      
+      // Apply discount if any
+      if (this.currentProduct.discount) {
+        finalPrice = finalPrice - (finalPrice * this.currentProduct.discount / 100);
+      }
+      
+      // Create the cart item
+      const cartItem = {
+        ...productToAdd,
+        finalPrice: finalPrice
       };
       
       // Add to cart with specified quantity
-      window.CartService.addToCart(productWithInstructions, this.quantity);
+      window.CartService.addToCart(cartItem, this.quantity);
       
-      // Show success message
-      alert(`${this.quantity} ${this.quantity > 1 ? 'items' : 'item'} added to your order!`);
+      // Show success message with customization details
+      let customizationDetails = '';
+      if (this.hasCustomization) {
+        customizationDetails = ' (Customized)';
+      }
+      
+      alert(`${this.quantity} ${this.quantity > 1 ? 'items' : 'item'}${customizationDetails} added to your order!`);
     }
   }
 };

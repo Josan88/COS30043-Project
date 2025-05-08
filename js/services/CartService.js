@@ -284,23 +284,29 @@ class CartService {
    */
   getDeliveryOptions() {
     return [
-      { 
-        id: 'standard', 
-        name: 'Standard Delivery', 
-        price: this.totals.subtotal < 15 ? 2.99 : 0,
+      {
+        id: 'dine-in',
+        name: 'Dine-in',
+        price: 0, // Or calculate if there's a specific dine-in service charge
+        estimatedTime: 'N/A' // Or link to preparation time
+      },
+      {
+        id: 'pickup',
+        name: 'Pick-up',
+        price: 0,
+        estimatedTime: '15-20 min' // Or dynamically calculate
+      },
+      {
+        id: 'standard_delivery',
+        name: 'Standard Delivery',
+        price: this.totals.subtotal < 15 ? 2.99 : 0, // Example fee
         estimatedTime: '30-45 min'
       },
-      { 
-        id: 'express', 
-        name: 'Express Delivery', 
-        price: 4.99,
+      {
+        id: 'express_delivery',
+        name: 'Express Delivery',
+        price: 4.99, // Example fee
         estimatedTime: '15-25 min'
-      },
-      { 
-        id: 'pickup', 
-        name: 'Self Pickup', 
-        price: 0,
-        estimatedTime: '15 min'
       }
     ];
   }
@@ -321,16 +327,17 @@ class CartService {
       orderDetails.estimatedDelivery = deliveryInfo.estimatedTime;
       orderDetails.estimatedMinutes = deliveryInfo.minutes;
       
-      // Submit order to database service
-      const savedOrder = await DatabaseService.saveOrder(orderDetails);
+      // Submit order to database service - using correct method name addOrder
+      const orderId = await DatabaseService.addOrder(orderDetails);
+      orderDetails.id = orderId; // Add the ID to the order details
       
       // Clear cart after successful order
       this.clearCart();
       
       // Notify listeners about successful order
-      this.notifyListeners('orderPlaced', savedOrder);
+      this.notifyListeners('orderPlaced', orderDetails);
       
-      return savedOrder;
+      return { success: true, order: orderDetails };
     } catch (error) {
       console.error('Error submitting order:', error);
       // Save order to local storage as fallback
@@ -354,7 +361,7 @@ class CartService {
       // Notify listeners
       this.notifyListeners('orderPlaced', localOrder);
       
-      return localOrder;
+      return { success: true, order: localOrder };
     }
   }
 

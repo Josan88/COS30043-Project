@@ -65,11 +65,20 @@ const ShoppingCart = {
               <!-- Table Service Options -->
               <div class="card mb-4">
                 <div class="card-header bg-white">
-                  <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Service Details</h5>
+                  <h5 class="mb-0"><i class="fas fa-concierge-bell me-2"></i> Service Method</h5>
                 </div>
                 <div class="card-body">
                   <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-12">
+                      <label for="service-method" class="form-label">Choose Service</label>
+                      <select class="form-select" id="service-method" v-model="serviceMethod" @change="updateServiceDetails">
+                        <option value="dine-in">Dine-in</option>
+                        <option value="pickup">Pick-up</option>
+                        <option value="delivery">Delivery</option>
+                      </select>
+                    </div>
+
+                    <div v-if="serviceMethod === 'dine-in'" class="col-md-6">
                       <label for="table-number" class="form-label">Table Number</label>
                       <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
@@ -77,7 +86,24 @@ const ShoppingCart = {
                       </div>
                       <small class="text-muted">Find your table number displayed on your table</small>
                     </div>
-                    
+
+                    <div v-if="serviceMethod === 'delivery'" class="col-12">
+                      <label for="delivery-address" class="form-label">Delivery Address</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                        <textarea class="form-control" id="delivery-address" v-model="deliveryAddress" rows="2" placeholder="Enter your delivery address"></textarea>
+                      </div>
+                    </div>
+
+                    <div v-if="serviceMethod === 'pickup' || serviceMethod === 'delivery'" class="col-md-6">
+                        <label for="phone-number" class="form-label">Phone Number</label>
+                        <div class="input-group">
+                          <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                          <input type="tel" class="form-control" id="phone-number" v-model="phoneNumber" placeholder="Enter your phone number">
+                        </div>
+                         <small class="text-muted">For order updates and pickup/delivery coordination</small>
+                    </div>
+
                     <div class="col-12">
                       <label for="special-requests" class="form-label">Special Requests (Optional)</label>
                       <div class="input-group">
@@ -229,49 +255,9 @@ const ShoppingCart = {
                   </div>
                   
                   <!-- Place Order Button -->
-                  <button @click="placeOrder" class="btn btn-primary btn-lg btn-place-order" :disabled="!isOrderValid">
+                  <button @click="placeOrder" class="btn btn-primary btn-lg btn-place-order w-100" :disabled="!isOrderValid">
                     <i class="fas fa-utensils me-2"></i> Place Order
                   </button>
-                </div>
-              </div>
-              
-              <!-- Ordering Policies Information -->
-              <div class="accordion" id="orderingPolicies">
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingAllergies">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAllergies" aria-expanded="false" aria-controls="collapseAllergies">
-                      <i class="fas fa-exclamation-circle me-2"></i> Food Allergies
-                    </button>
-                  </h2>
-                  <div id="collapseAllergies" class="accordion-collapse collapse" aria-labelledby="headingAllergies" data-bs-parent="#orderingPolicies">
-                    <div class="accordion-body">
-                      <p class="small mb-0">If you have specific food allergies, please mention them in the special instructions when adding items to your order or ask your server for assistance.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingCancellation">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCancellation" aria-expanded="false" aria-controls="collapseCancellation">
-                      <i class="fas fa-ban me-2"></i> Cancellation Policy
-                    </button>
-                  </h2>
-                  <div id="collapseCancellation" class="accordion-collapse collapse" aria-labelledby="headingCancellation" data-bs-parent="#orderingPolicies">
-                    <div class="accordion-body">
-                      <p class="small mb-0">Orders can be cancelled within 5 minutes of placing or before the kitchen starts preparing your food. See our <a href="#">cancellation policy</a> for details.</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="accordion-item">
-                  <h2 class="accordion-header" id="headingAssistance">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAssistance" aria-expanded="false" aria-controls="collapseAssistance">
-                      <i class="fas fa-question-circle me-2"></i> Need Assistance?
-                    </button>
-                  </h2>
-                  <div id="collapseAssistance" class="accordion-collapse collapse" aria-labelledby="headingAssistance" data-bs-parent="#orderingPolicies">
-                    <div class="accordion-body">
-                      <p class="small mb-0">If you need help with your order, please use the "Call Server" button on the Order Status page after placing your order, or simply ask any of our staff for assistance.</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -300,6 +286,9 @@ const ShoppingCart = {
       promoCodeApplied: false,
       activePromoCode: null,
       paymentMethod: 'card',
+      serviceMethod: 'dine-in', // Default to dine-in
+      deliveryAddress: '',
+      phoneNumber: '',
       serviceChargeRate: 0.05, // 5% service charge
       taxRate: 0.06, // 6% tax rate
       promoCodes: [
@@ -389,7 +378,11 @@ const ShoppingCart = {
       return `${hours}:${minutes} (approximately ${prepTime} minutes)`;
     },
     isOrderValid() {
-      return this.cartItems.length > 0 && this.tableNumber.trim() !== '';
+      if (this.cartItems.length === 0) return false;
+      if (this.serviceMethod === 'dine-in' && !this.tableNumber.trim()) return false;
+      if (this.serviceMethod === 'delivery' && !this.deliveryAddress.trim()) return false;
+      if ((this.serviceMethod === 'pickup' || this.serviceMethod === 'delivery') && !this.phoneNumber.trim()) return false;
+      return true;
     }
   },
   created() {
@@ -401,6 +394,19 @@ const ShoppingCart = {
     window.removeEventListener('cart-updated', this.loadCart);
   },
   methods: {
+    updateServiceDetails() {
+      // Reset fields when service method changes to avoid carrying over irrelevant data
+      if (this.serviceMethod !== 'dine-in') {
+        this.tableNumber = '';
+      }
+      if (this.serviceMethod !== 'delivery') {
+        this.deliveryAddress = '';
+      }
+      if (this.serviceMethod === 'dine-in') { // Clear phone for dine-in if not needed
+        this.phoneNumber = '';
+      }
+      this.recalculateCart(); // Recalculate totals, delivery fees might change
+    },
     async loadCart() {
       try {
         this.isLoading = true;
@@ -525,22 +531,31 @@ const ShoppingCart = {
       this.promoError = null;
       this.recalculateCart();
     },
-    placeOrder() {
+    async placeOrder() {
       if (!window.AuthService.isLoggedIn()) {
         localStorage.setItem('checkoutRedirect', true);
         this.$router.push('/login');
         return;
       }
       if (!this.isOrderValid) {
-        if (!this.tableNumber.trim()) {
-          alert('Please enter your table number to place your order');
+        let message = 'Please complete all required fields for your selected service method.';
+        if (this.serviceMethod === 'dine-in' && !this.tableNumber.trim()) {
+          message = 'Please enter your table number for dine-in orders.';
+        } else if (this.serviceMethod === 'delivery' && !this.deliveryAddress.trim()) {
+          message = 'Please enter your delivery address.';
+        } else if ((this.serviceMethod === 'pickup' || this.serviceMethod === 'delivery') && !this.phoneNumber.trim()) {
+          message = 'Please enter your phone number for pickup/delivery.';
         }
+        alert(message);
         return;
       }
       const orderData = {
         items: this.cartItems,
         totals: this.cartTotals,
-        tableNumber: this.tableNumber,
+        serviceMethod: this.serviceMethod,
+        tableNumber: this.serviceMethod === 'dine-in' ? this.tableNumber : null,
+        deliveryAddress: this.serviceMethod === 'delivery' ? this.deliveryAddress : null,
+        phoneNumber: (this.serviceMethod === 'pickup' || this.serviceMethod === 'delivery') ? this.phoneNumber : null,
         specialRequests: this.specialRequests,
         payment: {
           method: this.paymentMethod
@@ -552,14 +567,17 @@ const ShoppingCart = {
         } : null,
         orderTime: new Date().toISOString(),
         estimatedDeliveryTime: this.estimatedTime,
-        status: 'pending'
+        status: 'pending',
+        userId: window.AuthService.getCurrentUser().id
       };
-      const result = window.CartService.saveOrder(orderData);
-      if (result.success) {
+
+      try {
+        const result = await window.CartService.submitOrder(orderData);
         alert('Order placed successfully! Your food will be prepared shortly.');
         this.$router.push('/purchases');
-      } else {
-        alert('Error: ' + result.message);
+      } catch (error) {
+        console.error('Error placing order:', error);
+        alert('Error: ' + (error.message || 'Failed to place order'));
       }
     }
   }

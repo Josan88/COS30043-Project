@@ -724,12 +724,46 @@ const PurchasesPage = {
       // Get orders from CartService
       const currentUser = window.AuthService.getCurrentUser();
       if (currentUser && currentUser.id) {
-        this.orders = window.CartService.getUserOrders(currentUser.id);
+        let orders = window.CartService.getUserOrders(currentUser.id);
+        
+        // Normalize order data to ensure all required fields exist
+        this.orders = orders.map(order => this.normalizeOrder(order));
       } else {
         this.orders = [];
         console.warn('User not logged in or missing user ID');
       }
       this.filterOrders();
+    },
+    
+    // New method to ensure all orders have the required structure
+    normalizeOrder(order) {
+      // Create a copy to avoid modifying the original
+      const normalizedOrder = { ...order };
+      
+      // Ensure order has the required properties
+      normalizedOrder.totals = normalizedOrder.totals || { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
+      normalizedOrder.items = normalizedOrder.items || [];
+      normalizedOrder.status = normalizedOrder.status || 'pending';
+      normalizedOrder.orderTime = normalizedOrder.orderTime || order.orderDate || new Date().toISOString();
+      
+      // Ensure order has delivery info
+      normalizedOrder.delivery = normalizedOrder.delivery || {
+        method: order.serviceMethod || 'delivery',
+        details: {}
+      };
+      
+      // Convert older format orders to new format
+      if (!normalizedOrder.delivery.method && normalizedOrder.serviceMethod) {
+        normalizedOrder.delivery = {
+          method: normalizedOrder.serviceMethod,
+          details: {
+            line1: normalizedOrder.deliveryAddress || '',
+            notes: normalizedOrder.specialRequests || ''
+          }
+        };
+      }
+      
+      return normalizedOrder;
     },
     
     filterOrders() {
@@ -1044,7 +1078,8 @@ const PurchasesPage = {
     },
     
     getDeliveryLabel(order) {
-      return order.delivery.method === 'pickup' ? 'Pickup Fee' : 'Delivery Fee';
+      const method = order.delivery?.method || order.serviceMethod;
+      return method === 'pickup' ? 'Pickup Fee' : 'Delivery Fee';
     },
     
     isStatusReached(currentStatus, checkStatus) {
