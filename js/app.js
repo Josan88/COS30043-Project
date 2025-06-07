@@ -5,6 +5,13 @@
  * It initializes the Vue app, registers components, and mounts the app to the DOM.
  */
 
+// Initialize AuthService
+AuthService.init().then(() => {
+  console.log('AuthService initialized');
+}).catch(error => {
+  console.error('Error initializing AuthService:', error);
+});
+
 // Create the Vue application instance and make it globally available
 window.app = Vue.createApp({
   data() {

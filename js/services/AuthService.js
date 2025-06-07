@@ -13,8 +13,8 @@ const AuthService = {
       // If no users, add a default test user
       if (!users || users.length === 0) {
         const defaultUser = {
-          email: 'test@example.com',
-          password: 'Password123', // In a real app, this would be hashed
+          email: 'admin',
+          password: 'admin', // In a real app, this would be hashed
           firstName: 'John',
           lastName: 'Doe',
           address: '123 Main St, City, Country',
@@ -33,6 +33,36 @@ const AuthService = {
   // Login user
   async login(email, password) {
     try {
+      // Special case for admin login
+      if (email === 'admin') {
+        if (password === 'admin') {
+          const user = await DatabaseService.getUserByEmail(email);
+          if (user && user.password === password) { // Ensure DB password matches
+            const userInfo = { ...user };
+            delete userInfo.password;
+            localStorage.setItem('user', JSON.stringify(userInfo));
+            localStorage.setItem('isLoggedIn', 'true');
+            return { success: true, user: userInfo };
+          }
+          // If admin user not found in DB or password in DB doesn't match 'admin'
+          return { success: false, message: 'Admin login failed: User details incorrect or not found' };
+        } else {
+          // Email is 'admin' but password entered is not 'admin'
+          return { success: false, message: 'Admin login failed: Incorrect password' };
+        }
+      }
+
+      // Standard email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return { success: false, message: 'Invalid email format' };
+      }
+
+      // Standard password length validation
+      if (password.length < 8) {
+        return { success: false, message: 'Password must be at least 8 characters' };
+      }
+
       // Find user by email
       const user = await DatabaseService.getUserByEmail(email);
       
