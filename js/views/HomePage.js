@@ -1,139 +1,5 @@
-/**
- * HomePage Component v2.0.0 - Enhanced Edition
- * 
- * FEATURES:
- * - ✅ Hero Section: Dynamic video background with fallback image support
- * - ✅ Search Functionality: Advanced location and restaurant search with validation
- * - ✅ Featured Content: Dynamic display of popular restaurants, trending dishes, and categories
- * - ✅ Interactive Elements: Animated counters, testimonials carousel, and promotional banners
- * - ✅ Quick Actions: Direct navigation to popular sections and featured content
- * - ✅ Mobile Responsive: Optimized layouts for all screen sizes with touch-friendly interactions
- * - ✅ Performance Optimized: Lazy loading, image optimization, and efficient rendering
- * 
- * ENHANCED FEATURES:
- * - Constants integration via window.APP_CONSTANTS for centralized configuration
- * - ValidationService integration with comprehensive form validation
- * - Enhanced error handling with ErrorHandler and retry mechanisms
- * - Analytics tracking with detailed user behavior monitoring
- * - Toast notifications for all user interactions
- * - Debounced search and validation for optimal performance
- * - Accessibility improvements (ARIA labels, keyboard navigation, screen reader support)
- * - Advanced state management with component health monitoring
- * - Intersection Observer for scroll-based animations and lazy loading
- * - Progressive Web App features preparation
- * - SEO optimization with structured data and meta information
- * - Performance monitoring with Core Web Vitals tracking
- * - Advanced caching strategies for optimal loading times
- * - Real-time content updates and promotional banner management
- * - Comprehensive logging and debugging capabilities
- * 
- * DEPENDENCIES:
- * - window.APP_CONSTANTS (configuration and constants management)
- * - window.ValidationService (form validation and input sanitization)
- * - window.ErrorHandler (error management and recovery)
- * - window.Analytics (behavior tracking and conversion optimization)
- * - window.ToastService (user notifications and feedback)
- * - window.CartService (cart integration and quick actions)
- * - window.Filters (data formatting and display utilities)
- * - Bootstrap 5 (UI components, modals, and responsive grid)
- * - Intersection Observer API (scroll animations and lazy loading)
- * - Local Storage API (user preferences and search history)
- */
-const HomePage = {
-  template: `
+const HomePage = {  template: `
     <div class="home-page">
-      <!-- Hero Section with Video Background -->
-      <div class="hero-section position-relative">
-        <div class="video-overlay"></div>
-        <video 
-          v-if="!videoError" 
-          autoplay 
-          muted 
-          loop 
-          class="hero-video"
-          @error="handleVideoError"
-          :aria-label="config.heroVideoAriaLabel"
-        >
-          <source :src="config.heroVideoUrl" type="video/mp4">
-        </video>
-        <div 
-          v-if="videoError" 
-          class="hero-fallback"
-          :style="{ backgroundImage: \`url(\${config.heroFallbackImage})\` }"
-          role="img"
-          :aria-label="config.heroFallbackAriaLabel"
-        ></div>
-        
-        <div class="container position-relative hero-content">
-          <div class="row">
-            <div class="col-lg-8 col-md-10 mx-auto text-center py-5">
-              <h1 class="display-3 fw-bold text-white mb-3 animated-text">
-                {{ config.heroTitle }} <span class="text-primary">{{ config.heroTitleHighlight }}</span>
-              </h1>
-              <p class="lead text-white mb-4 fs-4">{{ config.heroSubtitle }}</p>
-                <!-- Location Status Display -->
-              <div class="location-status bg-white p-4 rounded-lg shadow-lg">
-                <div class="d-flex align-items-center justify-content-center">
-                  <div v-if="locationStatus.isDetecting" class="text-center">
-                    <div class="spinner-border text-primary me-3" role="status">
-                      <span class="visually-hidden">Detecting location...</span>
-                    </div>
-                    <div>
-                      <h5 class="mb-1">{{ config.detectingLocationText }}</h5>
-                      <p class="text-muted mb-0">{{ config.detectingLocationSubtext }}</p>
-                    </div>
-                  </div>
-                  
-                  <div v-else-if="locationStatus.detected" class="text-center">
-                    <div class="d-flex align-items-center justify-content-center mb-3">
-                      <i class="fas fa-map-marker-alt text-success me-3 fa-2x"></i>
-                      <div class="text-start">
-                        <h5 class="mb-1 text-success">{{ config.locationDetectedText }}</h5>
-                        <p class="text-muted mb-0">{{ locationStatus.address }}</p>
-                      </div>
-                    </div>
-                    <router-link 
-                      to="/product" 
-                      class="btn btn-primary btn-lg px-5"
-                      :aria-label="config.startOrderingAriaLabel"
-                    >
-                      <i class="fas fa-utensils me-2"></i>
-                      {{ config.startOrderingText }}
-                    </router-link>
-                  </div>
-                  
-                  <div v-else class="text-center">
-                    <div class="mb-3">
-                      <i class="fas fa-location-crosshairs text-warning fa-3x mb-3"></i>
-                      <h5 class="mb-2">{{ config.locationPermissionText }}</h5>
-                      <p class="text-muted mb-4">{{ config.locationPermissionSubtext }}</p>
-                    </div>
-                    <div class="d-flex gap-3 justify-content-center">
-                      <button 
-                        @click="detectLocation"
-                        class="btn btn-primary btn-lg"
-                        :disabled="locationStatus.isDetecting"
-                        :aria-label="config.detectLocationAriaLabel"
-                      >
-                        <i class="fas fa-crosshairs me-2"></i>
-                        {{ config.detectLocationText }}
-                      </button>
-                      <router-link 
-                        to="/product" 
-                        class="btn btn-outline-primary btn-lg"
-                        :aria-label="config.skipLocationAriaLabel"
-                      >
-                        {{ config.skipLocationText }}
-                      </router-link>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <!-- Main Content Container -->
       <div class="container-fluid px-0">
         <!-- Today's Special Carousel - Full Width -->
@@ -451,36 +317,11 @@ const HomePage = {
           featuredProductsCount: 8,
           maxCategoriesDisplay: 12,
           reviewsPerPage: 4
-        },
-
-        // Hero section configuration
-        heroTitle: 'Delicious Food',
-        heroTitleHighlight: 'Delivered Fast',
-        heroSubtitle: 'Order from the best local restaurants with easy, on-demand delivery',
-        heroVideoUrl: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
-        heroFallbackImage: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80',
-        heroVideoAriaLabel: 'Background video showing delicious food preparation',
-        heroFallbackAriaLabel: 'Hero section background showing various delicious dishes',        // Search form configuration (kept for compatibility but not displayed)
+        },        // Hero section configuration        // Search form configuration (kept for compatibility but not displayed)
         locationPlaceholder: 'Enter your delivery address',
         searchPlaceholder: 'Search for food or restaurants',
         searchButtonLabel: 'Search for food',
-        searchButtonText: 'Find Food',
-        searchingText: 'Searching...',
-
-        // Location detection configuration
-        detectingLocationText: 'Detecting Your Location',
-        detectingLocationSubtext: 'Please allow location access for better service',
-        locationDetectedText: 'Location Detected',
-        detectLocationText: 'Detect My Location',
-        detectLocationAriaLabel: 'Detect current location automatically',
-        startOrderingText: 'Start Ordering',
-        startOrderingAriaLabel: 'Start ordering food for delivery to your current location',
-        skipLocationText: 'Skip & Browse Menu',
-        skipLocationAriaLabel: 'Skip location detection and browse menu',
-        locationPermissionText: 'Enable Location for Better Service',
-        locationPermissionSubtext: 'We need your location to show nearby restaurants and accurate delivery times',
-        locationErrorText: 'Location access denied or unavailable',
-        locationErrorSubtext: 'You can still browse our menu and enter your address manually during checkout',
+        searchButtonText: 'Find Food',        searchingText: 'Searching...',
 
         // Featured section configuration
         featuredSectionTitle: 'Today\'s Special',
@@ -697,12 +538,10 @@ const HomePage = {
           categoriesViewed: [],
           productsViewed: [],
           conversionEvents: []
-        },
-        performanceMetrics: {
+        },        performanceMetrics: {
           timeToFirstByte: null,
           domContentLoaded: null,
           windowLoaded: null,
-          heroVideoLoadTime: null,
           featuredProductsLoadTime: null
         },
         userBehavior: {
@@ -712,28 +551,23 @@ const HomePage = {
           clickPatterns: [],
           hoverDuration: {}
         }
-      },
-
-      // === ERROR STATE ===
+      },      // === ERROR STATE ===
       errors: {
-        video: false,
         featuredProducts: null,
         categories: null,
         search: null,
         general: null,
         lastErrorTime: null,
         errorHistory: []
-      },
-
-      // === FEATURE FLAGS ===
+      },// === FEATURE FLAGS ===
       features: {
-        enableVideoBackground: true,
+        enableVideoBackground: false,
         enableAutoPlayCarousel: true,
         enableLazyLoading: true,
         enableAnalytics: true,
         enablePushNotifications: false,
         enableVoiceSearch: false,
-        enableGeolocation: true,
+        enableGeolocation: false,
         enableOfflineMode: false
       },
 
@@ -785,24 +619,13 @@ const HomePage = {
       },
 
       // === DEBOUNCED METHODS ===
-      debouncedMethods: {},
-
-      // Legacy compatibility (for backward compatibility)
+      debouncedMethods: {},      // Legacy compatibility (for backward compatibility)
       featuredProducts: [],
       categories: [],
-      isLoading: true, isSearching: false,
+      isLoading: true, 
+      isSearching: false,
       loadError: null,
-      videoError: false,
       retryCount: 0,
-
-      // Location detection state
-      locationStatus: {
-        isDetecting: false,
-        detected: false,
-        address: '',
-        coordinates: null,
-        error: null
-      },
 
       currentReviewIndex: 0,
       reviewInterval: null,
@@ -1077,162 +900,7 @@ const HomePage = {
         this.loadError = window.APP_CONSTANTS?.MESSAGES?.ERROR?.LOAD_FAILED || 'Failed to load content. Please refresh the page.';
         this.featuredProducts = [];
         this.categories = [];
-      }
-    },
-
-    /**
-     * Handle video error
-     */
-    handleVideoError(event) {
-      console.warn('Hero video failed to load, switching to fallback image:', event.target.error);
-      this.videoError = true;
-
-      if (window.ErrorHandler) {
-        window.ErrorHandler.handleError(new Error('Hero video load failed'), {
-          component: 'HomePage',
-          action: 'video_load',
-          severity: 'low'
-        });
-      }
-    },    /**
-     * Detect user's current location
-     */
-    async detectLocation() {
-      // Reset location status
-      this.locationStatus = {
-        isDetecting: true,
-        detected: false,
-        address: '',
-        coordinates: null,
-        error: null
-      };
-
-      try {
-        // Check if geolocation is supported
-        if (!navigator.geolocation) {
-          throw new Error('Geolocation is not supported by this browser');
-        }
-
-        // Get current position
-        const position = await this.getCurrentPosition();
-
-        // Store coordinates
-        this.locationStatus.coordinates = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-
-        // Get address from coordinates using reverse geocoding
-        const address = await this.reverseGeocode(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-
-        // Update status with successful detection
-        this.locationStatus = {
-          isDetecting: false,
-          detected: true,
-          address: address,
-          coordinates: this.locationStatus.coordinates,
-          error: null
-        };
-
-        // Track analytics
-        if (window.analytics) {
-          window.analytics.track('location_detected', {
-            address: address,
-            timestamp: new Date().toISOString()
-          });
-        }
-
-        // Show success toast
-        if (window.ToastService) {
-          window.ToastService.show('Location detected successfully!', 'success');
-        }
-
-      } catch (error) {
-        console.error('Location detection error:', error);
-
-        // Update status with error
-        this.locationStatus = {
-          isDetecting: false,
-          detected: false,
-          address: '',
-          coordinates: null,
-          error: error.message
-        };
-
-        // Show error toast
-        if (window.ToastService) {
-          window.ToastService.show('Location access denied or unavailable', 'warning');
-        }
-
-        // Track analytics
-        if (window.analytics) {
-          window.analytics.track('location_detection_failed', {
-            error: error.message,
-            timestamp: new Date().toISOString()
-          });
-        }
-      }
-    },
-
-    /**
-     * Get current position using Promise wrapper
-     */
-    getCurrentPosition() {
-      return new Promise((resolve, reject) => {
-        const options = {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutes
-        };
-
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          options
-        );
-      });
-    },
-
-    /**
-     * Reverse geocode coordinates to get human-readable address
-     */
-    async reverseGeocode(latitude, longitude) {
-      try {
-        // Using a free geocoding service (Nominatim OpenStreetMap)
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=16&addressdetails=1`
-        );
-
-        if (!response.ok) {
-          throw new Error('Geocoding service unavailable');
-        }
-
-        const data = await response.json();
-
-        if (data && data.display_name) {
-          // Extract meaningful parts of the address
-          const address = data.address || {};
-          const parts = [
-            address.house_number,
-            address.road,
-            address.neighbourhood || address.suburb,
-            address.city || address.town,
-            address.state
-          ].filter(Boolean);
-
-          return parts.length > 0 ? parts.join(', ') : data.display_name;
-        } else {
-          return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-        }
-      } catch (error) {
-        console.error('Reverse geocoding error:', error);
-        // Fallback to coordinates
-        return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-      }
-    },
+      }    },
 
     /**
      * Handle product card feedback
@@ -1415,7 +1083,8 @@ const HomePage = {
     /**
      * Truncate description text
      */
-    truncateDescription(text) {      if (this.$truncate) {
+    truncateDescription(text) {
+      if (this.$truncate) {
         return this.$truncate(text, 80);
       }
       // Fallback implementation
@@ -1462,6 +1131,31 @@ const HomePage = {
       } catch (error) {
         console.warn('Error calculating performance score:', error);
         return 50; // Default score
+      }
+    },    /**
+     * Track analytics events
+     */
+    trackEvent(eventName, eventData = {}) {
+      try {
+        // Store event in local analytics
+        const event = {
+          name: eventName,
+          data: eventData,
+          timestamp: new Date().toISOString(),
+          sessionId: this.analytics.sessionId
+        };
+        
+        this.analytics.userInteractions.push(event);
+        
+        // Send to external analytics if available
+        if (window.analytics && typeof window.analytics.track === 'function') {
+          window.analytics.track(eventName, eventData);
+        }
+        
+        // Log for debugging
+        console.log('Analytics event tracked:', eventName, eventData);
+      } catch (error) {
+        console.warn('Error tracking analytics event:', error);
       }
     },
 
