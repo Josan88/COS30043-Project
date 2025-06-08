@@ -357,8 +357,7 @@ class ErrorHandler {
     };
     
     // Try to determine error type from error message
-    let errorType = this.ERROR_TYPES.UNKNOWN;
-    const errorMessage = error.message || error || '';
+    let errorType = this.ERROR_TYPES.UNKNOWN;    const errorMessage = error.message || error || '';
     
     if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
       errorType = this.ERROR_TYPES.NETWORK;
@@ -371,6 +370,19 @@ class ErrorHandler {
     }
     
     return defaultMessages[errorType];
+  }
+
+  /**
+   * Generic error handler method for backward compatibility
+   * @param {Error|string} error - Error to handle
+   * @param {Object} context - Additional context
+   * @returns {string} Error ID
+   */
+  handleError(error, context = {}) {
+    const severity = context.severity || this.SEVERITY.MEDIUM;
+    const type = context.type || this.ERROR_TYPES.UNKNOWN;
+    
+    return this.logError(error, context, type, severity);
   }
 }
 

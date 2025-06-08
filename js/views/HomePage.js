@@ -622,15 +622,15 @@ const HomePage = {  template: `
       debouncedMethods: {},      // Legacy compatibility (for backward compatibility)
       featuredProducts: [],
       categories: [],
-      isLoading: true, 
-      isSearching: false,
+      isLoading: true,      isSearching: false,
       loadError: null,
       retryCount: 0,
 
       currentReviewIndex: 0,
       reviewInterval: null,
       latestNews: [],
-      reviews: []
+      reviews: [],
+      userLocation: null
     };
   }, computed: {
     /**
@@ -859,9 +859,40 @@ const HomePage = {  template: `
         ...category,
         icon: iconMap[category.id.toLowerCase()] || 'fas fa-utensils'
       }));
-    },
-
-    /**
+    },    /**
+     * Detect user location for personalized content
+     */
+    async detectLocation() {
+      try {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              this.userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              };
+              console.log('Location detected:', this.userLocation);
+            },
+            (error) => {
+              console.warn('Location detection failed:', error);
+              // Set a default location or continue without location
+              this.userLocation = null;
+            },
+            {
+              enableHighAccuracy: false,
+              timeout: 5000,
+              maximumAge: 600000 // 10 minutes
+            }
+          );
+        } else {
+          console.warn('Geolocation is not supported by this browser');
+          this.userLocation = null;
+        }
+      } catch (error) {
+        console.error('Error in detectLocation:', error);
+        this.userLocation = null;
+      }
+    },    /**
      * Handle component errors with proper logging
      */
     handleComponentError(message, error) {
@@ -871,7 +902,7 @@ const HomePage = {  template: `
         window.ErrorHandler.handleError(error, {
           component: 'HomePage',
           action: 'initialization',
-          severity: 'high'
+          severity: window.ErrorHandler.SEVERITY.HIGH
         });
       }
 
