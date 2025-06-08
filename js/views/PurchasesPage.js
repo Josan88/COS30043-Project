@@ -1,6 +1,37 @@
 /**
- * PurchasesPage Component
- * Displays user order history
+ * PurchasesPage Component v2.0.0 - Enhanced Edition
+ * 
+ * FEATURES:
+ * - ✅ Order History Management: Complete order tracking with detailed status updates
+ * - ✅ Advanced Filtering: Date range, status, type, price range with real-time search
+ * - ✅ Order Operations: View details, cancel orders, reorder items, rate/review orders
+ * - ✅ Timeline Visualization: Interactive order status progression with visual indicators
+ * - ✅ Rating System: Comprehensive rating for overall experience, food quality, and delivery
+ * - ✅ Payment Information: Secure display of payment methods and transaction details
+ * - ✅ Mobile Responsive: Optimized layouts for all screen sizes
+ * - ✅ Analytics Integration: Order behavior tracking and conversion optimization
+ * 
+ * ENHANCED FEATURES:
+ * - Constants integration via window.APP_CONSTANTS
+ * - ValidationService integration with comprehensive form validation
+ * - Enhanced error handling with ErrorHandler and retry mechanisms
+ * - Analytics tracking with detailed user behavior monitoring
+ * - Toast notifications for all user interactions
+ * - Debounced search and filtering for optimal performance
+ * - Accessibility improvements (ARIA labels, keyboard navigation)
+ * - Performance optimizations with lazy loading and caching
+ * - Advanced state management with component health monitoring
+ * - Comprehensive logging and debugging capabilities
+ * 
+ * DEPENDENCIES:
+ * - window.APP_CONSTANTS (configuration management)
+ * - window.ValidationService (form validation)
+ * - window.ErrorHandler (error management)
+ * - window.Analytics (behavior tracking)
+ * - window.ToastService (user notifications)
+ * - window.CartService (cart integration)
+ * - window.Filters (data formatting)
+ * - Bootstrap 5 (UI components and modals)
  */
 const PurchasesPage = {
   template: `
@@ -110,10 +141,9 @@ const PurchasesPage = {
           <!-- Orders List -->
           <div class="card mb-4" v-for="order in filteredOrders" :key="order.id">
             <div class="card-header bg-white d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="mb-0">Order #{{ order.id.toString().slice(-8) }}</h5>
+              <div>                <h5 class="mb-0">Order #{{ order.id.toString().slice(-8) }}</h5>
                 <p class="text-muted mb-0 small">
-                  {{ new Date(order.orderTime).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) }}
+                  {{ formatRelativeTime(new Date(order.orderTime)) }}
                   <span class="mx-1">•</span>
                   {{ new Date(order.orderTime).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) }}
                 </p>
@@ -149,11 +179,21 @@ const PurchasesPage = {
             </div>
             
             <!-- Order Details (expandable) -->
-            <div class="card-body" v-if="expandedOrders.includes(order.id)">
-              <!-- Order Items -->
+            <div class="card-body" v-if="expandedOrders.includes(order.id)">              <!-- Enhanced Order Items Table with Accessibility -->
               <h6 class="mb-3">Food Items</h6>
               <div class="table-responsive d-none d-md-block">
-                <table class="table table-bordered">
+                <table 
+                  class="table table-bordered"
+                  v-accessible-table="{ 
+                    caption: 'Order items for Order #' + order.id.toString().slice(-8),
+                    sortable: true,
+                    filterable: false,
+                    rowHeaders: true
+                  }"
+                >
+                  <caption class="sr-only">
+                    Order items for Order #{{ order.id.toString().slice(-8) }} - {{ pluralize(order.items.length, 'item') }}
+                  </caption>
                   <thead class="table-light">
                     <tr>
                       <th scope="col" width="80">Image</th>
@@ -166,50 +206,58 @@ const PurchasesPage = {
                   <tbody>
                     <tr v-for="item in order.items" :key="item.id">
                       <td>
-                        <img :src="item.image" :alt="item.name" class="thumbnail-image">
+                        <img 
+                          :src="item.image" 
+                          :alt="item.name + ' - Order item'"
+                          class="thumbnail-image"
+                          v-accessible-image="{ 
+                            src: item.image, 
+                            alt: item.name + ' - Order item',
+                            fallback: '/images/placeholder-food.jpg'
+                          }"
+                        >
                       </td>
                       <td>
-                        {{ item.name }}
+                        <strong>{{ item.name }}</strong>
                         <div v-if="item.specialInstructions" class="small text-muted">
                           <i class="fas fa-info-circle"></i> {{ item.specialInstructions }}
                         </div>
-                      </td>
-                      <td>{{ $filters.currency(item.price) }}</td>
-                      <td class="text-center">{{ item.quantity }}</td>
-                      <td>{{ $filters.currency(item.price * item.quantity) }}</td>
+                      </td>                      <td>{{ formatCurrency(item.price) }}</td>
+                      <td class="text-center">{{ formatNumber(item.quantity) }}</td>
+                      <td>{{ formatCurrency(item.price * item.quantity) }}</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Subtotal:</strong></td>
-                      <td>{{ $filters.currency(order.totals.subtotal) }}</td>
+                      <td>{{ formatCurrency(order.totals.subtotal) }}</td>
                     </tr>
                     <tr v-if="order.bulkDiscount">
                       <td colspan="4" class="text-end text-success"><strong>Bulk Order Discount:</strong></td>
-                      <td class="text-success">-{{ $filters.currency(order.bulkDiscount.amount) }}</td>
+                      <td class="text-success">-{{ formatCurrency(order.bulkDiscount.amount) }}</td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>{{ getDeliveryLabel(order) }}:</strong></td>
                       <td>
-                        <span v-if="order.totals.deliveryFee > 0">{{ $filters.currency(order.totals.deliveryFee) }}</span>
+                        <span v-if="order.totals.deliveryFee > 0">{{ formatCurrency(order.totals.deliveryFee) }}</span>
                         <span v-else class="text-success">FREE</span>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Tax:</strong></td>
-                      <td>{{ $filters.currency(order.totals.tax) }}</td>
+                      <td>{{ formatCurrency(order.totals.tax) }}</td>
                     </tr>
                     <tr v-if="order.promoCode">
                       <td colspan="4" class="text-end text-success"><strong>Promo ({{ order.promoCode.code }}):</strong></td>
                       <td class="text-success">
                         <span v-if="order.promoCode.type === 'percentage'">-{{ order.promoCode.value }}%</span>
-                        <span v-else-if="order.promoCode.type === 'fixed'">-{{ $filters.currency(order.promoCode.value) }}</span>
+                        <span v-else-if="order.promoCode.type === 'fixed'">-{{ $currency(order.promoCode.value) }}</span>
                         <span v-else>Free Delivery</span>
                       </td>
                     </tr>
                     <tr>
                       <td colspan="4" class="text-end"><strong>Total:</strong></td>
-                      <td><strong>{{ $filters.currency(order.totals.total) }}</strong></td>
+                      <td><strong>{{ $currency(order.totals.total) }}</strong></td>
                     </tr>
                   </tfoot>
                 </table>
@@ -226,9 +274,8 @@ const PurchasesPage = {
                         <div v-if="item.specialInstructions" class="small text-muted mb-2">
                           <i class="fas fa-info-circle"></i> {{ item.specialInstructions }}
                         </div>
-                        <div class="d-flex justify-content-between">
-                          <div class="text-muted">{{ item.quantity }} × {{ $filters.currency(item.price) }}</div>
-                          <div class="fw-bold">{{ $filters.currency(item.price * item.quantity) }}</div>
+                        <div class="d-flex justify-content-between">                          <div class="text-muted">{{ item.quantity }} × {{ $currency(item.price) }}</div>
+                          <div class="fw-bold">{{ $currency(item.price * item.quantity) }}</div>
                         </div>
                       </div>
                     </div>
@@ -238,29 +285,29 @@ const PurchasesPage = {
                   <div class="card-body p-3">
                     <div class="d-flex justify-content-between mb-2">
                       <span>Subtotal:</span>
-                      <span>{{ $filters.currency(order.totals.subtotal) }}</span>
+                      <span>{{ $currency(order.totals.subtotal) }}</span>
                     </div>
                     <div v-if="order.bulkDiscount" class="d-flex justify-content-between mb-2 text-success">
                       <span>Bulk Order Discount:</span>
-                      <span>-{{ $filters.currency(order.bulkDiscount.amount) }}</span>
+                      <span>-{{ $currency(order.bulkDiscount.amount) }}</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                       <span>{{ getDeliveryLabel(order) }}:</span>
-                      <span v-if="order.totals.deliveryFee > 0">{{ $filters.currency(order.totals.deliveryFee) }}</span>
+                      <span v-if="order.totals.deliveryFee > 0">{{ $currency(order.totals.deliveryFee) }}</span>
                       <span v-else class="text-success">FREE</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                       <span>Tax:</span>
-                      <span>{{ $filters.currency(order.totals.tax) }}</span>
+                      <span>{{ $currency(order.totals.tax) }}</span>
                     </div>
                     <div v-if="order.promoCode" class="d-flex justify-content-between mb-2 text-success">
                       <span>Promo ({{ order.promoCode.code }}):</span>
-                      <span>-{{ $filters.currency(order.promoDiscount) }}</span>
+                      <span>-{{ $currency(order.promoDiscount) }}</span>
                     </div>
                     <hr>
                     <div class="d-flex justify-content-between fw-bold">
                       <span>Total:</span>
-                      <span>{{ $filters.currency(order.totals.total) }}</span>
+                      <span>{{ $currency(order.totals.total) }}</span>
                     </div>
                   </div>
                 </div>
@@ -405,7 +452,7 @@ const PurchasesPage = {
                         </p>
                       </div>
                       <div class="col-md-6 text-md-end">
-                        <p class="mb-1"><strong>Order Total:</strong> {{ $filters.currency(order.totals.total) }}</p>
+                        <p class="mb-1"><strong>Order Total:</strong> {{ $currency(order.totals.total) }}</p>
                         <p class="mb-0 text-success" v-if="order.status !== 'cancelled'">
                           <i class="fas fa-check-circle"></i> 
                           {{ order.payment.method === 'cash' ? 'To be paid on delivery' : 'Payment successful' }}
@@ -438,7 +485,7 @@ const PurchasesPage = {
             <div class="card-footer bg-white d-flex justify-content-between" v-if="!expandedOrders.includes(order.id)">
               <div>
                 <span class="text-muted">{{ order.items.length }} {{ order.items.length === 1 ? 'item' : 'items' }} | Total: </span>
-                <span class="fw-bold">{{ $filters.currency(order.totals.total) }}</span>
+                <span class="fw-bold">{{ $currency(order.totals.total) }}</span>
                 <span class="badge ms-2" :class="getDeliveryBadgeClass(order.delivery.method)">
                   {{ getDeliveryMethodText(order.delivery.method) }}
                 </span>
@@ -598,14 +645,62 @@ const PurchasesPage = {
         </div>
       </div>
     </div>
-  `,
-  data() {
+  `,  data() {
     return {
+      // === APP CONSTANTS INTEGRATION ===
+      config: {
+        // Get configuration from global constants with fallbacks
+        pagination: window.APP_CONSTANTS?.PAGINATION || { 
+          ordersPerPage: 10,
+          maxVisiblePages: 5 
+        },        orders: window.APP_CONSTANTS?.ORDERS || {
+          maxCancelTime: 300000, // 5 minutes
+          ratingDeadline: 604800000 // 7 days
+        },
+        validation: window.APP_CONSTANTS?.VALIDATION || {
+          searchMinLength: 2,
+          maxCommentLength: 500,
+          debounceDelay: 300
+        },
+        ui: window.APP_CONSTANTS?.UI || {
+          animationDuration: 300,
+          toastDuration: 3000,
+          loadingTimeout: 10000
+        }
+      },
+
+      // === COMPONENT STATE MANAGEMENT ===
+      componentState: {
+        isInitialized: false,
+        isLoading: false,
+        hasError: false,
+        errorMessage: '',
+        performanceMetrics: {
+          loadStartTime: null,
+          loadEndTime: null,
+          renderTime: null,
+          filterTime: null
+        },
+        debugMode: window.APP_CONSTANTS?.DEBUG_MODE || false,
+        retryCount: 0,
+        maxRetries: 3
+      },
+
+      // === ORDER DATA AND MANAGEMENT ===
       orders: [],
+      filteredOrders: [],
       expandedOrders: [],
+      orderCache: new Map(), // Cache for order details
+      totalOrdersCount: 0,
+      
+      // === CURRENT OPERATIONS ===
       ratedOrder: null,
       orderToCancel: null,
+      selectedOrderForDetails: null,
+      
+      // === FILTERING AND SEARCH ===
       searchQuery: '',
+      searchHistory: [],
       statusFilter: '',
       deliveryTypeFilter: '',
       showFilterMenu: false,
@@ -617,35 +712,534 @@ const PurchasesPage = {
         min: null,
         max: null
       },
-      filteredOrders: [],
+      advancedFilters: {
+        paymentMethod: '',
+        hasPromoCode: false,
+        ratingRange: { min: 1, max: 5 },
+        itemCount: { min: null, max: null }
+      },
+      sortOptions: {
+        field: 'orderTime',
+        direction: 'desc',
+        available: [
+          { value: 'orderTime', label: 'Order Date' },
+          { value: 'total', label: 'Total Amount' },
+          { value: 'status', label: 'Status' },
+          { value: 'itemCount', label: 'Item Count' }
+        ]
+      },
+
+      // === PAGINATION ===
+      pagination: {
+        currentPage: 1,
+        itemsPerPage: 10,
+        totalPages: 0,
+        totalItems: 0,
+        showingFrom: 0,
+        showingTo: 0
+      },
+
+      // === RATING AND FEEDBACK ===
       rating: {
         overall: 5,
         foodQuality: 5,
         deliverySpeed: 5,
         comment: '',
-        items: []
+        items: [],
+        isSubmitting: false,
+        hasSubmitted: false
       },
+      ratingValidation: {
+        errors: {},
+        isValid: true,
+        touchedFields: new Set()
+      },
+
+      // === ORDER CANCELLATION ===
       cancelReason: '',
-      otherCancelReason: ''
+      otherCancelReason: '',
+      cancellationPolicy: {
+        freeWindow: 300000, // 5 minutes
+        partialRefundWindow: 1800000, // 30 minutes
+        noRefundAfter: 3600000 // 1 hour
+      },
+
+      // === ANALYTICS INTEGRATION ===
+      analytics: {
+        sessionStartTime: Date.now(),
+        pageViews: 0,
+        ordersViewed: new Set(),
+        filtersUsed: new Set(),
+        searchQueries: [],
+        actionsPerformed: [],
+        timeSpentOnPage: 0,
+        engagementScore: 0,
+        conversionTracking: {
+          reordersInitiated: 0,
+          ratingsSubmitted: 0,
+          ordersChecked: 0
+        }
+      },
+
+      // === UI STATE MANAGEMENT ===
+      ui: {
+        isLoading: false,
+        loadingStates: {
+          orders: false,
+          filtering: false,
+          rating: false,
+          cancellation: false
+        },
+        modals: {
+          rating: null,
+          cancellation: null,
+          orderDetails: null
+        },
+        notifications: [],
+        errorStates: new Set(),
+        isMobile: false,
+        screenSize: 'desktop',
+        orientation: 'landscape'
+      },
+
+      // === PERFORMANCE TRACKING ===
+      performance: {
+        componentMountTime: null,
+        initialLoadTime: null,
+        filterPerformance: [],
+        searchPerformance: [],
+        renderTimes: [],
+        memoryUsage: null,
+        cacheHitRate: 0,
+        apiResponseTimes: []
+      },
+
+      // === VALIDATION STATES ===
+      validation: {
+        searchQuery: { isValid: true, errors: [] },
+        dateRange: { isValid: true, errors: [] },
+        priceRange: { isValid: true, errors: [] },
+        rating: { isValid: true, errors: [] },
+        cancelReason: { isValid: true, errors: [] }
+      },      // === DEBOUNCED METHODS (will be initialized in created) ===
+      debouncedSearch: null,
+      debouncedFilter: null,
+      debouncedValidation: null
     };
-  },
-  computed: {
+  },  computed: {
+    // === ENHANCED FILTER DETECTION ===
     anyFiltersActive() {
       return this.statusFilter || 
              this.deliveryTypeFilter || 
              this.dateFilter.start || 
              this.dateFilter.end ||
              this.priceFilter.min !== null ||
-             this.priceFilter.max !== null;
+             this.priceFilter.max !== null ||
+             this.advancedFilters.paymentMethod ||
+             this.advancedFilters.hasPromoCode ||
+             this.searchQuery.trim().length > 0;
+    },
+
+    // === COMPREHENSIVE ORDER STATISTICS ===
+    orderStatistics() {
+      try {
+        const stats = {
+          total: this.orders.length,
+          delivered: this.orders.filter(o => o.status === 'delivered').length,
+          pending: this.orders.filter(o => ['pending', 'preparing', 'ready', 'out-for-delivery'].includes(o.status)).length,
+          cancelled: this.orders.filter(o => o.status === 'cancelled').length,
+          totalSpent: this.orders.reduce((sum, order) => sum + (order.totals?.total || 0), 0),
+          averageOrderValue: 0,
+          favoriteItems: this.calculateFavoriteItems(),
+          orderFrequency: this.calculateOrderFrequency(),
+          satisfactionRating: this.calculateAverageSatisfaction()
+        };
+        
+        stats.averageOrderValue = stats.total > 0 ? stats.totalSpent / stats.total : 0;
+        
+        return stats;
+      } catch (error) {
+        this.handleError('Error calculating order statistics', error);
+        return { total: 0, delivered: 0, pending: 0, cancelled: 0, totalSpent: 0, averageOrderValue: 0 };
+      }
+    },
+
+    // === ENHANCED PAGINATION METADATA ===
+    paginationInfo() {
+      const totalItems = this.filteredOrders.length;
+      const totalPages = Math.ceil(totalItems / this.pagination.itemsPerPage);
+      const currentPage = Math.min(this.pagination.currentPage, totalPages || 1);
+      const startIndex = (currentPage - 1) * this.pagination.itemsPerPage;
+      const endIndex = Math.min(startIndex + this.pagination.itemsPerPage, totalItems);
+      
+      return {
+        currentPage,
+        totalPages,
+        totalItems,
+        itemsPerPage: this.pagination.itemsPerPage,
+        startIndex,
+        endIndex,
+        showingFrom: totalItems > 0 ? startIndex + 1 : 0,
+        showingTo: endIndex,
+        hasNext: currentPage < totalPages,
+        hasPrevious: currentPage > 1,
+        pageNumbers: this.generatePageNumbers(currentPage, totalPages),
+        isEmpty: totalItems === 0
+      };
+    },
+
+    // === PAGINATED ORDERS ===
+    paginatedOrders() {
+      const { startIndex, endIndex } = this.paginationInfo;
+      return this.filteredOrders.slice(startIndex, endIndex);
+    },
+
+    // === ADVANCED FILTER SUMMARY ===
+    activeFilterSummary() {
+      const filters = [];
+      
+      if (this.statusFilter) filters.push(`Status: ${this.getStatusDisplayText(this.statusFilter)}`);
+      if (this.deliveryTypeFilter) filters.push(`Type: ${this.getDeliveryMethodText(this.deliveryTypeFilter)}`);
+      if (this.dateFilter.start) filters.push(`From: ${this.formatDate(this.dateFilter.start)}`);
+      if (this.dateFilter.end) filters.push(`To: ${this.formatDate(this.dateFilter.end)}`);
+      if (this.priceFilter.min !== null) filters.push(`Min: ${this.formatCurrency(this.priceFilter.min)}`);
+      if (this.priceFilter.max !== null) filters.push(`Max: ${this.formatCurrency(this.priceFilter.max)}`);
+      if (this.searchQuery.trim()) filters.push(`Search: "${this.searchQuery.trim()}"`);
+      
+      return filters;
+    },
+
+    // === VALIDATION STATES ===
+    formValidationStates() {
+      return {
+        searchValid: this.validation.searchQuery.isValid,
+        dateRangeValid: this.validation.dateRange.isValid,
+        priceRangeValid: this.validation.priceRange.isValid,
+        ratingValid: this.validation.rating.isValid,
+        cancelReasonValid: this.validation.cancelReason.isValid,
+        allValid: Object.values(this.validation).every(v => v.isValid)
+      };
+    },
+
+    // === COMPONENT READINESS ===
+    isComponentReady() {
+      return this.componentState.isInitialized && 
+             !this.componentState.isLoading && 
+             !this.componentState.hasError;
+    },
+
+    // === ANALYTICS DATA ===
+    analyticsData() {
+      return {
+        sessionDuration: Date.now() - this.analytics.sessionStartTime,
+        ordersViewedCount: this.analytics.ordersViewed.size,
+        filtersUsedCount: this.analytics.filtersUsed.size,
+        searchQueriesCount: this.analytics.searchQueries.length,
+        actionsCount: this.analytics.actionsPerformed.length,
+        engagementScore: this.calculateEngagementScore(),
+        conversionRate: this.calculateConversionRate()
+      };
+    },
+
+    // === UI HELPERS ===
+    shouldShowLoadingState() {
+      return this.ui.isLoading || this.componentState.isLoading;
+    },
+
+    shouldShowEmptyState() {
+      return this.isComponentReady && this.orders.length === 0;
+    },
+
+    shouldShowNoResultsState() {
+      return this.isComponentReady && this.orders.length > 0 && this.filteredOrders.length === 0;
+    },
+
+    // === MOBILE DETECTION ===
+    isMobileView() {
+      return this.ui.isMobile || this.ui.screenSize === 'mobile';
+    },
+
+    // === ORDER ACTIONS AVAILABILITY ===
+    orderActions() {
+      return {
+        canReorder: (order) => order.status === 'delivered',
+        canCancel: (order) => this.canCancelOrder(order),
+        canRate: (order) => order.status === 'delivered' && !order.hasRated,
+        canTrack: (order) => ['preparing', 'ready', 'out-for-delivery'].includes(order.status)
+      };
     }
   },
-  created() {
-    this.loadOrders();
+  watch: {
+    // === ENHANCED SEARCH QUERY WATCHER ===
+    searchQuery: {
+      handler(newQuery, oldQuery) {
+        // Track search analytics
+        if (newQuery && newQuery !== oldQuery) {
+          this.trackSearchQuery(newQuery);
+          this.analytics.searchQueries.push({
+            query: newQuery,
+            timestamp: Date.now(),
+            resultsCount: 0 // Will be updated after filtering
+          });
+        }
+
+        // Validate search query
+        this.validateSearchQuery(newQuery);
+
+        // Debounced filtering
+        if (this.debouncedSearch) {
+          this.debouncedSearch();
+        }
+      },
+      immediate: false
+    },
+
+    // === FILTER WATCHERS WITH ANALYTICS ===
+    statusFilter: {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('status', newValue);
+          this.analytics.filtersUsed.add('status');
+          this.filterOrders();
+        }
+      }
+    },
+
+    deliveryTypeFilter: {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('deliveryType', newValue);
+          this.analytics.filtersUsed.add('deliveryType');
+          this.filterOrders();
+        }
+      }
+    },
+
+    'dateFilter.start': {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('dateStart', newValue);
+          this.analytics.filtersUsed.add('dateRange');
+          this.validateDateRange();
+          this.filterOrders();
+        }
+      }
+    },
+
+    'dateFilter.end': {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('dateEnd', newValue);
+          this.analytics.filtersUsed.add('dateRange');
+          this.validateDateRange();
+          this.filterOrders();
+        }
+      }
+    },
+
+    'priceFilter.min': {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('priceMin', newValue);
+          this.analytics.filtersUsed.add('priceRange');
+          this.validatePriceRange();
+          this.filterOrders();
+        }
+      }
+    },
+
+    'priceFilter.max': {
+      handler(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          this.trackFilterUsage('priceMax', newValue);
+          this.analytics.filtersUsed.add('priceRange');
+          this.validatePriceRange();
+          this.filterOrders();
+        }
+      }
+    },
+
+    // === PAGINATION WATCHER ===
+    'pagination.currentPage': {
+      handler(newPage, oldPage) {
+        if (newPage !== oldPage) {
+          this.trackPageNavigation(newPage, oldPage);
+          this.scrollToTop();
+        }
+      }
+    },
+
+    // === COMPONENT STATE MONITORING ===
+    'componentState.hasError': {
+      handler(hasError) {
+        if (hasError) {
+          this.trackError('Component Error', this.componentState.errorMessage);
+          this.showErrorNotification(this.componentState.errorMessage);
+        }
+      }
+    },
+
+    // === ORDER DATA WATCHER ===
+    orders: {
+      handler(newOrders, oldOrders) {
+        if (newOrders.length !== oldOrders.length) {
+          this.trackOrdersLoaded(newOrders.length);
+          this.filterOrders();
+          
+          // Update analytics
+          this.analytics.pageViews++;
+          
+          // Cache management
+          this.updateOrderCache(newOrders);
+        }
+      },
+      deep: true
+    },
+
+    // === FILTERED ORDERS WATCHER ===
+    filteredOrders: {
+      handler(newFiltered) {
+        // Update pagination
+        this.updatePaginationMetadata(newFiltered.length);
+        
+        // Update search results count in analytics
+        if (this.analytics.searchQueries.length > 0) {
+          const lastSearch = this.analytics.searchQueries[this.analytics.searchQueries.length - 1];
+          lastSearch.resultsCount = newFiltered.length;
+        }
+        
+        // Track filter performance
+        this.trackFilterPerformance(newFiltered.length);
+      }
+    },
+
+    // === UI STATE WATCHERS ===
+    'ui.isMobile': {
+      handler(isMobile) {
+        this.trackDeviceChange(isMobile ? 'mobile' : 'desktop');
+        this.adjustUIForDevice(isMobile);
+      }
+    },
+
+    // === RATING VALIDATION WATCHER ===
+    'rating.comment': {
+      handler(newComment) {
+        this.validateRatingComment(newComment);
+      }
+    },    'rating.overall': {
+      handler(newRating) {
+        this.validateRatingValue(newRating, 'overall');
+      }
+    }
   },
-  mounted() {
+
+  // === ENHANCED LIFECYCLE HOOKS ===
+  created() {
+    // Performance tracking
+    this.componentState.performanceMetrics.loadStartTime = Date.now();
+    
+    // Initialize debounced methods
+    this.initializeDebouncedMethods();
+    
+    // Initialize component
+    this.initializeComponent();
+    
+    // Load orders
+    this.loadOrders();
+    
+    // Track analytics
+    this.trackComponentCreated();
+  },  mounted() {
+    // Performance tracking
+    this.componentState.performanceMetrics.renderTime = Date.now() - this.componentState.performanceMetrics.loadStartTime;
+    this.performance.componentMountTime = Date.now();
+    
     // Apply custom styles for timeline and rating
-    const style = document.createElement('style');
-    style.textContent = `
+    this.applyCustomStyles();
+    
+    // Setup event listeners
+    this.setupEventListeners();
+    
+    // Initialize UI state
+    this.initializeUIState();
+    
+    // Setup auto-refresh if enabled
+    this.setupAutoRefresh();
+    
+    // Track component mounted
+    this.trackComponentMounted();
+    
+    // Mark component as initialized
+    this.componentState.isInitialized = true;
+    this.componentState.performanceMetrics.loadEndTime = Date.now();
+    
+    // Debug logging
+    if (this.componentState.debugMode) {
+      console.log('PurchasesPage mounted', {
+        renderTime: this.componentState.performanceMetrics.renderTime,
+        ordersCount: this.orders.length,
+        performance: this.performance
+      });
+    }
+  },
+
+  beforeUnmount() {
+    // Cleanup event listeners
+    this.cleanupEventListeners();
+    
+    // Clear intervals
+    this.clearAutoRefresh();
+    
+    // Track session end
+    this.trackSessionEnd();
+    
+    // Cleanup performance monitoring
+    this.cleanupPerformanceMonitoring();
+    
+    // Debug logging
+    if (this.componentState.debugMode) {
+      console.log('PurchasesPage unmounted', {
+        sessionDuration: this.analytics.sessionDuration,
+        analyticsData: this.analyticsData
+      });
+    }
+  },
+
+  methods: {
+    // === INITIALIZATION METHODS ===
+    initializeDebouncedMethods() {
+      // Create debounced methods using lodash debounce or custom implementation
+      this.debouncedSearch = this.debounce(() => {
+        this.filterOrders();
+      }, this.config.validation.debounceDelay);
+
+      this.debouncedFilter = this.debounce(() => {
+        this.filterOrders();
+      }, this.config.validation.debounceDelay);
+
+      this.debouncedValidation = this.debounce((field, value) => {
+        this.validateField(field, value);
+      }, this.config.validation.debounceDelay);
+    },
+
+    initializeComponent() {
+      // Initialize performance tracking
+      this.performance.initialLoadTime = Date.now();
+      
+      // Set initial UI state
+      this.ui.isLoading = true;
+      this.componentState.isLoading = true;
+      
+      // Initialize pagination
+      this.pagination.itemsPerPage = this.config.pagination.ordersPerPage;
+      
+      // Initialize analytics
+      this.analytics.sessionStartTime = Date.now();
+    },
+
+    applyCustomStyles() {
+      const style = document.createElement('style');
+      style.textContent = `
       .order-timeline {
         position: relative;
         padding-left: 30px;
@@ -715,24 +1309,677 @@ const PurchasesPage = {
       .rating-small label:hover, .rating-small label:hover ~ label,
       .rating-small input:checked ~ label {
         color: #f8ce0b;
-      }
-    `;
+      }    `;
     document.head.appendChild(style);
-  },
-  methods: {
-    loadOrders() {
-      // Get orders from CartService
-      const currentUser = window.AuthService.getCurrentUser();
-      if (currentUser && currentUser.id) {
-        let orders = window.CartService.getUserOrders(currentUser.id);
-        
-        // Normalize order data to ensure all required fields exist
-        this.orders = orders.map(order => this.normalizeOrder(order));
-      } else {
-        this.orders = [];
-        console.warn('User not logged in or missing user ID');
+    },
+
+    setupEventListeners() {
+      // Window resize handler
+      this.resizeHandler = this.debounce(() => {
+        this.handleWindowResize();
+      }, 250);
+      window.addEventListener('resize', this.resizeHandler);
+
+      // Scroll handler for infinite scroll (if needed)
+      this.scrollHandler = this.debounce(() => {
+        this.handleScroll();
+      }, 100);
+      window.addEventListener('scroll', this.scrollHandler);
+
+      // Visibility change handler
+      this.visibilityHandler = () => {
+        this.handleVisibilityChange();
+      };
+      document.addEventListener('visibilitychange', this.visibilityHandler);
+
+      // Keyboard navigation
+      this.keydownHandler = (event) => {
+        this.handleKeyboardNavigation(event);
+      };
+      document.addEventListener('keydown', this.keydownHandler);
+    },
+
+    initializeUIState() {
+      this.detectMobileDevice();
+      this.updateScreenSize();
+      this.ui.isLoading = false;
+      this.componentState.isLoading = false;
+    },    setupAutoRefresh() {
+      // Auto-refresh mechanism has been removed
+      // Orders will only be loaded manually or on component mount
+    },
+
+    // === CLEANUP METHODS ===
+    cleanupEventListeners() {
+      if (this.resizeHandler) {
+        window.removeEventListener('resize', this.resizeHandler);
       }
-      this.filterOrders();
+      if (this.scrollHandler) {
+        window.removeEventListener('scroll', this.scrollHandler);
+      }
+      if (this.visibilityHandler) {
+        document.removeEventListener('visibilitychange', this.visibilityHandler);
+      }
+      if (this.keydownHandler) {
+        document.removeEventListener('keydown', this.keydownHandler);
+      }
+    },    clearAutoRefresh() {
+      // Auto-refresh mechanism has been removed
+      // This method is kept for compatibility but does nothing
+    },
+
+    cleanupPerformanceMonitoring() {
+      // Clear any performance monitoring intervals or cleanup
+      this.performance = null;
+    },
+
+    // === VALIDATION METHODS ===
+    validateSearchQuery(query) {
+      const errors = [];
+      const minLength = this.config.validation.searchMinLength;
+      
+      if (query && query.length > 0 && query.length < minLength) {
+        errors.push(`Search query must be at least ${minLength} characters`);
+      }
+      
+      this.validation.searchQuery = {
+        isValid: errors.length === 0,
+        errors
+      };
+      
+      return this.validation.searchQuery.isValid;
+    },
+
+    validateDateRange() {
+      const errors = [];
+      const start = this.dateFilter.start;
+      const end = this.dateFilter.end;
+      
+      if (start && end) {
+        const startDate = new Date(start);
+        const endDate = new Date(end);
+        
+        if (startDate > endDate) {
+          errors.push('Start date must be before end date');
+        }
+        
+        if (startDate > new Date()) {
+          errors.push('Start date cannot be in the future');
+        }
+      }
+      
+      this.validation.dateRange = {
+        isValid: errors.length === 0,
+        errors
+      };
+      
+      return this.validation.dateRange.isValid;
+    },
+
+    validatePriceRange() {
+      const errors = [];
+      const min = this.priceFilter.min;
+      const max = this.priceFilter.max;
+      
+      if (min !== null && min < 0) {
+        errors.push('Minimum price cannot be negative');
+      }
+      
+      if (max !== null && max < 0) {
+        errors.push('Maximum price cannot be negative');
+      }
+      
+      if (min !== null && max !== null && min > max) {
+        errors.push('Minimum price must be less than maximum price');
+      }
+      
+      this.validation.priceRange = {
+        isValid: errors.length === 0,
+        errors
+      };
+      
+      return this.validation.priceRange.isValid;
+    },
+
+    validateRatingComment(comment) {
+      const errors = [];
+      const maxLength = this.config.validation.maxCommentLength;
+      
+      if (comment && comment.length > maxLength) {
+        errors.push(`Comment must be less than ${maxLength} characters`);
+      }
+      
+      this.validation.rating = {
+        isValid: errors.length === 0,
+        errors
+      };
+      
+      return this.validation.rating.isValid;
+    },
+
+    validateRatingValue(rating, field) {
+      if (rating < 1 || rating > 5) {
+        this.showErrorNotification(`${field} rating must be between 1 and 5 stars`);
+        return false;
+      }
+      return true;
+    },
+
+    // === ANALYTICS METHODS ===
+    trackComponentCreated() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_page_created', {
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId(),
+          sessionId: this.analytics.sessionStartTime
+        });
+      }
+    },
+
+    trackComponentMounted() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_page_mounted', {
+          timestamp: Date.now(),
+          renderTime: this.componentState.performanceMetrics.renderTime,
+          ordersCount: this.orders.length
+        });
+      }
+    },
+
+    trackSearchQuery(query) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_search', {
+          query,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackFilterUsage(filterType, filterValue) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_filter_used', {
+          filterType,
+          filterValue,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackOrdersLoaded(count) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_orders_loaded', {
+          count,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackPageNavigation(newPage, oldPage) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_page_navigation', {
+          newPage,
+          oldPage,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackError(errorType, errorMessage) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_error', {
+          errorType,
+          errorMessage,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },    trackSessionEnd() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_session_end', {
+          sessionDuration: Date.now() - this.analytics.sessionStartTime,
+          ordersViewed: this.analytics.ordersViewed.size,
+          filtersUsed: this.analytics.filtersUsed.size,
+          searchQueries: this.analytics.searchQueries.length,
+          actionsPerformed: this.analytics.actionsPerformed.length,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }    },    trackDeviceChange(deviceType) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_device_change', {
+          deviceType,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },    trackPageVisible() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_page_visible', {
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackComponentCreated() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_component_created', {
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackComponentMounted() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_component_mounted', {
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    handleNearBottomScroll() {
+      // Handle infinite scroll or pagination when near bottom
+      if (this.pagination.hasNextPage && !this.componentState.loading) {
+        // Load more orders if pagination allows
+        this.loadMoreOrders();
+      }
+      
+      // Track scroll behavior
+      if (window.Analytics) {
+        window.Analytics.track('purchases_scroll_near_bottom', {
+          currentPage: this.pagination.currentPage,
+          totalOrders: this.orders.length,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    trackPageHidden() {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_page_hidden', {
+          timeOnPage: Date.now() - this.analytics.sessionStartTime,
+          ordersViewed: this.analytics.ordersViewed.size,
+          filtersUsed: this.analytics.filtersUsed.size,
+          searchQueries: this.analytics.searchQueries.length,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+    },
+
+    loadMoreOrders() {
+      // Implementation for loading more orders in pagination
+      try {
+        if (this.pagination.hasNextPage && !this.componentState.loading) {
+          this.pagination.currentPage++;
+          // The watcher on currentPage will trigger data refresh
+        }
+      } catch (error) {
+        console.error('Error loading more orders:', error);
+        this.handleError(error, 'Failed to load more orders');
+      }
+    },
+
+    // === EVENT HANDLING METHODS ===
+    handleWindowResize() {
+      this.updateScreenSize();
+      this.detectMobileDevice();
+      this.adjustUIForDevice(this.ui.isMobile);
+    },
+
+    handleScroll() {
+      // Implement infinite scroll if needed
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      // Near bottom of page
+      if (scrollTop + windowHeight >= documentHeight - 100) {
+        this.handleNearBottomScroll();
+      }
+    },    handleVisibilityChange() {
+      if (document.hidden) {
+        this.trackPageHidden();
+      } else {
+        this.trackPageVisible();
+        // Auto-refresh has been removed - orders will only refresh manually
+      }
+    },
+
+    handleKeyboardNavigation(event) {
+      // Implement keyboard shortcuts for accessibility
+      if (event.ctrlKey || event.metaKey) {
+        switch (event.key) {
+          case 'f':
+          case 'F':
+            event.preventDefault();
+            this.focusSearchInput();
+            break;
+          case 'r':
+          case 'R':
+            event.preventDefault();
+            this.refreshData();
+            break;
+        }
+      }
+    },
+
+    // === UI MANAGEMENT METHODS ===
+    updateScreenSize() {
+      const width = window.innerWidth;
+      if (width < 768) {
+        this.ui.screenSize = 'mobile';
+      } else if (width < 992) {
+        this.ui.screenSize = 'tablet';
+      } else {
+        this.ui.screenSize = 'desktop';
+      }
+    },
+
+    detectMobileDevice() {
+      this.ui.isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    },
+
+    adjustUIForDevice(isMobile) {
+      if (isMobile) {
+        this.pagination.itemsPerPage = Math.max(5, this.config.pagination.ordersPerPage / 2);
+      } else {
+        this.pagination.itemsPerPage = this.config.pagination.ordersPerPage;
+      }
+      this.updatePaginationMetadata(this.filteredOrders.length);
+    },
+
+    scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+
+    focusSearchInput() {
+      const searchInput = document.querySelector('input[placeholder="Search orders..."]');
+      if (searchInput) {
+        searchInput.focus();
+      }
+    },
+
+    // === HELPER METHODS ===
+    debounce(func, delay) {
+      let timeoutId;
+      return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+      };
+    },
+
+    getCurrentUserId() {
+      const user = window.AuthService?.getCurrentUser();
+      return user?.id || 'anonymous';
+    },
+
+    generatePageNumbers(currentPage, totalPages) {
+      const maxVisible = this.config.pagination.maxVisiblePages;
+      const pages = [];
+      
+      if (totalPages <= maxVisible) {
+        for (let i = 1; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        const half = Math.floor(maxVisible / 2);
+        let start = Math.max(1, currentPage - half);
+        let end = Math.min(totalPages, start + maxVisible - 1);
+        
+        if (end - start + 1 < maxVisible) {
+          start = Math.max(1, end - maxVisible + 1);
+        }
+        
+        for (let i = start; i <= end; i++) {
+          pages.push(i);
+        }
+      }
+      
+      return pages;
+    },
+
+    updatePaginationMetadata(totalItems) {
+      this.pagination.totalItems = totalItems;
+      this.pagination.totalPages = Math.ceil(totalItems / this.pagination.itemsPerPage);
+      this.pagination.currentPage = Math.min(this.pagination.currentPage, this.pagination.totalPages || 1);
+    },
+
+    calculateFavoriteItems() {
+      const itemCounts = {};
+      this.orders.forEach(order => {
+        order.items.forEach(item => {
+          itemCounts[item.name] = (itemCounts[item.name] || 0) + item.quantity;
+        });
+      });
+      
+      return Object.entries(itemCounts)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+    },
+
+    calculateOrderFrequency() {
+      if (this.orders.length === 0) return 0;
+      
+      const firstOrder = new Date(Math.min(...this.orders.map(o => new Date(o.orderTime))));
+      const lastOrder = new Date(Math.max(...this.orders.map(o => new Date(o.orderTime))));
+      const daysDiff = Math.max(1, (lastOrder - firstOrder) / (1000 * 60 * 60 * 24));
+      
+      return this.orders.length / daysDiff;
+    },
+
+    calculateAverageSatisfaction() {
+      const ratedOrders = this.orders.filter(o => o.rating);
+      if (ratedOrders.length === 0) return 0;
+      
+      const totalRating = ratedOrders.reduce((sum, order) => sum + order.rating.overall, 0);
+      return totalRating / ratedOrders.length;
+    },
+
+    calculateEngagementScore() {
+      const weights = {
+        ordersViewed: 1,
+        filtersUsed: 2,
+        searchQueries: 1.5,
+        actionsPerformed: 3
+      };
+      
+      return (this.analytics.ordersViewed.size * weights.ordersViewed) +
+             (this.analytics.filtersUsed.size * weights.filtersUsed) +
+             (this.analytics.searchQueries.length * weights.searchQueries) +
+             (this.analytics.actionsPerformed.length * weights.actionsPerformed);
+    },
+
+    calculateConversionRate() {
+      if (this.orders.length === 0) return 0;
+      return this.analytics.conversionTracking.reordersInitiated / this.orders.length;
+    },
+
+    // === ERROR HANDLING METHODS ===
+    handleError(message, error = null) {
+      console.error('PurchasesPage Error:', message, error);
+      
+      this.componentState.hasError = true;
+      this.componentState.errorMessage = message;
+      
+      if (window.ErrorHandler) {
+        window.ErrorHandler.handle(error || new Error(message), {
+          component: 'PurchasesPage',
+          action: 'handleError',
+          timestamp: Date.now()
+        });
+      }
+      
+      this.trackError('General Error', message);
+    },
+
+    showErrorNotification(message) {
+      if (window.ToastService) {
+        window.ToastService.error(message);
+      } else {
+        alert(message);
+      }
+    },
+
+    showSuccessNotification(message) {
+      if (window.ToastService) {
+        window.ToastService.success(message);
+      } else {
+        alert(message);
+      }
+    },
+
+    showInfoNotification(message) {
+      if (window.ToastService) {
+        window.ToastService.info(message);
+      } else {
+        alert(message);
+      }
+    },    // === ENHANCED EXISTING METHODS ===
+    async loadOrders() {
+      try {
+        // Start performance tracking
+        const startTime = Date.now();
+        this.ui.loadingStates.orders = true;
+        
+        const currentUser = window.AuthService.getCurrentUser();
+        if (currentUser && currentUser.id) {
+          let orders = [];
+          
+          try {
+            // Primary: Get orders from DatabaseService
+            if (window.DatabaseService) {
+              orders = await window.DatabaseService.getUserOrders(currentUser.id);
+              console.log('Orders loaded from database:', orders.length);
+            }
+            
+            // Fallback: If no orders from database or service unavailable, try CartService
+            if (orders.length === 0 && window.CartService) {
+              console.log('Falling back to CartService for orders');
+              orders = window.CartService.getUserOrders(currentUser.id) || [];
+                // If we found orders in CartService but not in database, sync them
+              if (orders.length > 0 && window.DatabaseService) {
+                console.log('Syncing orders from CartService to database');
+                for (const order of orders) {
+                  try {
+                    // Use addOrder to save to database
+                    await window.DatabaseService.addOrder(order);
+                  } catch (syncError) {
+                    console.warn('Failed to sync order to database:', syncError);
+                  }
+                }
+              }
+            }
+          } catch (dbError) {
+            console.warn('Database service error, falling back to CartService:', dbError);
+            // Final fallback to CartService
+            if (window.CartService) {
+              orders = window.CartService.getUserOrders(currentUser.id) || [];
+            }
+          }
+          
+          // Normalize order data to ensure all required fields exist
+          this.orders = orders.map(order => this.normalizeOrder(order));
+          
+          // Cache orders
+          this.updateOrderCache(this.orders);
+          
+          // Track performance
+          this.performance.apiResponseTimes.push({
+            operation: 'loadOrders',
+            duration: Date.now() - startTime,
+            timestamp: Date.now()
+          });
+          
+          // Track analytics
+          this.trackOrdersLoaded(this.orders.length);
+          
+        } else {
+          this.orders = [];
+          console.warn('User not logged in or missing user ID');
+          this.handleError('User authentication required');
+        }
+        
+        // Filter orders and update UI
+        this.filterOrders();
+        this.ui.loadingStates.orders = false;
+        
+        // Show success notification if orders loaded
+        if (this.orders.length > 0) {
+          this.showInfoNotification(`Loaded ${this.orders.length} orders`);
+        }
+        
+      } catch (error) {
+        this.ui.loadingStates.orders = false;
+        this.handleError('Failed to load orders', error);
+        this.showErrorNotification('Failed to load your order history. Please try refreshing the page.');
+        
+        // Retry mechanism
+        if (this.componentState.retryCount < this.componentState.maxRetries) {
+          this.componentState.retryCount++;
+          setTimeout(() => {
+            this.loadOrders();
+          }, 2000 * this.componentState.retryCount);
+        }
+      }
+    },
+
+    normalizeOrder(order) {
+      // Ensure all required fields exist with defaults
+      return {
+        id: order.id || Date.now(),
+        userId: order.userId || this.getCurrentUserId(),
+        orderTime: order.orderTime || new Date().toISOString(),
+        status: order.status || 'pending',
+        items: order.items || [],
+        totals: {
+          subtotal: order.totals?.subtotal || 0,
+          tax: order.totals?.tax || 0,
+          deliveryFee: order.totals?.deliveryFee || 0,
+          total: order.totals?.total || 0,
+          ...order.totals
+        },
+        delivery: {
+          method: order.delivery?.method || 'delivery',
+          details: order.delivery?.details || {},
+          ...order.delivery
+        },
+        payment: {
+          method: order.payment?.method || 'card',
+          details: order.payment?.details || {},
+          ...order.payment
+        },
+        promoCode: order.promoCode || null,
+        bulkDiscount: order.bulkDiscount || null,
+        specialInstructions: order.specialInstructions || '',
+        statusUpdates: order.statusUpdates || {},
+        hasRated: order.hasRated || false,
+        rating: order.rating || null,
+        cancellationReason: order.cancellationReason || null,
+        estimatedDeliveryTime: order.estimatedDeliveryTime || null
+      };
+    },
+
+    updateOrderCache(orders) {
+      orders.forEach(order => {
+        this.orderCache.set(order.id, order);
+      });
+      
+      // Calculate cache hit rate
+      const totalRequests = this.performance.apiResponseTimes.length;
+      const cacheHits = this.orderCache.size;
+      this.performance.cacheHitRate = totalRequests > 0 ? cacheHits / totalRequests : 0;
+    },    refreshData() {
+      this.showInfoNotification('Refreshing order data...');
+      this.loadOrders();
     },
     
     // New method to ensure all orders have the required structure
@@ -764,73 +2011,202 @@ const PurchasesPage = {
       }
       
       return normalizedOrder;
-    },
-    
+    },    
     filterOrders() {
-      let filtered = [...this.orders];
-      
-      // Apply status filter if selected
-      if (this.statusFilter) {
-        filtered = filtered.filter(order => order.status === this.statusFilter);
+      try {
+        // Start performance tracking
+        const startTime = Date.now();
+        this.ui.loadingStates.filtering = true;
+        
+        let filtered = [...this.orders];
+        
+        // Apply status filter if selected
+        if (this.statusFilter) {
+          filtered = filtered.filter(order => order.status === this.statusFilter);
+        }
+        
+        // Apply delivery type filter if selected
+        if (this.deliveryTypeFilter) {
+          filtered = filtered.filter(order => order.delivery.method === this.deliveryTypeFilter);
+        }
+        
+        // Apply date range filter
+        if (this.dateFilter.start) {
+          const startDate = new Date(this.dateFilter.start);
+          filtered = filtered.filter(order => new Date(order.orderTime) >= startDate);
+        }
+        
+        if (this.dateFilter.end) {
+          const endDate = new Date(this.dateFilter.end);
+          // Set time to end of day
+          endDate.setHours(23, 59, 59, 999);
+          filtered = filtered.filter(order => new Date(order.orderTime) <= endDate);
+        }
+        
+        // Apply price filter
+        if (this.priceFilter.min !== null) {
+          filtered = filtered.filter(order => order.totals.total >= this.priceFilter.min);
+        }
+        
+        if (this.priceFilter.max !== null) {
+          filtered = filtered.filter(order => order.totals.total <= this.priceFilter.max);
+        }
+        
+        // Apply advanced filters
+        if (this.advancedFilters.paymentMethod) {
+          filtered = filtered.filter(order => order.payment.method === this.advancedFilters.paymentMethod);
+        }
+        
+        if (this.advancedFilters.hasPromoCode) {
+          filtered = filtered.filter(order => !!order.promoCode);
+        }
+        
+        if (this.advancedFilters.itemCount.min !== null) {
+          filtered = filtered.filter(order => order.items.length >= this.advancedFilters.itemCount.min);
+        }
+        
+        if (this.advancedFilters.itemCount.max !== null) {
+          filtered = filtered.filter(order => order.items.length <= this.advancedFilters.itemCount.max);
+        }
+        
+        // Apply search query if entered
+        if (this.searchQuery.trim()) {
+          const query = this.searchQuery.toLowerCase();
+          filtered = filtered.filter(order => {
+            // Search by order ID
+            if (order.id.toString().includes(query)) return true;
+            
+            // Search by food item names
+            if (order.items.some(item => item.name.toLowerCase().includes(query))) return true;
+            
+            // Search by delivery address if it exists
+            if (order.delivery.method !== 'pickup' && 
+                order.delivery.details.line1 && 
+                order.delivery.details.line1.toLowerCase().includes(query)) return true;
+            
+            // Search by status
+            if (order.status.toLowerCase().includes(query)) return true;
+            
+            // Search by payment method
+            if (order.payment.method.toLowerCase().includes(query)) return true;
+            
+            return false;
+          });
+        }
+        
+        // Apply sorting
+        this.applySorting(filtered);
+        
+        // Update filtered results
+        this.filteredOrders = filtered;
+        
+        // Track performance
+        const filterTime = Date.now() - startTime;
+        this.performance.filterPerformance.push({
+          timestamp: Date.now(),
+          duration: filterTime,
+          resultsCount: filtered.length,
+          filtersApplied: this.getActiveFiltersCount()
+        });
+        
+        // Update pagination
+        this.updatePaginationMetadata(filtered.length);
+        this.resetToFirstPage();
+        
+        // Track analytics
+        this.trackFilterPerformance(filtered.length);
+        
+        this.ui.loadingStates.filtering = false;
+        
+      } catch (error) {
+        this.ui.loadingStates.filtering = false;
+        this.handleError('Failed to filter orders', error);
       }
+    },
+
+    applySorting(orders) {
+      const { field, direction } = this.sortOptions;
       
-      // Apply delivery type filter if selected
-      if (this.deliveryTypeFilter) {
-        filtered = filtered.filter(order => order.delivery.method === this.deliveryTypeFilter);
-      }
-      
-      // Apply date range filter
-      if (this.dateFilter.start) {
-        const startDate = new Date(this.dateFilter.start);
-        filtered = filtered.filter(order => new Date(order.orderTime) >= startDate);
-      }
-      
-      if (this.dateFilter.end) {
-        const endDate = new Date(this.dateFilter.end);
-        // Set time to end of day
-        endDate.setHours(23, 59, 59, 999);
-        filtered = filtered.filter(order => new Date(order.orderTime) <= endDate);
-      }
-      
-      // Apply price filter
-      if (this.priceFilter.min !== null) {
-        filtered = filtered.filter(order => order.totals.total >= this.priceFilter.min);
-      }
-      
-      if (this.priceFilter.max !== null) {
-        filtered = filtered.filter(order => order.totals.total <= this.priceFilter.max);
-      }
-      
-      // Apply search query if entered
-      if (this.searchQuery.trim()) {
-        const query = this.searchQuery.toLowerCase();
-        filtered = filtered.filter(order => {
-          // Search by order ID
-          if (order.id.toString().includes(query)) return true;
-          
-          // Search by food item names
-          if (order.items.some(item => item.name.toLowerCase().includes(query))) return true;
-          
-          // Search by delivery address if it exists
-          if (order.delivery.method !== 'pickup' && 
-              order.delivery.details.line1 && 
-              order.delivery.details.line1.toLowerCase().includes(query)) return true;
-          
-          return false;
+      orders.sort((a, b) => {
+        let aValue, bValue;
+        
+        switch (field) {
+          case 'orderTime':
+            aValue = new Date(a.orderTime);
+            bValue = new Date(b.orderTime);
+            break;
+          case 'total':
+            aValue = a.totals.total;
+            bValue = b.totals.total;
+            break;
+          case 'status':
+            aValue = a.status;
+            bValue = b.status;
+            break;
+          case 'itemCount':
+            aValue = a.items.length;
+            bValue = b.items.length;
+            break;
+          default:
+            aValue = a.orderTime;
+            bValue = b.orderTime;
+        }
+        
+        if (direction === 'asc') {
+          return aValue > bValue ? 1 : -1;
+        } else {
+          return aValue < bValue ? 1 : -1;
+        }
+      });
+    },
+
+    getActiveFiltersCount() {
+      let count = 0;
+      if (this.statusFilter) count++;
+      if (this.deliveryTypeFilter) count++;
+      if (this.dateFilter.start) count++;
+      if (this.dateFilter.end) count++;
+      if (this.priceFilter.min !== null) count++;
+      if (this.priceFilter.max !== null) count++;
+      if (this.searchQuery.trim()) count++;
+      if (this.advancedFilters.paymentMethod) count++;
+      if (this.advancedFilters.hasPromoCode) count++;
+      return count;
+    },
+
+    resetToFirstPage() {
+      this.pagination.currentPage = 1;
+    },
+
+    trackFilterPerformance(resultsCount) {
+      if (window.Analytics) {
+        window.Analytics.track('purchases_filter_performance', {
+          resultsCount,
+          filtersCount: this.getActiveFiltersCount(),
+          hasSearch: !!this.searchQuery.trim(),
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
         });
       }
-      
-      // Sort by order date (newest first)
-      filtered.sort((a, b) => new Date(b.orderTime) - new Date(a.orderTime));
-      
-      this.filteredOrders = filtered;
-    },
-    
+    },    
     toggleFilterMenu() {
       this.showFilterMenu = !this.showFilterMenu;
+      
+      // Track analytics
+      if (window.Analytics) {
+        window.Analytics.track('purchases_filter_menu_toggled', {
+          isOpen: this.showFilterMenu,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
     },
     
     clearFilters() {
+      // Store previous state for analytics
+      const previousFiltersCount = this.getActiveFiltersCount();
+      
+      // Clear all filters
       this.statusFilter = '';
       this.deliveryTypeFilter = '';
       this.dateFilter.start = '';
@@ -838,7 +2214,31 @@ const PurchasesPage = {
       this.priceFilter.min = null;
       this.priceFilter.max = null;
       this.searchQuery = '';
+      this.advancedFilters = {
+        paymentMethod: '',
+        hasPromoCode: false,
+        ratingRange: { min: 1, max: 5 },
+        itemCount: { min: null, max: null }
+      };
+      
+      // Reset sorting to default
+      this.sortOptions.field = 'orderTime';
+      this.sortOptions.direction = 'desc';
+      
+      // Apply filtering
       this.filterOrders();
+      
+      // Track analytics
+      if (window.Analytics) {
+        window.Analytics.track('purchases_filters_cleared', {
+          previousFiltersCount,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+      
+      // Show notification
+      this.showInfoNotification('All filters cleared');
     },
     
     toggleOrderDetails(orderId) {
@@ -846,77 +2246,290 @@ const PurchasesPage = {
         this.expandedOrders = this.expandedOrders.filter(id => id !== orderId);
       } else {
         this.expandedOrders.push(orderId);
+        
+        // Track order viewed for analytics
+        this.analytics.ordersViewed.add(orderId);
+        this.analytics.actionsPerformed.push({
+          action: 'order_details_viewed',
+          orderId,
+          timestamp: Date.now()
+        });
+      }
+      
+      // Track analytics
+      if (window.Analytics) {
+        window.Analytics.track('purchases_order_details_toggled', {
+          orderId,
+          isExpanded: this.expandedOrders.includes(orderId),
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
       }
     },
     
     rateOrder(order) {
-      this.ratedOrder = JSON.parse(JSON.stringify(order)); // Deep copy
-      
-      // Initialize rating for each item
-      this.rating = {
-        overall: 5,
-        foodQuality: 5,
-        deliverySpeed: order.delivery.method !== 'pickup' ? 5 : 0,
-        comment: '',
-        items: order.items.map(() => ({ rating: 5, comment: '' }))
-      };
-      
-      // Open modal
-      new bootstrap.Modal(document.getElementById('rateOrderModal')).show();
-    },
-    
-    submitRating() {
-      // Prepare review data
-      const reviewData = {
-        orderId: this.ratedOrder.id,
-        userId: this.ratedOrder.userId,
-        ratings: {
-          overall: this.rating.overall,
-          foodQuality: this.rating.foodQuality,
-          deliverySpeed: this.rating.deliverySpeed
-        },
-        comment: this.rating.comment,
-        itemRatings: this.ratedOrder.items.map((item, index) => ({
-          foodItemId: item.id,
-          name: item.name,
-          rating: this.rating.items[index].rating,
-          comment: this.rating.items[index].comment || ''
-        })),
-        reviewDate: new Date().toISOString()
-      };
-      
-      // Save the review
       try {
-        // Call DatabaseService to save the review
-        window.DatabaseService.addReview(reviewData)
+        this.ratedOrder = JSON.parse(JSON.stringify(order)); // Deep copy
+        
+        // Initialize rating for each item
+        this.rating = {
+          overall: 5,
+          foodQuality: 5,
+          deliverySpeed: order.delivery.method !== 'pickup' ? 5 : 0,
+          comment: '',
+          items: order.items.map(() => ({ rating: 5, comment: '' })),
+          isSubmitting: false,
+          hasSubmitted: false
+        };
+        
+        // Reset validation
+        this.ratingValidation = {
+          errors: {},
+          isValid: true,
+          touchedFields: new Set()
+        };
+        
+        // Track analytics
+        this.analytics.actionsPerformed.push({
+          action: 'rating_modal_opened',
+          orderId: order.id,
+          timestamp: Date.now()
+        });
+        
+        if (window.Analytics) {
+          window.Analytics.track('purchases_rating_started', {
+            orderId: order.id,
+            orderTotal: order.totals.total,
+            itemCount: order.items.length,
+            timestamp: Date.now(),
+            userId: this.getCurrentUserId()
+          });
+        }
+        
+        // Open modal
+        new bootstrap.Modal(document.getElementById('rateOrderModal')).show();
+        
+      } catch (error) {
+        this.handleError('Failed to open rating modal', error);
+        this.showErrorNotification('Failed to open rating form. Please try again.');
+      }
+    },    
+    submitRating() {
+      try {
+        // Validate rating before submission
+        if (!this.validateRatingSubmission()) {
+          return;
+        }
+        
+        // Set submitting state
+        this.rating.isSubmitting = true;
+        this.ui.loadingStates.rating = true;
+        
+        // Prepare review data
+        const reviewData = {
+          orderId: this.ratedOrder.id,
+          userId: this.ratedOrder.userId,
+          ratings: {
+            overall: this.rating.overall,
+            foodQuality: this.rating.foodQuality,
+            deliverySpeed: this.rating.deliverySpeed
+          },
+          comment: this.rating.comment.trim(),
+          itemRatings: this.ratedOrder.items.map((item, index) => ({
+            foodItemId: item.id,
+            name: item.name,
+            rating: this.rating.items[index].rating,
+            comment: this.rating.items[index].comment || ''
+          })),
+          reviewDate: new Date().toISOString(),
+          metadata: {
+            deviceType: this.ui.isMobile ? 'mobile' : 'desktop',
+            sessionId: this.analytics.sessionStartTime,
+            submissionAttempt: 1
+          }
+        };
+        
+        // Track submission attempt
+        this.analytics.actionsPerformed.push({
+          action: 'rating_submission_attempted',
+          orderId: this.ratedOrder.id,
+          timestamp: Date.now()
+        });
+        
+        // Save the review with retry mechanism
+        this.saveReviewWithRetry(reviewData)
           .then(() => {
-            // Close modal
-            const modalElement = document.getElementById('rateOrderModal');
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            modal.hide();
-            
-            // Show success message
-            alert('Thank you for your review!');
+            this.handleRatingSuccess(reviewData);
           })
           .catch(error => {
-            console.error('Error saving review:', error);
-            alert('There was an error saving your review. Please try again.');
+            this.handleRatingError(error, reviewData);
           });
+          
       } catch (error) {
-        console.error('Error in review submission:', error);
-        
-        // Fallback to localStorage if the database service fails
+        this.rating.isSubmitting = false;
+        this.ui.loadingStates.rating = false;
+        this.handleError('Failed to submit rating', error);
+        this.showErrorNotification('Failed to submit your rating. Please try again.');
+      }
+    },
+
+    validateRatingSubmission() {
+      const errors = [];
+      
+      // Validate overall rating
+      if (this.rating.overall < 1 || this.rating.overall > 5) {
+        errors.push('Overall rating must be between 1 and 5 stars');
+      }
+      
+      // Validate food quality rating
+      if (this.rating.foodQuality < 1 || this.rating.foodQuality > 5) {
+        errors.push('Food quality rating must be between 1 and 5 stars');
+      }
+      
+      // Validate delivery speed rating (if applicable)
+      if (this.ratedOrder.delivery.method !== 'pickup' && 
+          (this.rating.deliverySpeed < 1 || this.rating.deliverySpeed > 5)) {
+        errors.push('Delivery speed rating must be between 1 and 5 stars');
+      }
+      
+      // Validate comment length
+      if (this.rating.comment && this.rating.comment.length > this.config.validation.maxCommentLength) {
+        errors.push(`Comment must be less than ${this.config.validation.maxCommentLength} characters`);
+      }
+      
+      // Validate item ratings
+      for (let i = 0; i < this.rating.items.length; i++) {
+        if (this.rating.items[i].rating < 1 || this.rating.items[i].rating > 5) {
+          errors.push(`Item ${i + 1} rating must be between 1 and 5 stars`);
+        }
+      }
+      
+      if (errors.length > 0) {
+        this.ratingValidation.errors = { general: errors };
+        this.ratingValidation.isValid = false;
+        this.showErrorNotification(errors.join(', '));
+        return false;
+      }
+      
+      this.ratingValidation.isValid = true;
+      return true;
+    },
+
+    async saveReviewWithRetry(reviewData, attempt = 1) {
+      const maxAttempts = 3;
+      
+      try {
+        if (window.DatabaseService) {
+          await window.DatabaseService.addReview(reviewData);
+        } else {
+          throw new Error('DatabaseService not available');
+        }
+      } catch (error) {
+        if (attempt < maxAttempts) {
+          // Retry with exponential backoff
+          const delay = Math.pow(2, attempt) * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return this.saveReviewWithRetry(reviewData, attempt + 1);
+        } else {
+          // Fallback to localStorage after all retries failed
+          return this.saveReviewToLocalStorage(reviewData);
+        }
+      }
+    },
+
+    saveReviewToLocalStorage(reviewData) {
+      try {
         const existingReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
         existingReviews.push(reviewData);
         localStorage.setItem('reviews', JSON.stringify(existingReviews));
         
-        // Close modal
-        const modalElement = document.getElementById('rateOrderModal');
-        const modal = bootstrap.Modal.getInstance(modalElement);
-        modal.hide();
+        // Mark as local storage fallback
+        reviewData.isLocalStorageFallback = true;
         
-        // Show success message
-        alert('Thank you for your review!');
+        return Promise.resolve();
+      } catch (error) {
+        return Promise.reject(new Error('Failed to save to local storage'));
+      }
+    },
+
+    handleRatingSuccess(reviewData) {
+      // Update order as rated
+      const orderIndex = this.orders.findIndex(o => o.id === this.ratedOrder.id);
+      if (orderIndex >= 0) {
+        this.orders[orderIndex].hasRated = true;
+        this.orders[orderIndex].rating = {
+          overall: this.rating.overall,
+          foodQuality: this.rating.foodQuality,
+          deliverySpeed: this.rating.deliverySpeed,
+          comment: this.rating.comment,
+          date: reviewData.reviewDate
+        };
+      }
+      
+      // Update analytics
+      this.analytics.conversionTracking.ratingsSubmitted++;
+      this.analytics.actionsPerformed.push({
+        action: 'rating_submitted_successfully',
+        orderId: this.ratedOrder.id,
+        rating: this.rating.overall,
+        timestamp: Date.now()
+      });
+      
+      // Track success analytics
+      if (window.Analytics) {
+        window.Analytics.track('purchases_rating_submitted', {
+          orderId: this.ratedOrder.id,
+          overallRating: this.rating.overall,
+          foodQualityRating: this.rating.foodQuality,
+          deliverySpeedRating: this.rating.deliverySpeed,
+          hasComment: !!this.rating.comment.trim(),
+          commentLength: this.rating.comment.length,
+          itemRatingsCount: this.rating.items.length,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+      
+      // Close modal
+      const modalElement = document.getElementById('rateOrderModal');
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+      }
+      
+      // Reset states
+      this.rating.isSubmitting = false;
+      this.rating.hasSubmitted = true;
+      this.ui.loadingStates.rating = false;
+      
+      // Show success notification
+      this.showSuccessNotification('Thank you for your review! Your feedback helps us improve.');
+      
+      // Refresh filtered orders to reflect changes
+      this.filterOrders();
+    },    handleRatingError(error, reviewData) {
+      console.error('Error saving review:', error);
+      
+      // Reset states
+      this.rating.isSubmitting = false;
+      this.ui.loadingStates.rating = false;
+      
+      // Track error analytics
+      if (window.Analytics) {
+        window.Analytics.track('purchases_rating_error', {
+          orderId: this.ratedOrder.id,
+          error: error.message,
+          isLocalStorageFallback: reviewData.isLocalStorageFallback,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId()
+        });
+      }
+      
+      // Show appropriate error message
+      if (reviewData.isLocalStorageFallback) {
+        this.showErrorNotification('Your review was saved locally but could not be synced. It will be uploaded when connection is restored.');
+      } else {
+        this.showErrorNotification('Failed to save your review. Please try again or check your connection.');
       }
     },
     
@@ -1110,8 +2723,7 @@ const PurchasesPage = {
         minute: '2-digit'
       });
     },
-    
-    getCardIcon(brand) {
+      getCardIcon(brand) {
       switch (brand.toLowerCase()) {
         case 'visa': return 'fa-cc-visa';
         case 'mastercard': return 'fa-cc-mastercard';
@@ -1119,6 +2731,42 @@ const PurchasesPage = {
         case 'discover': return 'fa-cc-discover';
         default: return 'fa-credit-card';
       }
+    },
+
+    // Filter methods for accessing custom filters
+    formatCurrency(value) {
+      if (window.Filters && window.Filters.formatCurrency) {
+        return window.Filters.formatCurrency(value);
+      }
+      return 'RM ' + (value || 0).toFixed(2);
+    },
+
+    formatNumber(value) {
+      if (window.Filters && window.Filters.formatNumber) {
+        return window.Filters.formatNumber(value);
+      }
+      return (value || 0).toLocaleString();
+    },
+
+    pluralize(count, singular, plural) {
+      if (window.Filters && window.Filters.pluralize) {
+        return window.Filters.pluralize(count, singular, plural);
+      }
+      return count === 1 ? singular : (plural || singular + 's');
+    },
+
+    formatRelativeTime(date) {
+      if (window.Filters && window.Filters.formatRelativeTime) {
+        return window.Filters.formatRelativeTime(date);
+      }
+      const now = new Date();
+      const inputDate = new Date(date);
+      const diffInSeconds = Math.floor((now - inputDate) / 1000);
+      
+      if (diffInSeconds < 60) return 'just now';
+      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+      return `${Math.floor(diffInSeconds / 86400)} days ago`;
     }
   }
 };

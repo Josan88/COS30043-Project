@@ -1,23 +1,64 @@
 /**
  * CartItem Component
  * Component for displaying food items in the order cart
+ * Enhanced with better prop validation and error handling
  */
 window.app.component('cart-item', {
   props: {
     item: {
       type: Object,
-      required: true
+      required: true,
+      validator(item) {
+        // Validate that item has required properties
+        const requiredProps = ['id', 'name', 'price', 'quantity'];
+        return requiredProps.every(prop => prop in item) && 
+               typeof item.price === 'number' && 
+               typeof item.quantity === 'number' && 
+               item.quantity > 0;
+      }
+    },
+    index: {
+      type: Number,
+      default: 0,
+      validator(index) {
+        return index >= 0;
+      }
     }
-  },
-  data() {
+  },  data() {
     return {
+      // UI State
       showInstructions: false,
-      specialInstructions: this.item.specialInstructions || (this.item.customization ? this.item.customization.specialInstructions : '') || '',
-      isEditing: false,
-      originalQuantity: this.item.quantity,
       showOptions: false,
+      showCustomizations: false,
+      isEditing: false,
       isRemoving: false,
-      showCustomizations: false
+      
+      // Data
+      specialInstructions: this.getInitialInstructions(),
+      originalQuantity: this.item.quantity,
+      
+      // Constants
+      MAX_INSTRUCTIONS_LENGTH: 200,
+      MIN_QUANTITY: 1,
+      
+      // Dietary option mappings
+      DIETARY_BADGE_CLASSES: {
+        'Vegetarian': 'bg-success',
+        'Vegan': 'bg-success',
+        'Gluten-free': 'bg-info',
+        'Halal': 'bg-secondary',
+        'Keto': 'bg-primary',
+        'Spicy': 'bg-danger'
+      },
+      
+      DIETARY_ICONS: {
+        'Vegetarian': 'fas fa-leaf',
+        'Vegan': 'fas fa-seedling',
+        'Gluten-free': 'fas fa-bread-slice',
+        'Halal': 'fas fa-moon',
+        'Keto': 'fas fa-bacon',
+        'Spicy': 'fas fa-pepper-hot'
+      }
     };
   },
   template: `
@@ -160,12 +201,11 @@ window.app.component('cart-item', {
             </button>
           </div>
         </div>
-        
-        <!-- Item Price -->
+          <!-- Item Price -->
         <div class="col-4 col-md-2 mt-3 mt-md-0 text-end">
-          <p class="price fw-bold mb-0">{{ $filters.currency(totalPrice) }}</p>
+          <p class="price fw-bold mb-0">{{ $currency(totalPrice) }}</p>
           <small v-if="item.quantity > 1" class="text-muted d-block">
-            {{ $filters.currency(itemUnitPrice) }} each
+            {{ $currency(itemUnitPrice) }} each
           </small>
           <small v-if="item.discount" class="text-success d-block">
             <i class="fas fa-tag me-1"></i>{{ item.discount }}% off
@@ -241,11 +281,9 @@ window.app.component('cart-item', {
       
       return price;
     },
-    
-    // Character count for special instructions
+      // Character count for special instructions
     remainingChars() {
-      const maxChars = 200;
-      return maxChars - this.specialInstructions.length;
+      return this.MAX_INSTRUCTIONS_LENGTH - this.specialInstructions.length;
     },
     
     // Check if item has customization options
@@ -396,30 +434,54 @@ window.app.component('cart-item', {
       this.showOptions = false;
       // In a real app, open customization modal with current customizations
       this.$root.$emit('open-customization-modal', this.item);
-    },
+    },    /**
+     * Get CSS class for dietary option badge
+     * @param {string} option - Dietary option
+     * @returns {string} CSS class
+     */
     getDietaryBadgeClass(option) {
-      const classMap = {
-        'Vegetarian': 'bg-success',
-        'Vegan': 'bg-success',
-        'Gluten-free': 'bg-info',
-        'Halal': 'bg-secondary',
-        'Keto': 'bg-primary',
-        'Spicy': 'bg-danger'
-      };
-      
-      return classMap[option] || 'bg-secondary';
+      return this.DIETARY_BADGE_CLASSES[option] || 'bg-secondary';
     },
+
+    /**
+     * Get icon for dietary option
+     * @param {string} option - Dietary option
+     * @returns {string} Icon class
+     */
     getDietaryIcon(option) {
-      const iconMap = {
-        'Vegetarian': 'fas fa-leaf',
-        'Vegan': 'fas fa-seedling',
-        'Gluten-free': 'fas fa-bread-slice',
-        'Halal': 'fas fa-moon',
-        'Keto': 'fas fa-bacon',
-        'Spicy': 'fas fa-pepper-hot'
-      };
-      
-      return iconMap[option] || 'fas fa-check';
+      return this.DIETARY_ICONS[option] || 'fas fa-check';
+    },
+
+    /**
+     * Initialize special instructions from item data
+     * @returns {string} Initial instructions
+     */
+    getInitialInstructions() {
+      return this.item.specialInstructions || 
+             (this.item.customization ? this.item.customization.specialInstructions : '') || 
+             '';
+    },
+
+    /**
+     * Validate quantity input
+     * @param {number} quantity - Quantity to validate
+     * @returns {number} Valid quantity
+     */
+    validateQuantity(quantity) {
+      const num = parseInt(quantity) || this.MIN_QUANTITY;
+      return Math.max(this.MIN_QUANTITY, num);
+    },
+
+    /**
+     * Handle quantity changes with validation
+     * @param {number} newQuantity - New quantity value
+     */
+    handleQuantityChange(newQuantity) {
+      const validQuantity = this.validateQuantity(newQuantity);
+      if (this.item.quantity !== validQuantity) {
+        this.item.quantity = validQuantity;
+        this.updateCart();
+      }
     }
   }
 });

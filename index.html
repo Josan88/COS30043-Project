@@ -18,38 +18,40 @@
     <div id="app">
         <!-- Navigation Component -->
         <nav-bar></nav-bar>
-        
+
         <!-- Main Content Area - Router View -->
         <main class="container my-4">
             <router-view></router-view>
         </main>
-        
+
         <!-- Footer Component -->
         <app-footer></app-footer>
     </div>
-    
+
     <!-- Vue 3 -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <!-- Vue Router -->
     <script src="https://unpkg.com/vue-router@4.2.5/dist/vue-router.global.js"></script>
     <!-- Vue Pagination -->
-    <script src="https://unpkg.com/vuejs-paginate-next@latest/dist/vuejs-paginate-next.umd.js"></script>
-    <!-- Bootstrap JavaScript Bundle with Popper -->
+    <script src="https://unpkg.com/vuejs-paginate-next@latest/dist/vuejs-paginate-next.umd.js"></script>    <!-- Bootstrap JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Services and Utilities - Load these first -->
+
+    <!-- Constants - Load first so they're available to all components -->
+    <script src="js/constants/loader.js"></script>    <!-- Services and Utilities - Load these after constants -->
+    <script src="js/services/ErrorHandler.js"></script>
+    <script src="js/services/ValidationService.js"></script>
+    <script src="js/services/ToastService.js"></script>
     <script src="js/services/ProductService.js"></script>
     <script src="js/services/AuthService.js"></script>
     <script src="js/services/CartService.js"></script>
     <script src="js/services/DatabaseService.js"></script>
-    
-    <!-- Main Application - Create global app instance first -->
+    <script src="js/utils/helpers.js"></script>    <!-- Main Application - Create global app instance first -->
     <script src="js/app.js"></script>
-    
-    <!-- Custom Directives and Filters - Use app instance -->
+
+    <!-- Custom Directives and Filters - Load these after app instance but before components -->
     <script src="js/directives/index.js"></script>
     <script src="js/filters/index.js"></script>
-    
+
     <!-- Views/Pages - Define components and make them globally available -->
     <script src="js/views/HomePage.js"></script>
     <script src="js/views/ProductPage.js"></script>
@@ -57,14 +59,13 @@
     <script src="js/views/RegisterPage.js"></script>
     <script src="js/views/LoginPage.js"></script>
     <script src="js/views/AccountPage.js"></script>
-    <script src="js/views/PurchasesPage.js"></script>
-    
-    <!-- Components - Use the app instance to register components -->
+    <script src="js/views/PurchasesPage.js"></script>    <!-- Components - Use the app instance to register components -->
     <script src="js/components/NavBar.js"></script>
     <script src="js/components/AppFooter.js"></script>
     <script src="js/components/ProductCard.js"></script>
     <script src="js/components/CartItem.js"></script>
-    
+    <script src="js/components/CustomizationModal.js"></script>
+
     <!-- Router Setup - Should be defined after all view components are loaded -->
     <script src="js/router.js"></script>
 </body>

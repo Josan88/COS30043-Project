@@ -1,38 +1,89 @@
 /**
  * CartService
  * Manages shopping cart functionality for food ordering
+ * Improved structure with better error handling and constants
  */
 class CartService {
   constructor() {
     this.cart = [];
-    this.loadCart();
+    this.totals = {
+      subtotal: 0,
+      tax: 0,
+      deliveryFee: 0,
+      total: 0
+    };
     this.eventListeners = {};
+    
+    // Configuration constants
+    this.config = {
+      TAX_RATE: 0.1,
+      FREE_DELIVERY_THRESHOLD: 15,
+      DELIVERY_FEE: 2.99,
+      STORAGE_KEY: 'foodCart',
+      ORDERS_STORAGE_KEY: 'foodOrders'
+    };
+    
+    this.loadCart();
   }
-
   /**
-   * Load cart data from localStorage
+   * Load cart data from localStorage with error handling
    */
   loadCart() {
     try {
-      const savedCart = localStorage.getItem('foodCart');
+      const savedCart = localStorage.getItem(this.config.STORAGE_KEY);
       if (savedCart) {
-        this.cart = JSON.parse(savedCart);
+        const parsedCart = JSON.parse(savedCart);
+        this.cart = Array.isArray(parsedCart) ? parsedCart : [];
+        this.updateCartTotals();
+      } else {
+        this.cart = [];
       }
     } catch (error) {
       console.error('Error loading cart:', error);
       this.cart = [];
+      this.clearCorruptedStorage();
     }
   }
 
   /**
-   * Save cart to localStorage
+   * Clear corrupted storage data
+   * @private
+   */
+  clearCorruptedStorage() {
+    try {
+      localStorage.removeItem(this.config.STORAGE_KEY);
+      console.log('Corrupted cart data cleared');
+    } catch (error) {
+      console.error('Error clearing corrupted storage:', error);
+    }
+  }
+  /**
+   * Save cart to localStorage with error handling
    */
   saveCart() {
     try {
-      localStorage.setItem('foodCart', JSON.stringify(this.cart));
+      const cartData = JSON.stringify(this.cart);
+      localStorage.setItem(this.config.STORAGE_KEY, cartData);
       this.notifyListeners('update', this.cart);
     } catch (error) {
       console.error('Error saving cart:', error);
+      this.handleStorageError(error);
+    }
+  }
+
+  /**
+   * Handle storage errors gracefully
+   * @private
+   * @param {Error} error - Storage error
+   */
+  handleStorageError(error) {
+    // Check if storage quota exceeded
+    if (error.name === 'QuotaExceededError') {
+      console.warn('Storage quota exceeded. Consider clearing old data.');
+      this.notifyListeners('storage-error', { type: 'quota-exceeded' });
+    } else {
+      console.error('Storage error:', error);
+      this.notifyListeners('storage-error', { type: 'general', error });
     }
   }
 
@@ -41,6 +92,15 @@ class CartService {
    */
   getCart() {
     return this.cart;
+  }
+  /**
+   * Add a food item to the cart
+   * @param {Object} item - The food item to add
+   * @param {Number} quantity - Quantity to add (default: 1)
+   * @param {Object} options - Special instructions and customization options
+   */
+  addItem(item, quantity = 1, options = {}) {
+    return this.addToCart(item, quantity, options);
   }
 
   /**
@@ -210,32 +270,42 @@ class CartService {
     this.saveCart();
     return this.cart;
   }
-
   /**
-   * Calculate cart totals, taxes, and delivery fees
+   * Calculate cart totals with configurable tax and delivery fees
    */
   updateCartTotals() {
-    // Calculate subtotal
-    const subtotal = this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    
-    // Calculate tax (assume 10%)
-    const tax = subtotal * 0.1;
-    
-    // Calculate delivery fee (assume $2.99 for orders under $15, free otherwise)
-    const deliveryFee = subtotal < 15 ? 2.99 : 0;
-    
-    // Total with tax and delivery fee
-    const total = subtotal + tax + deliveryFee;
-    
-    // Save totals
-    this.totals = {
-      subtotal,
-      tax,
-      deliveryFee,
-      total
-    };
-    
-    return this.totals;
+    try {
+      // Calculate subtotal
+      const subtotal = this.cart.reduce((total, item) => {
+        const itemPrice = item.price || 0;
+        const itemQuantity = item.quantity || 0;
+        return total + (itemPrice * itemQuantity);
+      }, 0);
+      
+      // Calculate tax using configured rate
+      const tax = subtotal * this.config.TAX_RATE;
+      
+      // Calculate delivery fee with free threshold
+      const deliveryFee = subtotal < this.config.FREE_DELIVERY_THRESHOLD ? this.config.DELIVERY_FEE : 0;
+      
+      // Calculate total
+      const total = subtotal + tax + deliveryFee;
+      
+      // Update totals object
+      this.totals = {
+        subtotal: Math.round(subtotal * 100) / 100,
+        tax: Math.round(tax * 100) / 100,
+        deliveryFee: Math.round(deliveryFee * 100) / 100,
+        total: Math.round(total * 100) / 100
+      };
+      
+      return this.totals;
+    } catch (error) {
+      console.error('Error calculating cart totals:', error);
+      // Return safe default totals
+      this.totals = { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
+      return this.totals;
+    }
   }
 
   /**
@@ -576,3 +646,10 @@ class CartService {
 
 // Create and expose singleton instance as global variable
 window.CartService = new CartService();
+
+// Debug logging
+console.log('CartService initialized:', {
+  hasAddItem: typeof window.CartService.addItem === 'function',
+  hasAddToCart: typeof window.CartService.addToCart === 'function',
+  methods: Object.getOwnPropertyNames(CartService.prototype).filter(name => name !== 'constructor')
+});
