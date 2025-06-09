@@ -95,26 +95,7 @@ const HomePage = {
                 </div>
               </router-link>
             </div>
-          </div>
-        </div>
-        
-        <!-- Promotional Banner - Parallax Effect -->
-        <div class="promo-banner parallax-section my-5">
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-6 col-md-8 py-5">
-                <div class="promo-content bg-white bg-opacity-90 p-5 rounded-lg shadow-lg">
-                  <span class="badge bg-danger fs-6 mb-3">Limited Time Offer</span>
-                  <h2 class="display-5 fw-bold mb-3">Free Delivery on Your First Order</h2>
-                  <p class="lead mb-4">Use code <span class="bg-primary text-white px-2 py-1 rounded">WELCOME</span> at checkout for free delivery on orders over RM50!</p>
-                  <router-link to="/product" class="btn btn-lg btn-primary">
-                    <i class="fas fa-shopping-basket me-2"></i> Order Now
-                  </router-link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+          </div>        </div>
         
         <!-- How It Works - Modern Process Flow -->
         <div class="container my-5 py-5">
@@ -281,10 +262,18 @@ const HomePage = {
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://foodnow.example.com/app" width="80" height="80" alt="App QR Code">
                   </div>
                   <p class="text-white mb-0">Scan to download<br>the FoodNow App</p>
-                </div>
-              </div>
+                </div>              </div>
               <div class="col-lg-6 text-center">
-                <img src="https://www.pngmart.com/files/21/iPhone-App-PNG-Pic.png" alt="FoodNow Mobile App" class="img-fluid app-mockup" style="max-height: 500px;">
+                <div class="app-mockup-container d-inline-block" style="max-height: 400px;">
+                  <div class="phone-mockup bg-dark rounded-4 p-2 shadow-lg" style="width: 200px; height: 400px; border-radius: 30px !important;">
+                    <div class="phone-screen bg-primary rounded-3 h-100 d-flex flex-column align-items-center justify-content-center text-white p-3" style="border-radius: 25px !important;">
+                      <i class="fas fa-utensils fa-3x mb-2 text-white"></i>
+                      <h4 class="fw-bold text-white mb-1">FoodNow</h4>
+                      <p class="small text-white-50 text-center mb-3">Order Food<br>Anytime, Anywhere</p>
+                      
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -917,11 +906,10 @@ const HomePage = {
         ...category,
         icon: iconMap[category.id.toLowerCase()] || "fas fa-utensils",
       }));
-    }
+    },
     /**
      * Detect user location for personalized content
-     */,
-    async detectLocation() {
+     */ async detectLocation() {
       try {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -951,11 +939,10 @@ const HomePage = {
         console.error("Error in detectLocation:", error);
         this.userLocation = null;
       }
-    }
+    },
     /**
      * Handle component errors with proper logging
-     */,
-    handleComponentError(message, error) {
+     */ handleComponentError(message, error) {
       console.error(message, error);
 
       if (window.ErrorHandler) {
@@ -1021,11 +1008,10 @@ const HomePage = {
       } finally {
         this.isLoading = false;
       }
-    }
+    },
     /**
      * Navigate to next review with smooth transition
-     */,
-    nextReview() {
+     */ nextReview() {
       const reviewCards = document.querySelectorAll(".testimonial-card");
       if (reviewCards.length > 0) {
         this.transitionReview(1);
@@ -1040,11 +1026,10 @@ const HomePage = {
       if (reviewCards.length > 0) {
         this.transitionReview(-1);
       }
-    }
+    },
     /**
      * Handle review transition with direction
-     */,
-    transitionReview(direction) {
+     */ transitionReview(direction) {
       const reviewCards = document.querySelectorAll(".testimonial-card");
       if (reviewCards.length === 0) return;
 
@@ -1070,11 +1055,10 @@ const HomePage = {
         this.updateReviewCard(reviewCards[0], review);
         reviewCards[0].classList.add("active");
       }, 300);
-    }
+    },
     /**
      * Update review card content
-     */,
-    updateReviewCard(card, review) {
+     */ updateReviewCard(card, review) {
       // Check if review is defined to prevent errors when reviews array is empty
       if (!review) {
         console.warn("updateReviewCard called with undefined review");
@@ -1159,34 +1143,10 @@ const HomePage = {
             });
         }
 
-        // Setup parallax effect for promo banner
-        this.setupParallaxEffect();
-
         console.log("HomePage effects initialized successfully");
       } catch (error) {
         console.warn("Error setting up page effects:", error);
       }
-    },
-
-    /**
-     * Setup parallax scrolling effect
-     */
-    setupParallaxEffect() {
-      const promoBanner = document.querySelector(".promo-banner");
-      if (!promoBanner) return;
-
-      const handleScroll =
-        window.Helpers?.throttle(() => {
-          const scrolled = window.pageYOffset;
-          const parallaxElement = promoBanner.querySelector(".promo-content");
-
-          if (parallaxElement) {
-            const speed = scrolled * 0.5;
-            parallaxElement.style.transform = `translateY(${speed}px)`;
-          }
-        }, 16) || (() => {}); // 60fps throttling
-
-      window.addEventListener("scroll", handleScroll, { passive: true });
     },
 
     /**
@@ -1242,11 +1202,10 @@ const HomePage = {
         console.warn("Error calculating performance score:", error);
         return 50; // Default score
       }
-    }
+    },
     /**
      * Track analytics events
-     */,
-    trackEvent(eventName, eventData = {}) {
+     */ trackEvent(eventName, eventData = {}) {
       try {
         // Store event in local analytics
         const event = {
