@@ -146,31 +146,127 @@ const getCategoryIconMap = () => ({
 const HomePage = {
   template: `
     <div class="home-page">
-      <div class="container-fluid px-0">
-        <!-- Featured Products Section -->
-        <featured-products-section 
-          :products="featuredProducts"
-          :is-loading="isLoading"
-          :load-error="loadError"
-          :config="config"
-          @retry-load="retryLoad"
-          @product-feedback="handleProductCardFeedback"
-        />
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <div class="hero-content">
+                <h1>Delicious Food Delivered Fast</h1>
+                <p>Order from your favorite restaurants with just a few clicks</p>
+                <div class="hero-cta">
+                  <router-link to="/product" class="btn-primary-custom">
+                    <i class="fas fa-utensils"></i> Order Now
+                  </router-link>
+                  <router-link to="/product" class="btn-outline-custom">
+                    <i class="fas fa-info-circle"></i> Learn More
+                  </router-link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <!-- Categories Section -->
-        <categories-section 
-          :categories="categories"
-        />
+      <!-- Search Section - Mobile First -->
+      <section class="content-section bg-light">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <div class="search-container">
+                <input 
+                  type="search" 
+                  class="search-bar" 
+                  placeholder="Search for delicious food..."
+                  v-model="searchQuery"
+                  @input="handleSearch"
+                  aria-label="Search for food items"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-        <!-- How It Works Section -->
-        <how-it-works-section />        <!-- News and Reviews Section -->
-        <news-reviews-section 
-          :latest-news="latestNews"
-          :current-review="currentReview"
-          @prev-review="prevReview"
-          @next-review="nextReview"
-        />
-      </div>
+      <!-- Categories Section -->
+      <section class="content-section">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Popular Categories</h2>
+            <p class="section-subtitle">Choose from our variety of food categories</p>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <categories-section 
+                :categories="categories"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Featured Products Section -->
+      <section class="content-section bg-light">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">{{ config.text.featuredSectionTitle }}</h2>
+            <p class="section-subtitle">{{ config.text.featuredSectionSubtitle }}</p>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <featured-products-section 
+                :products="featuredProducts"
+                :is-loading="isLoading"
+                :load-error="loadError"
+                :config="config"
+                @retry-load="retryLoad"
+                @product-feedback="handleProductCardFeedback"
+              />
+            </div>
+          </div>
+          
+          <!-- View All Menu Button -->
+          <div class="row mt-4">
+            <div class="col-12 text-center">
+              <router-link 
+                to="/product" 
+                class="btn-primary-custom"
+                :aria-label="config.text.viewAllMenuAriaLabel"
+              >
+                {{ config.text.viewAllMenuText }}
+                <i class="fas fa-arrow-right ms-2"></i>
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- How It Works Section -->
+      <section class="content-section">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <how-it-works-section />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- News and Reviews Section -->
+      <section class="content-section bg-light">
+        <div class="container">
+          <div class="row">
+            <div class="col-12">
+              <news-reviews-section 
+                :latest-news="latestNews"
+                :current-review="currentReview"
+                @prev-review="prevReview"
+                @next-review="nextReview"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   `, // =====================================================
   // Component Registration
@@ -181,7 +277,6 @@ const HomePage = {
     "how-it-works-section": window.HowItWorksSection,
     "news-reviews-section": window.NewsReviewsSection,
   },
-
   // =====================================================
   // Component Data - Simplified and Organized
   // =====================================================
@@ -194,7 +289,10 @@ const HomePage = {
       retryCount: 0,
 
       // Configuration
-      config: createHomePageConfig(),
+      config: createHomePageConfig(), // Search functionality
+      searchQuery: "",
+      searchResults: [],
+      searchTimeout: null,
 
       // Content data
       featuredProducts: [],
@@ -293,9 +391,7 @@ const HomePage = {
       this.categories = this.processCategoriesData(categoriesData);
       this.loadError = null;
       this.retryCount = 0;
-    },
-
-    // === DATA PROCESSING METHODS ===
+    }, // === DATA PROCESSING METHODS ===
 
     /**
      * Process categories data with enhanced icons
@@ -307,6 +403,45 @@ const HomePage = {
         ...category,
         icon: iconMap[category.id.toLowerCase()] || "fas fa-utensils",
       }));
+    },
+
+    // === SEARCH METHODS ===
+
+    /**
+     * Handle search input with debouncing
+     */
+    handleSearch() {
+      // Clear previous timeout
+      if (this.searchTimeout) {
+        clearTimeout(this.searchTimeout);
+      }
+
+      // Debounce search to avoid excessive API calls
+      this.searchTimeout = setTimeout(() => {
+        this.performSearch();
+      }, this.config.search.debounceDelay);
+    },
+
+    /**
+     * Perform actual search operation
+     */
+    async performSearch() {
+      const query = this.searchQuery.trim();
+
+      if (query.length < this.config.search.minQueryLength) {
+        this.searchResults = [];
+        return;
+      }
+
+      try {
+        // Navigate to products page with search query
+        this.$router.push({
+          path: "/product",
+          query: { search: query },
+        });
+      } catch (error) {
+        console.error("Search navigation failed:", error);
+      }
     }, // === REVIEW CAROUSEL METHODS ===
 
     /**

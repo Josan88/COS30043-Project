@@ -4,6 +4,53 @@
  */
 window.app.component("app-footer", {
   template: `
+    <!-- Mobile Portrait Navigation Footer -->
+    <nav class="mobile-nav-footer" aria-label="Mobile navigation">
+      <div class="nav-container">
+        <router-link 
+          to="/" 
+          class="nav-item"
+          :class="{ active: $route.path === '/' }"
+          aria-label="Home"
+        >
+          <i class="fas fa-home"></i>
+          <span>Home</span>
+        </router-link>
+        
+        <router-link 
+          to="/product" 
+          class="nav-item"
+          :class="{ active: $route.path === '/product' }"
+          aria-label="Menu"
+        >
+          <i class="fas fa-utensils"></i>
+          <span>Menu</span>
+        </router-link>
+        
+        <router-link 
+          to="/cart" 
+          class="nav-item"
+          :class="{ active: $route.path === '/cart' }"
+          aria-label="Shopping cart"
+        >
+          <i class="fas fa-shopping-cart"></i>
+          <span>Cart</span>
+          <span v-if="cartItemCount > 0" class="badge">{{ cartItemCount }}</span>
+        </router-link>
+        
+        <router-link 
+          to="/account" 
+          class="nav-item"
+          :class="{ active: $route.path === '/account' }"
+          aria-label="Account"
+        >
+          <i class="fas fa-user"></i>
+          <span>Account</span>
+        </router-link>
+      </div>
+    </nav>
+
+    <!-- Main Footer -->
     <footer class="footer mt-auto">
       <div class="container">
         <div class="row">
@@ -76,7 +123,25 @@ window.app.component("app-footer", {
     return {
       email: "",
       currentYear: new Date().getFullYear(),
+      cartItemCount: 0,
     };
+  },
+  mounted() {
+    // Subscribe to cart updates
+    if (window.CartService) {
+      this.updateCartCount();
+      // Listen for cart updates using CartService event system
+      window.CartService.addEventListener("update", this.updateCartCount);
+    }
+  },
+  unmounted() {
+    // Clean up event listener
+    if (
+      window.CartService &&
+      typeof window.CartService.removeEventListener === "function"
+    ) {
+      window.CartService.removeEventListener("update", this.updateCartCount);
+    }
   },
   methods: {
     subscribeNewsletter() {
@@ -85,6 +150,14 @@ window.app.component("app-footer", {
         `Thank you for subscribing with ${this.email}! You'll receive our special food offers.`
       );
       this.email = "";
+    },
+    updateCartCount() {
+      if (
+        window.CartService &&
+        typeof window.CartService.getCartCount === "function"
+      ) {
+        this.cartItemCount = window.CartService.getCartCount();
+      }
     },
   },
 });
