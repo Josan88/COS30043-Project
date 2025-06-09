@@ -62,6 +62,16 @@
     <!-- Custom Directives and Filters - Load these after app instance but before components -->
     <script src="js/directives/index.js"></script>
     <script src="js/filters/index.js"></script>
+    <!-- Components - Load all components first before views that use them -->
+    <script src="js/components/NavBar.js"></script>
+    <script src="js/components/AppFooter.js"></script>
+    <script src="js/components/ProductCard.js"></script>
+    <script src="js/components/CartItem.js"></script>
+    <script src="js/components/CustomizationModal.js"></script>
+    <script src="js/components/FeaturedProductsSection.js"></script>
+    <script src="js/components/CategoriesSection.js"></script>
+    <script src="js/components/HowItWorksSection.js"></script>
+    <script src="js/components/NewsReviewsSection.js"></script>
 
     <!-- Views/Pages - Define components and make them globally available -->
     <script src="js/views/HomePage.js"></script>
@@ -71,12 +81,6 @@
     <script src="js/views/LoginPage.js"></script>
     <script src="js/views/AccountPage.js"></script>
     <script src="js/views/PurchasesPage.js"></script>
-    <!-- Components - Use the app instance to register components -->
-    <script src="js/components/NavBar.js"></script>
-    <script src="js/components/AppFooter.js"></script>
-    <script src="js/components/ProductCard.js"></script>
-    <script src="js/components/CartItem.js"></script>
-    <script src="js/components/CustomizationModal.js"></script>
 
     <!-- Router Setup - Should be defined after all view components are loaded -->
     <script src="js/router.js"></script>
