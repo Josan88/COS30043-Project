@@ -1,0 +1,219 @@
+﻿<svg width="1200" height="800" viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #f8f9fa; }
+      .header { fill: #2c3e50; }
+      .card { fill: white; stroke: #dee2e6; stroke-width: 1; }
+      .text-primary { fill: #2c3e50; }
+      .text-secondary { fill: #6c757d; }
+      .text-accent { fill: #3498db; }
+      .text-success { fill: #27ae60; }
+      .text-warning { fill: #f39c12; }
+      .text-danger { fill: #e74c3c; }
+      .button-primary { fill: #3498db; }
+      .button-success { fill: #27ae60; }
+      .button-warning { fill: #f39c12; }
+      .button-danger { fill: #e74c3c; }
+      .border { stroke: #dee2e6; stroke-width: 1; fill: none; }
+      .small-text { font-size: 12px; }
+      .medium-text { font-size: 14px; }
+      .large-text { font-size: 16px; }
+      .xl-text { font-size: 20px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="800" class="bg"/>
+
+  <!-- Header -->
+  <rect x="0" y="0" width="1200" height="80" class="header"/>
+  <text x="50" y="50" fill="white" class="xl-text" font-weight="bold">FoodNow</text>
+  
+  <!-- Navigation -->
+  <text x="200" y="50" fill="white" class="medium-text">Home</text>
+  <text x="260" y="50" fill="white" class="medium-text">Menu</text>
+  <text x="320" y="50" fill="white" class="medium-text">Orders</text>
+  <text x="380" y="50" fill="#3498db" class="medium-text" font-weight="bold">Account</text>
+  
+  <!-- User Info -->
+  <text x="1000" y="35" fill="white" class="small-text">Welcome, John Doe</text>
+  <text x="1000" y="55" fill="white" class="small-text">john.doe@email.com</text>
+  <rect x="1100" y="25" width="60" height="30" rx="15" fill="#e74c3c"/>
+  <text x="1125" y="43" fill="white" class="small-text">Logout</text>
+
+  <!-- Main Content Area -->
+  <g transform="translate(50, 100)">
+    <!-- Left Column - Profile Overview -->
+    <rect x="0" y="0" width="350" height="600" class="card" rx="12"/>
+    
+    <!-- Profile Header -->
+    <rect x="20" y="20" width="310" height="120" rx="8" fill="#f8f9fa"/>
+    <circle cx="80" cy="80" r="30" class="button-primary"/>
+    <text x="80" y="88" fill="white" class="large-text" text-anchor="middle">JD</text>
+    
+    <text x="130" y="65" class="text-primary large-text" font-weight="bold">John Doe</text>
+    <text x="130" y="85" class="text-secondary medium-text">Premium Member</text>
+    <text x="130" y="105" class="text-accent medium-text">Edit Profile</text>
+    
+    <!-- Stats Cards -->
+    <g transform="translate(20, 160)">
+      <!-- Total Orders -->
+      <rect x="0" y="0" width="90" height="70" class="card" rx="6"/>
+      <text x="45" y="30" class="text-primary xl-text" font-weight="bold" text-anchor="middle">24</text>
+      <text x="45" y="50" class="text-secondary small-text" text-anchor="middle">Total Orders</text>
+      
+      <!-- Favorites -->
+      <rect x="105" y="0" width="90" height="70" class="card" rx="6"/>
+      <text x="150" y="30" class="text-success xl-text" font-weight="bold" text-anchor="middle">12</text>
+      <text x="150" y="50" class="text-secondary small-text" text-anchor="middle">Favorites</text>
+      
+      <!-- Points -->
+      <rect x="210" y="0" width="90" height="70" class="card" rx="6"/>
+      <text x="255" y="30" class="text-warning xl-text" font-weight="bold" text-anchor="middle">850</text>
+      <text x="255" y="50" class="text-secondary small-text" text-anchor="middle">Points</text>
+    </g>
+    
+    <!-- Quick Actions -->
+    <g transform="translate(20, 250)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Quick Actions</text>
+      
+      <!-- Order History -->
+      <rect x="0" y="40" width="310" height="50" class="card" rx="6"/>
+      <circle cx="25" cy="65" r="8" class="button-primary"/>
+      <text x="45" y="60" class="text-primary medium-text" font-weight="bold">Order History</text>
+      <text x="45" y="75" class="text-secondary small-text">View past orders and reorder</text>
+      <text x="285" y="68" class="text-secondary medium-text"></text>
+      
+      <!-- Favorites -->
+      <rect x="0" y="100" width="310" height="50" class="card" rx="6"/>
+      <circle cx="25" cy="125" r="8" class="button-success"/>
+      <text x="45" y="120" class="text-primary medium-text" font-weight="bold">My Favorites</text>
+      <text x="45" y="135" class="text-secondary small-text">Saved items and quick reorder</text>
+      <text x="285" y="128" class="text-secondary medium-text"></text>
+      
+      <!-- Addresses -->
+      <rect x="0" y="160" width="310" height="50" class="card" rx="6"/>
+      <circle cx="25" cy="185" r="8" class="button-warning"/>
+      <text x="45" y="180" class="text-primary medium-text" font-weight="bold">Delivery Addresses</text>
+      <text x="45" y="195" class="text-secondary small-text">Manage your delivery locations</text>
+      <text x="285" y="188" class="text-secondary medium-text"></text>
+    </g>
+  </g>
+
+  <!-- Middle Column - Account Settings -->
+  <g transform="translate(430, 100)">
+    <rect x="0" y="0" width="350" height="600" class="card" rx="12"/>
+    
+    <text x="20" y="40" class="text-primary xl-text" font-weight="bold">Account Settings</text>
+    
+    <!-- Personal Information -->
+    <g transform="translate(20, 60)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Personal Information</text>
+      
+      <!-- Name -->
+      <text x="0" y="50" class="text-secondary medium-text">Full Name</text>
+      <rect x="0" y="55" width="310" height="35" class="card" rx="4"/>
+      <text x="10" y="75" class="text-primary medium-text">John Doe</text>
+      
+      <!-- Email -->
+      <text x="0" y="110" class="text-secondary medium-text">Email Address</text>
+      <rect x="0" y="115" width="310" height="35" class="card" rx="4"/>
+      <text x="10" y="135" class="text-primary medium-text">john.doe@email.com</text>
+      
+      <!-- Phone -->
+      <text x="0" y="170" class="text-secondary medium-text">Phone Number</text>
+      <rect x="0" y="175" width="310" height="35" class="card" rx="4"/>
+      <text x="10" y="195" class="text-primary medium-text">+1 (555) 123-4567</text>
+      
+      <!-- Update Button -->
+      <rect x="0" y="230" width="100" height="35" rx="6" class="button-primary"/>
+      <text x="40" y="250" fill="white" class="medium-text">Update Info</text>
+    </g>
+    
+    <!-- Preferences -->
+    <g transform="translate(20, 340)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Preferences</text>
+      
+      <!-- Notifications -->
+      <rect x="0" y="40" width="310" height="40" class="card" rx="6"/>
+      <text x="10" y="60" class="text-primary medium-text">Push Notifications</text>
+      <rect x="250" y="50" width="40" height="20" rx="10" class="button-success"/>
+      <circle cx="265" cy="60" r="8" fill="white"/>
+      
+      <!-- Email Updates -->
+      <rect x="0" y="90" width="310" height="40" class="card" rx="6"/>
+      <text x="10" y="110" class="text-primary medium-text">Email Updates</text>
+      <rect x="250" y="100" width="40" height="20" rx="10" fill="#dee2e6"/>
+      <circle cx="255" cy="110" r="8" fill="white"/>
+      
+      <!-- Location -->
+      <rect x="0" y="140" width="310" height="40" class="card" rx="6"/>
+      <text x="10" y="160" class="text-primary medium-text">Location Services</text>
+      <rect x="250" y="150" width="40" height="20" rx="10" class="button-success"/>
+      <circle cx="265" cy="160" r="8" fill="white"/>
+    </g>
+  </g>
+
+  <!-- Right Column - Quick Actions -->
+  <g transform="translate(810, 100)">
+    <rect x="0" y="0" width="340" height="600" class="card" rx="12"/>
+    
+    <text x="20" y="40" class="text-primary xl-text" font-weight="bold">Manage Account</text>
+    
+    <!-- Payment Methods -->
+    <g transform="translate(20, 60)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Payment Methods</text>
+      
+      <!-- Credit Card -->
+      <rect x="0" y="40" width="300" height="60" class="card" rx="8"/>
+      <rect x="15" y="55" width="50" height="30" rx="4" fill="#1e3a8a"/>
+      <text x="25" y="72" fill="white" class="small-text">VISA</text>
+      <text x="80" y="65" class="text-primary medium-text">   4532</text>
+      <text x="80" y="80" class="text-secondary small-text">Expires 12/26</text>
+      
+      <!-- Add Payment -->
+      <rect x="0" y="120" width="300" height="40" class="card" rx="6"/>
+      <text x="140" y="142" class="text-accent medium-text" text-anchor="middle">+ Add Payment Method</text>
+    </g>
+    
+    <!-- Recent Activity -->
+    <g transform="translate(20, 240)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Recent Activity</text>
+      
+      <!-- Order 1 -->
+      <rect x="0" y="40" width="300" height="50" class="card" rx="6"/>
+      <text x="10" y="58" class="text-primary medium-text" font-weight="bold">Order #1234</text>
+      <text x="10" y="75" class="text-secondary small-text">2 items  $24.50</text>
+      <text x="250" y="65" class="text-success small-text">Delivered</text>
+      
+      <!-- Order 2 -->
+      <rect x="0" y="100" width="300" height="50" class="card" rx="6"/>
+      <text x="10" y="118" class="text-primary medium-text" font-weight="bold">Order #1233</text>
+      <text x="10" y="135" class="text-secondary small-text">1 item  $18.99</text>
+      <text x="250" y="125" class="text-warning small-text">In Transit</text>
+      
+      <!-- Order 3 -->
+      <rect x="0" y="160" width="300" height="50" class="card" rx="6"/>
+      <text x="10" y="178" class="text-primary medium-text" font-weight="bold">Order #1232</text>
+      <text x="10" y="195" class="text-secondary small-text">3 items  $31.25</text>
+      <text x="250" y="185" class="text-success small-text">Delivered</text>
+    </g>
+    
+    <!-- Account Actions -->
+    <g transform="translate(20, 460)">
+      <text x="0" y="20" class="text-primary large-text" font-weight="bold">Account Actions</text>
+      
+      <!-- Change Password -->
+      <rect x="0" y="40" width="145" height="35" class="button-primary" rx="6"/>
+      <text x="65" y="60" fill="white" class="medium-text" text-anchor="middle">Change Password</text>
+      
+      <!-- Download Data -->
+      <rect x="155" y="40" width="145" height="35" fill="white" stroke="#dee2e6" rx="6"/>
+      <text x="215" y="60" class="text-primary medium-text" text-anchor="middle">Download Data</text>
+      
+      <!-- Deactivate Account -->
+      <rect x="0" y="85" width="300" height="35" class="button-danger" rx="6"/>
+      <text x="140" y="105" fill="white" class="medium-text" text-anchor="middle">Deactivate Account</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,122 @@
+﻿<svg width="768" height="576" viewBox="0 0 768 576" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #f8f9fa; }
+      .header { fill: #2c3e50; }
+      .card { fill: white; stroke: #dee2e6; stroke-width: 1; }
+      .text-primary { fill: #2c3e50; }
+      .text-secondary { fill: #6c757d; }
+      .text-accent { fill: #3498db; }
+      .text-success { fill: #27ae60; }
+      .button-primary { fill: #3498db; }
+      .button-success { fill: #27ae60; }
+      .border { stroke: #dee2e6; stroke-width: 1; fill: none; }
+      .small-text { font-size: 10px; }
+      .medium-text { font-size: 12px; }
+      .large-text { font-size: 14px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="768" height="576"/>
+
+  <!-- Header -->
+  <rect class="header" width="768" height="60"/>
+  <text x="16" y="35" class="text-primary" fill="white" font-size="18" font-weight="bold">Create Account</text>
+  <text x="680" y="35" fill="white" class="medium-text">FoodNow</text>
+
+  <!-- Main Content (Split Layout) -->
+  <rect x="40" y="80" width="688" height="480" rx="12" class="card"/>
+
+  <!-- Left Section - Form Fields -->
+  <rect x="60" y="100" width="320" height="440" fill="white"/>
+  <text x="60" y="125" class="text-primary" font-size="20" font-weight="bold">Join FoodNow!</text>
+  <text x="60" y="145" class="text-secondary medium-text">Create your account to start ordering</text>
+
+  <!-- First Name -->
+  <text x="60" y="175" class="text-primary medium-text" font-weight="bold">First Name</text>
+  <rect x="60" y="180" width="150" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="70" y="198" class="text-secondary medium-text">John</text>
+
+  <!-- Last Name -->
+  <text x="230" y="175" class="text-primary medium-text" font-weight="bold">Last Name</text>
+  <rect x="230" y="180" width="150" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="240" y="198" class="text-secondary medium-text">Doe</text>
+
+  <!-- Email -->
+  <text x="60" y="230" class="text-primary medium-text" font-weight="bold">Email Address</text>
+  <rect x="60" y="235" width="320" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="70" y="253" class="text-secondary medium-text">Enter your email address</text>
+
+  <!-- Phone -->
+  <text x="60" y="285" class="text-primary medium-text" font-weight="bold">Phone Number</text>
+  <rect x="60" y="290" width="320" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="70" y="308" class="text-secondary medium-text">+1 (555) 123-4567</text>
+
+  <!-- Password -->
+  <text x="60" y="340" class="text-primary medium-text" font-weight="bold">Password</text>
+  <rect x="60" y="345" width="320" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="70" y="363" class="text-secondary medium-text">Create a strong password</text>
+  <text x="350" y="363" class="text-secondary medium-text"></text>
+
+  <!-- Confirm Password -->
+  <text x="60" y="395" class="text-primary medium-text" font-weight="bold">Confirm Password</text>
+  <rect x="60" y="400" width="320" height="30" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="70" y="418" class="text-secondary medium-text">Confirm your password</text>
+  <text x="350" y="418" class="text-secondary medium-text"></text>
+
+  <!-- Terms & Privacy -->
+  <rect x="60" y="445" width="15" height="15" rx="3" fill="white" stroke="#dee2e6"/>
+  <text x="80" y="457" class="text-secondary small-text">I agree to the</text>
+  <text x="150" y="457" class="text-accent small-text">Terms of Service</text>
+  <text x="230" y="457" class="text-secondary small-text">and</text>
+  <text x="250" y="457" class="text-accent small-text">Privacy Policy</text>
+
+  <!-- Marketing Checkbox -->
+  <rect x="60" y="470" width="15" height="15" rx="3" fill="white" stroke="#dee2e6"/>
+  <text x="80" y="482" class="text-secondary small-text">Send me promotions and deals via email</text>
+
+  <!-- Create Account Button -->
+  <rect x="60" y="500" width="320" height="35" rx="17" class="button-success"/>
+  <text x="195" y="521" fill="white" font-size="14" font-weight="bold">Create Account</text>
+
+  <!-- Right Section - Benefits & Social -->
+  <rect x="400" y="100" width="308" height="440" fill="#f8f9fa"/>
+  <text x="480" y="130" class="text-primary" font-size="18" font-weight="bold"> Why Choose FoodNow?</text>
+
+  <!-- Benefit Cards -->
+  <rect x="420" y="150" width="268" height="55" rx="6" fill="white"/>
+  <text x="430" y="170" class="text-primary medium-text" font-weight="bold"> Welcome Bonus</text>
+  <text x="430" y="185" class="text-secondary small-text">Get $10 off your first order of $25 or more</text>
+  <text x="430" y="198" class="text-success small-text" font-weight="bold">Use code: WELCOME10</text>
+
+  <rect x="420" y="215" width="268" height="45" rx="6" fill="white"/>
+  <text x="430" y="235" class="text-primary medium-text" font-weight="bold"> Free Delivery</text>
+  <text x="430" y="250" class="text-secondary small-text">Free delivery on orders over $15 for members</text>
+
+  <rect x="420" y="270" width="268" height="45" rx="6" fill="white"/>
+  <text x="430" y="290" class="text-primary medium-text" font-weight="bold"> Loyalty Rewards</text>
+  <text x="430" y="305" class="text-secondary small-text">Earn points with every order, redeem for free food</text>
+
+  <rect x="420" y="325" width="268" height="45" rx="6" fill="white"/>
+  <text x="430" y="345" class="text-primary medium-text" font-weight="bold"> Easy Reordering</text>
+  <text x="430" y="360" class="text-secondary small-text">Save favorites and reorder with one tap</text>
+
+  <!-- Social Registration -->
+  <text x="520" y="395" class="text-secondary medium-text">Or sign up with:</text>
+  
+  <rect x="420" y="405" width="125" height="35" rx="6" fill="white" stroke="#dee2e6"/>
+  <text x="465" y="425" class="text-secondary medium-text"> Facebook</text>
+  
+  <rect x="563" y="405" width="125" height="35" rx="6" fill="white" stroke="#dee2e6"/>
+  <text x="610" y="425" class="text-secondary medium-text"> Google</text>
+
+  <!-- Login Link -->
+  <text x="460" y="470" class="text-secondary medium-text">Already have an account?</text>
+  <text x="580" y="470" class="text-accent medium-text" font-weight="bold">Sign In</text>
+
+  <!-- Security Notice -->
+  <rect x="420" y="485" width="268" height="35" rx="6" fill="#e8f5e8"/>
+  <text x="430" y="505" class="text-success small-text"> Your information is secure and encrypted</text>
+  <text x="430" y="515" class="text-success small-text">We never share your data with third parties</text>
+</svg>

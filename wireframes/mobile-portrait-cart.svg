@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="568" viewBox="0 0 320 568" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mobile Portrait Shopping Cart Wireframe -->
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="320" height="60" fill="#2c3e50" stroke="#34495e" stroke-width="1"/>
+  <text x="40" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white">Shopping Cart</text>
+  
+  <!-- Back Button -->
+  <g transform="translate(10, 20)">
+    <rect x="0" y="0" width="20" height="20" fill="none" stroke="white" stroke-width="1" rx="2"/>
+    <path d="M12 8 L8 12 L12 16" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Cart Items Count -->
+  <text x="280" y="35" font-family="Arial, sans-serif" font-size="12" fill="white" text-anchor="end">3 items</text>
+  
+  <!-- Cart Items Section -->
+  <rect x="0" y="60" width="320" height="320" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <text x="20" y="85" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Your Order</text>
+  
+  <!-- Cart Item 1 -->
+  <rect x="10" y="95" width="300" height="80" fill="white" stroke="#bdc3c7" stroke-width="1" rx="8"/>
+  <rect x="20" y="105" width="50" height="40" fill="#ffe4e1" rx="4"/>
+  <text x="45" y="128" font-family="Arial, sans-serif" font-size="12" text-anchor="middle"></text>
+  
+  <text x="80" y="115" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Margherita Pizza</text>
+  <text x="80" y="130" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Large size, extra cheese</text>
+  <text x="80" y="145" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">$15.99</text>
+  
+  <!-- Quantity Controls -->
+  <g transform="translate(220, 125)">
+    <rect x="0" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="10" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">-</text>
+    <rect x="25" y="0" width="25" height="20" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="37" y="13" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2c3e50">1</text>
+    <rect x="55" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="65" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">+</text>
+  </g>
+  
+  <!-- Remove Button -->
+  <g transform="translate(280, 105)">
+    <circle cx="10" cy="10" r="8" fill="#e74c3c"/>
+    <text x="10" y="14" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white"></text>
+  </g>
+  
+  <!-- Cart Item 2 -->
+  <rect x="10" y="185" width="300" height="80" fill="white" stroke="#bdc3c7" stroke-width="1" rx="8"/>
+  <rect x="20" y="195" width="50" height="40" fill="#e1f5fe" rx="4"/>
+  <text x="45" y="218" font-family="Arial, sans-serif" font-size="12" text-anchor="middle"></text>
+  
+  <text x="80" y="205" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Classic Burger</text>
+  <text x="80" y="220" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Medium, no pickles</text>
+  <text x="80" y="235" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">$12.99</text>
+  
+  <!-- Quantity Controls -->
+  <g transform="translate(220, 215)">
+    <rect x="0" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="10" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">-</text>
+    <rect x="25" y="0" width="25" height="20" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="37" y="13" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2c3e50">2</text>
+    <rect x="55" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="65" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">+</text>
+  </g>
+  
+  <!-- Remove Button -->
+  <g transform="translate(280, 195)">
+    <circle cx="10" cy="10" r="8" fill="#e74c3c"/>
+    <text x="10" y="14" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white"></text>
+  </g>
+  
+  <!-- Cart Item 3 -->
+  <rect x="10" y="275" width="300" height="80" fill="white" stroke="#bdc3c7" stroke-width="1" rx="8"/>
+  <rect x="20" y="285" width="50" height="40" fill="#f3e5f5" rx="4"/>
+  <text x="45" y="308" font-family="Arial, sans-serif" font-size="12" text-anchor="middle"></text>
+  
+  <text x="80" y="295" font-family="Arial, sans-serif" font-size="12" font-weight="bold">Coca Cola</text>
+  <text x="80" y="310" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">500ml bottle</text>
+  <text x="80" y="325" font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#27ae60">$2.99</text>
+  
+  <!-- Quantity Controls -->
+  <g transform="translate(220, 305)">
+    <rect x="0" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="10" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">-</text>
+    <rect x="25" y="0" width="25" height="20" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="37" y="13" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2c3e50">1</text>
+    <rect x="55" y="0" width="20" height="20" fill="#ecf0f1" stroke="#bdc3c7" stroke-width="1" rx="2"/>
+    <text x="65" y="13" font-family="Arial, sans-serif" font-size="12" text-anchor="middle" fill="#2c3e50">+</text>
+  </g>
+  
+  <!-- Remove Button -->
+  <g transform="translate(280, 285)">
+    <circle cx="10" cy="10" r="8" fill="#e74c3c"/>
+    <text x="10" y="14" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white"></text>
+  </g>
+  
+  <!-- Order Summary -->
+  <rect x="0" y="380" width="320" height="120" fill="white" stroke="#dee2e6" stroke-width="1"/>
+  <text x="20" y="405" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Order Summary</text>
+  
+  <text x="20" y="425" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Subtotal:</text>
+  <text x="300" y="425" font-family="Arial, sans-serif" font-size="12" text-anchor="end" fill="#2c3e50">$31.97</text>
+  
+  <text x="20" y="445" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Delivery Fee:</text>
+  <text x="300" y="445" font-family="Arial, sans-serif" font-size="12" text-anchor="end" fill="#2c3e50">$3.99</text>
+  
+  <text x="20" y="465" font-family="Arial, sans-serif" font-size="12" fill="#2c3e50">Tax:</text>
+  <text x="300" y="465" font-family="Arial, sans-serif" font-size="12" text-anchor="end" fill="#2c3e50">$2.88</text>
+  
+  <line x1="20" y1="475" x2="300" y2="475" stroke="#dee2e6" stroke-width="1"/>
+  
+  <text x="20" y="490" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#2c3e50">Total:</text>
+  <text x="300" y="490" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="end" fill="#27ae60">$38.84</text>
+  
+  <!-- Promo Code Section -->
+  <rect x="0" y="500" width="320" height="40" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  <rect x="20" y="510" width="200" height="20" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="25" y="522" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Enter promo code</text>
+  
+  <rect x="230" y="510" width="70" height="20" fill="#3498db" stroke="#2980b9" stroke-width="1" rx="4"/>
+  <text x="265" y="522" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="white">Apply</text>
+  
+  <!-- Checkout Button -->
+  <rect x="20" y="550" width="280" height="40" fill="#27ae60" stroke="#229954" stroke-width="1" rx="20"/>
+  <text x="160" y="573" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Proceed to Checkout</text>
+</svg>

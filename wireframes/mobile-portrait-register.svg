@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg width="320" height="568" viewBox="0 0 320 568" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mobile Portrait Register Page Wireframe -->
+  
+  <!-- Header -->
+  <rect x="0" y="0" width="320" height="60" fill="#2c3e50" stroke="#34495e" stroke-width="1"/>
+  <text x="160" y="35" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="white">Create Account</text>
+  
+  <!-- Back Button -->
+  <g transform="translate(10, 20)">
+    <rect x="0" y="0" width="20" height="20" fill="none" stroke="white" stroke-width="1" rx="2"/>
+    <path d="M12 8 L8 12 L12 16" stroke="white" stroke-width="2" fill="none"/>
+  </g>
+  
+  <!-- Logo Section -->
+  <rect x="0" y="60" width="320" height="100" fill="#3498db" stroke="#2980b9" stroke-width="1"/>
+  <circle cx="160" cy="110" r="25" fill="white"/>
+  <text x="160" y="118" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50"></text>
+  <text x="160" y="140" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="white">Join FoodNow</text>
+  
+  <!-- Registration Form -->
+  <rect x="0" y="160" width="320" height="380" fill="white" stroke="#dee2e6" stroke-width="1"/>
+  <text x="160" y="185" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2c3e50">Create Your Account</text>
+  <text x="160" y="200" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">Join thousands of food lovers</text>
+  
+  <!-- First Name -->
+  <text x="30" y="225" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">First Name</text>
+  <rect x="30" y="230" width="125" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="35" y="248" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">John</text>
+  
+  <!-- Last Name -->
+  <text x="165" y="225" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">Last Name</text>
+  <rect x="165" y="230" width="125" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="170" y="248" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Doe</text>
+  
+  <!-- Email -->
+  <text x="30" y="280" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">Email Address</text>
+  <rect x="30" y="285" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="35" y="303" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Enter your email</text>
+  
+  <!-- Phone Number -->
+  <text x="30" y="335" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">Phone Number</text>
+  <rect x="30" y="340" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="35" y="358" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">+1 (555) 123-4567</text>
+  
+  <!-- Password -->
+  <text x="30" y="390" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">Password</text>
+  <rect x="30" y="395" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="35" y="413" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">At least 8 characters</text>
+  <text x="270" y="413" font-family="Arial, sans-serif" font-size="10" text-anchor="end" fill="#3498db"></text>
+  
+  <!-- Confirm Password -->
+  <text x="30" y="445" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#2c3e50">Confirm Password</text>
+  <rect x="30" y="450" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="4"/>
+  <text x="35" y="468" font-family="Arial, sans-serif" font-size="10" fill="#7f8c8d">Re-enter password</text>
+  <text x="270" y="468" font-family="Arial, sans-serif" font-size="10" text-anchor="end" fill="#3498db"></text>
+  
+  <!-- Terms Checkbox -->
+  <g transform="translate(30, 490)">
+    <rect x="0" y="0" width="10" height="10" fill="white" stroke="#bdc3c7" stroke-width="1"/>
+    <text x="15" y="9" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">I agree to the </text>
+    <text x="85" y="9" font-family="Arial, sans-serif" font-size="9" fill="#3498db">Terms of Service</text>
+    <text x="15" y="20" font-family="Arial, sans-serif" font-size="9" fill="#2c3e50">and </text>
+    <text x="30" y="20" font-family="Arial, sans-serif" font-size="9" fill="#3498db">Privacy Policy</text>
+  </g>
+  
+  <!-- Create Account Button -->
+  <rect x="30" y="515" width="260" height="35" fill="#27ae60" stroke="#229954" stroke-width="1" rx="17"/>
+  <text x="160" y="535" font-family="Arial, sans-serif" font-size="12" font-weight="bold" text-anchor="middle" fill="white">Create Account</text>
+  
+  <!-- Social Registration -->
+  <rect x="0" y="560" width="320" height="120" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
+  
+  <!-- OR Divider -->
+  <line x1="30" y1="580" x2="130" y2="580" stroke="#dee2e6" stroke-width="1"/>
+  <text x="160" y="585" font-family="Arial, sans-serif" font-size="9" text-anchor="middle" fill="#7f8c8d">OR</text>
+  <line x1="190" y1="580" x2="290" y2="580" stroke="#dee2e6" stroke-width="1"/>
+  
+  <!-- Social Buttons -->
+  <rect x="30" y="595" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="15"/>
+  <circle cx="55" cy="610" r="6" fill="#4267B2"/>
+  <text x="55" y="613" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="white">f</text>
+  <text x="160" y="612" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2c3e50">Sign up with Facebook</text>
+  
+  <rect x="30" y="635" width="260" height="30" fill="white" stroke="#bdc3c7" stroke-width="1" rx="15"/>
+  <circle cx="55" cy="650" r="6" fill="#db4437"/>
+  <text x="55" y="653" font-family="Arial, sans-serif" font-size="6" text-anchor="middle" fill="white">G</text>
+  <text x="160" y="652" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2c3e50">Sign up with Google</text>
+  
+  <!-- Login Link -->
+  <text x="160" y="685" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#7f8c8d">Already have an account? </text>
+  <text x="220" y="685" font-family="Arial, sans-serif" font-size="10" font-weight="bold" fill="#3498db">Sign In</text>
+</svg>

@@ -1,0 +1,512 @@
+/**
+ * FoodNow - COS30043 Project Styles
+ * Comprehensive CSS implementing all project requirements
+ */
+
+/* ==========================================================================
+   1. CONTEXT VIEW GROUPING - ROW-COLUMN GRID SYSTEM
+   ========================================================================== */
+
+/* Context Group Implementation */
+.context-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.context-cards {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr; /* Mobile first */
+}
+
+/* Custom Grid Classes */
+.row-custom {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -0.5rem;
+}
+
+.col-custom {
+  flex: 1;
+  padding: 0.5rem;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   2. MOBILE-FIRST RESPONSIVE DESIGN - THREE BREAKPOINTS
+   ========================================================================== */
+
+/* Mobile Portrait: 320px - 575px (Default) */
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* Mobile Landscape: 576px - 767px */
+@media (min-width: 576px) {
+  .context-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .col-custom-sm-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+/* Tablet: 768px - 991px */
+@media (min-width: 768px) {
+  .context-cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Desktop: 992px+ */
+@media (min-width: 992px) {
+  .context-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  
+  .category-grid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  
+  .col-custom-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  
+  .col-custom-lg-4 {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+  }
+}
+
+/* ==========================================================================
+   3. ACCESSIBILITY SUPPORT
+   ========================================================================== */
+
+/* Focus Management */
+.focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid #000;
+  }
+  
+  .btn {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Screen Reader Only Content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ==========================================================================
+   4. FORM ACCESSIBILITY
+   ========================================================================== */
+
+/* Form Validation States */
+.form-control:invalid {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control:valid {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.invalid-feedback {
+  display: block;
+  color: #dc3545;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+.valid-feedback {
+  display: block;
+  color: #28a745;
+  font-size: 0.875em;
+  margin-top: 0.25rem;
+}
+
+/* Required Field Indicator */
+.required::after {
+  content: " *";
+  color: #dc3545;
+}
+
+/* ==========================================================================
+   5. TABLE ACCESSIBILITY
+   ========================================================================== */
+
+.accessible-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+
+.accessible-table th,
+.accessible-table td {
+  padding: 0.75rem;
+  vertical-align: top;
+  border: 1px solid #dee2e6;
+}
+
+.accessible-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  text-align: left;
+}
+
+.accessible-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Sortable Table Headers */
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.sortable-header:hover {
+  background-color: #e9ecef;
+}
+
+.sortable-header::after {
+  content: '\2195';
+  position: absolute;
+  right: 0.5rem;
+  opacity: 0.5;
+}
+
+.sortable-header.sort-asc::after {
+  content: '\2191';
+  opacity: 1;
+}
+
+.sortable-header.sort-desc::after {
+  content: '\2193';
+  opacity: 1;
+}
+
+/* ==========================================================================
+   6. COMPONENT STYLES
+   ========================================================================== */
+
+/* Product Cards */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 100%;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+/* Category Cards */
+.category-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
+.category-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.category-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+/* ==========================================================================
+   7. PAGINATION STYLES
+   ========================================================================== */
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.pagination {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 0.25rem;
+}
+
+.page-item {
+  position: relative;
+}
+
+.page-link {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: #007bff;
+  text-decoration: none;
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  transition: all 0.3s ease;
+}
+
+.page-link:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* ==========================================================================
+   8. LOADING AND ANIMATION STATES
+   ========================================================================== */
+
+.loading-spinner {
+  display: inline-block;
+  width: 2rem;
+  height: 2rem;
+  border: 0.25rem solid rgba(0, 123, 255, 0.25);
+  border-right-color: #007bff;
+  border-radius: 50%;
+  animation: spinner-border 0.75s linear infinite;
+}
+
+@keyframes spinner-border {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================================
+   9. UTILITY CLASSES
+   ========================================================================== */
+
+.shadow-hover {
+  transition: box-shadow 0.3s ease;
+}
+
+.shadow-hover:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.text-truncate-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Currency Display */
+.currency {
+  font-weight: 600;
+  color: #28a745;
+}
+
+.currency-large {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Rating Stars */
+.rating-stars {
+  color: #ffc107;
+  font-size: 0.875rem;
+}
+
+.rating-stars .fa-star {
+  margin-right: 0.125rem;
+}
+
+/* Status Badges */
+.status-available {
+  background-color: #28a745;
+  color: white;
+}
+
+.status-low-stock {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-out-of-stock {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* ==========================================================================
+   10. RESPONSIVE IMAGES
+   ========================================================================== */
+
+.img-responsive {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.img-lazy {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.img-lazy.loaded {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   11. PRINT STYLES
+   ========================================================================== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .container {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}

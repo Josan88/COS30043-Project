@@ -1,0 +1,154 @@
+﻿<svg width="768" height="576" viewBox="0 0 768 576" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #f8f9fa; }
+      .header { fill: #2c3e50; }
+      .card { fill: white; stroke: #dee2e6; stroke-width: 1; }
+      .text-primary { fill: #2c3e50; }
+      .text-secondary { fill: #6c757d; }
+      .text-accent { fill: #3498db; }
+      .text-success { fill: #27ae60; }
+      .text-danger { fill: #e74c3c; }
+      .button-primary { fill: #3498db; }
+      .button-success { fill: #27ae60; }
+      .button-danger { fill: #e74c3c; }
+      .border { stroke: #dee2e6; stroke-width: 1; fill: none; }
+      .small-text { font-size: 10px; }
+      .medium-text { font-size: 12px; }
+      .large-text { font-size: 14px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="768" height="576"/>
+
+  <!-- Header -->
+  <rect class="header" width="768" height="60"/>
+  <text x="16" y="35" class="text-primary" fill="white" font-size="18" font-weight="bold"> Shopping Cart</text>
+  <text x="680" y="35" fill="white" class="medium-text">3 items</text>
+
+  <!-- Main Content Area (Split Layout) -->
+  <!-- Cart Items Section (Left) -->
+  <rect x="16" y="80" width="460" height="420" rx="8" class="card"/>
+  <text x="32" y="105" class="text-primary large-text" font-weight="bold">Cart Items</text>
+
+  <!-- Cart Item 1 -->
+  <rect x="32" y="120" width="428" height="80" rx="6" fill="#f8f9fa"/>
+  <rect x="40" y="128" width="60" height="60" rx="4" fill="#e9ecef"/>
+  <text x="65" y="165" class="text-secondary small-text"></text>
+  <text x="115" y="140" class="text-primary medium-text" font-weight="bold">Margherita Pizza</text>
+  <text x="115" y="155" class="text-secondary small-text">Large, extra cheese</text>
+  <text x="115" y="170" class="text-success medium-text" font-weight="bold">$15.99</text>
+  
+  <!-- Quantity Controls -->
+  <rect x="320" y="140" width="30" height="25" rx="4" class="card"/>
+  <text x="330" y="155" class="text-secondary medium-text">-</text>
+  <rect x="355" y="140" width="40" height="25" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="370" y="155" class="text-primary medium-text">2</text>
+  <rect x="400" y="140" width="30" height="25" rx="4" class="card"/>
+  <text x="410" y="155" class="text-secondary medium-text">+</text>
+  
+  <!-- Remove Button -->
+  <circle cx="440" cy="140" r="12" class="button-danger"/>
+  <text x="436" y="144" fill="white" class="small-text"></text>
+
+  <!-- Cart Item 2 -->
+  <rect x="32" y="210" width="428" height="80" rx="6" fill="#f8f9fa"/>
+  <rect x="40" y="218" width="60" height="60" rx="4" fill="#e9ecef"/>
+  <text x="65" y="255" class="text-secondary small-text"></text>
+  <text x="115" y="230" class="text-primary medium-text" font-weight="bold">Classic Burger</text>
+  <text x="115" y="245" class="text-secondary small-text">Medium, no pickles</text>
+  <text x="115" y="260" class="text-success medium-text" font-weight="bold">$8.99</text>
+  
+  <rect x="320" y="230" width="30" height="25" rx="4" class="card"/>
+  <text x="330" y="245" class="text-secondary medium-text">-</text>
+  <rect x="355" y="230" width="40" height="25" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="375" y="245" class="text-primary medium-text">1</text>
+  <rect x="400" y="230" width="30" height="25" rx="4" class="card"/>
+  <text x="410" y="245" class="text-secondary medium-text">+</text>
+  
+  <circle cx="440" cy="230" r="12" class="button-danger"/>
+  <text x="436" y="234" fill="white" class="small-text"></text>
+
+  <!-- Cart Item 3 -->
+  <rect x="32" y="300" width="428" height="80" rx="6" fill="#f8f9fa"/>
+  <rect x="40" y="308" width="60" height="60" rx="4" fill="#e9ecef"/>
+  <text x="65" y="345" class="text-secondary small-text"></text>
+  <text x="115" y="320" class="text-primary medium-text" font-weight="bold">Fresh Smoothie</text>
+  <text x="115" y="335" class="text-secondary small-text">Mixed berries, large</text>
+  <text x="115" y="350" class="text-success medium-text" font-weight="bold">$6.99</text>
+  
+  <rect x="320" y="320" width="30" height="25" rx="4" class="card"/>
+  <text x="330" y="335" class="text-secondary medium-text">-</text>
+  <rect x="355" y="320" width="40" height="25" rx="4" fill="white" stroke="#dee2e6"/>
+  <text x="375" y="335" class="text-primary medium-text">1</text>
+  <rect x="400" y="320" width="30" height="25" rx="4" class="card"/>
+  <text x="410" y="335" class="text-secondary medium-text">+</text>
+  
+  <circle cx="440" cy="320" r="12" class="button-danger"/>
+  <text x="436" y="324" fill="white" class="small-text"></text>
+
+  <!-- Continue Shopping Button -->
+  <rect x="32" y="395" width="428" height="40" rx="8" class="card"/>
+  <text x="230" y="418" class="text-accent medium-text"> Continue Shopping</text>
+
+  <!-- Promo Code Section -->
+  <rect x="32" y="445" width="428" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="40" y="463" class="text-primary medium-text">Promo Code</text>
+  <rect x="40" y="470" width="280" height="15" fill="white" stroke="#dee2e6"/>
+  <text x="45" y="480" class="text-secondary small-text">Enter promo code...</text>
+  <rect x="330" y="468" width="60" height="19" rx="4" class="button-primary"/>
+  <text x="350" y="480" fill="white" class="small-text">Apply</text>
+
+  <!-- Order Summary Section (Right) -->
+  <rect x="500" y="80" width="252" height="480" rx="8" class="card"/>
+  <text x="516" y="105" class="text-primary large-text" font-weight="bold">Order Summary</text>
+
+  <!-- Summary Details -->
+  <rect x="516" y="120" width="220" height="200" fill="#f8f9fa" rx="6"/>
+  
+  <text x="525" y="140" class="text-secondary medium-text">Subtotal (4 items)</text>
+  <text x="700" y="140" class="text-primary medium-text">$31.97</text>
+  
+  <text x="525" y="160" class="text-secondary medium-text">Delivery Fee</text>
+  <text x="700" y="160" class="text-primary medium-text">$2.99</text>
+  
+  <text x="525" y="180" class="text-secondary medium-text">Service Fee</text>
+  <text x="700" y="180" class="text-primary medium-text">$1.50</text>
+  
+  <text x="525" y="200" class="text-secondary medium-text">Tax</text>
+  <text x="700" y="200" class="text-primary medium-text">$2.86</text>
+  
+  <line x1="525" y1="210" x2="715" y2="210" stroke="#dee2e6"/>
+  
+  <text x="525" y="230" class="text-primary large-text" font-weight="bold">Total</text>
+  <text x="690" y="230" class="text-success large-text" font-weight="bold">$39.32</text>
+  
+  <text x="525" y="250" class="text-secondary small-text"> You saved $5.00 with deals!</text>
+  
+  <text x="525" y="270" class="text-secondary small-text">Estimated delivery:</text>
+  <text x="525" y="285" class="text-primary medium-text" font-weight="bold">25-35 minutes</text>
+  
+  <text x="525" y="305" class="text-secondary small-text"> Delivering to:</text>
+  <text x="525" y="320" class="text-primary small-text">123 Main St, City</text>
+
+  <!-- Payment Method -->
+  <rect x="516" y="340" width="220" height="60" fill="#f8f9fa" rx="6"/>
+  <text x="525" y="360" class="text-primary medium-text" font-weight="bold">Payment Method</text>
+  <rect x="525" y="365" width="202" height="30" fill="white" stroke="#dee2e6" rx="4"/>
+  <text x="535" y="383" class="text-primary medium-text"> **** 1234</text>
+  <text x="680" y="383" class="text-accent small-text">Change</text>
+
+  <!-- Special Instructions -->
+  <rect x="516" y="410" width="220" height="60" fill="#f8f9fa" rx="6"/>
+  <text x="525" y="430" class="text-primary medium-text" font-weight="bold">Special Instructions</text>
+  <rect x="525" y="435" width="202" height="30" fill="white" stroke="#dee2e6" rx="4"/>
+  <text x="535" y="453" class="text-secondary small-text">Add delivery notes...</text>
+
+  <!-- Checkout Button -->
+  <rect x="516" y="485" width="220" height="50" rx="25" class="button-success"/>
+  <text x="605" y="515" fill="white" font-size="16" font-weight="bold">Proceed to Checkout</text>
+
+  <!-- Security Notice -->
+  <text x="550" y="555" class="text-secondary small-text"> Secure checkout with SSL encryption</text>
+</svg>
