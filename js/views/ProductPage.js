@@ -1018,7 +1018,6 @@ const ProductPage = {
       });
     }
   },
-
   watch: {
     // Enhanced route watching with analytics
     $route: {
@@ -1027,6 +1026,11 @@ const ProductPage = {
         if (to.path === '/products') {
           this.analytics.pageViews++;
           this.loadData();
+          this.updateRouteAnalytics(to, from);
+        } else if (to.path.startsWith('/product/') && to.params.id) {
+          // Handle individual product detail view
+          this.analytics.pageViews++;
+          this.loadProductDetails(to.params.id);
           this.updateRouteAnalytics(to, from);
         }
       }
