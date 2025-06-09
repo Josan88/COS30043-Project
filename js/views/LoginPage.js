@@ -1,31 +1,5 @@
-/**
- * LoginPage Component v2.0.0 - Enhanced Edition
- * 
- * FEATURES:
- * - ✅ User Authentication: Secure login with comprehensive validation
- * - ✅ Form Validation: Real-time validation with user-friendly feedback
- * - ✅ Error Handling: Enhanced error messages with retry mechanisms
- * - ✅ Analytics Tracking: Complete user login flow monitoring
- * - ✅ Security Features: Password visibility toggle and secure validation
- * - ✅ Accessibility: ARIA labels, focus management, and keyboard navigation
- * - ✅ Mobile Responsive: Optimized layouts for all screen sizes
- * - ✅ Performance Optimized: Debounced validation and efficient rendering
- * 
- * ENHANCED FEATURES:
- * - Constants integration via window.APP_CONSTANTS for centralized configuration
- * - ValidationService integration with comprehensive form validation
- * - Enhanced error handling with ErrorHandler and retry mechanisms
- * - Toast notifications for user feedback and status updates
- * - Analytics session tracking with user behavior monitoring
- * - Performance optimizations with debouncing and efficient state management
- * 
- * DEPENDENCIES:
- * - AuthService: User authentication and validation
- * - ValidationService: Form validation logic
- * - APP_CONSTANTS: Application constants and messaging
- * - ErrorHandler: Centralized error handling
- */
-const LoginPage = {template: `
+const LoginPage = {
+  template: `
     <div class="login-page">
       <div class="container">
         <div class="row justify-content-center">
@@ -153,7 +127,8 @@ const LoginPage = {template: `
         </div>
       </div>
     </div>
-  `,  data() {
+  `,
+  data() {
     return {
       // Form Configuration
       config: {
@@ -161,14 +136,14 @@ const LoginPage = {template: `
         retryDelay: window.APP_CONSTANTS?.UI?.RETRY_DELAY || 1000,
         debounceDelay: window.APP_CONSTANTS?.UI?.DEBOUNCE_DELAY || 300,
         redirectDelay: window.APP_CONSTANTS?.UI?.REDIRECT_DELAY || 1500,
-        validationMessages: window.APP_CONSTANTS?.VALIDATION?.MESSAGES || {}
+        validationMessages: window.APP_CONSTANTS?.VALIDATION?.MESSAGES || {},
       },
 
       // Form Data
       formData: {
-        email: '',
-        password: '',
-        rememberMe: false
+        email: "",
+        password: "",
+        rememberMe: false,
       },
 
       // UI State
@@ -178,7 +153,7 @@ const LoginPage = {template: `
         loginSuccess: false,
         showPassword: false,
         isLoading: false,
-        retryCount: 0
+        retryCount: 0,
       },
 
       // Validation and Error Handling
@@ -186,15 +161,15 @@ const LoginPage = {template: `
         errors: {},
         touched: {
           email: false,
-          password: false
-        }
+          password: false,
+        },
       },
 
       // Error State
       errorState: {
         error: null,
         hasRetriableError: false,
-        lastErrorTime: null
+        lastErrorTime: null,
       },
 
       // Analytics State
@@ -202,15 +177,15 @@ const LoginPage = {template: `
         formStartTime: null,
         interactionCount: 0,
         validationAttempts: 0,
-        loginAttempts: 0
+        loginAttempts: 0,
       },
 
       // Component State
       componentState: {
         isMounted: false,
         hasInitialized: false,
-        loadError: null
-      }
+        loadError: null,
+      },
     };
   },
 
@@ -219,18 +194,22 @@ const LoginPage = {template: `
      * Check if form is valid for submission
      */
     isFormValid() {
-      return this.formData.email && 
-             this.formData.password && 
-             Object.keys(this.validation.errors).length === 0;
+      return (
+        this.formData.email &&
+        this.formData.password &&
+        Object.keys(this.validation.errors).length === 0
+      );
     },
 
     /**
      * Check if form can be submitted
      */
     canSubmit() {
-      return this.isFormValid && 
-             !this.uiState.isSubmitting && 
-             !this.uiState.loginSuccess;
+      return (
+        this.isFormValid &&
+        !this.uiState.isSubmitting &&
+        !this.uiState.loginSuccess
+      );
     },
 
     /**
@@ -244,8 +223,10 @@ const LoginPage = {template: `
      * Check if retry is available
      */
     canRetry() {
-      return this.errorState.hasRetriableError && 
-             this.uiState.retryCount < this.config.maxRetries;
+      return (
+        this.errorState.hasRetriableError &&
+        this.uiState.retryCount < this.config.maxRetries
+      );
     },
 
     /**
@@ -266,60 +247,64 @@ const LoginPage = {template: `
      * Get success message configuration
      */
     successMessage() {
-      return window.APP_CONSTANTS?.SUCCESS_MESSAGES?.LOGIN_SUCCESS || 
-             'Login successful! Redirecting...';
+      return (
+        window.APP_CONSTANTS?.SUCCESS_MESSAGES?.LOGIN_SUCCESS ||
+        "Login successful! Redirecting..."
+      );
     },
 
     /**
      * Check if component is ready for interaction
      */
     isReady() {
-      return this.componentState.isMounted && 
-             this.componentState.hasInitialized && 
-             !this.componentState.loadError;
-    }
+      return (
+        this.componentState.isMounted &&
+        this.componentState.hasInitialized &&
+        !this.componentState.loadError
+      );
+    },
   },
 
   watch: {
     /**
      * Track form data changes for analytics
      */
-    'formData.email'(newValue, oldValue) {
-      if (newValue !== oldValue && oldValue !== '') {
-        this.trackFieldInteraction('email', 'change');
+    "formData.email"(newValue, oldValue) {
+      if (newValue !== oldValue && oldValue !== "") {
+        this.trackFieldInteraction("email", "change");
       }
     },
 
-    'formData.password'(newValue, oldValue) {
-      if (newValue !== oldValue && oldValue !== '') {
-        this.trackFieldInteraction('password', 'change');
+    "formData.password"(newValue, oldValue) {
+      if (newValue !== oldValue && oldValue !== "") {
+        this.trackFieldInteraction("password", "change");
       }
     },
 
     /**
      * Clear errors when form data changes
      */
-    'formData.email'() {
+    "formData.email"() {
       if (this.validation.errors.email) {
-        this.clearFieldError('email');
+        this.clearFieldError("email");
       }
     },
 
-    'formData.password'() {
+    "formData.password"() {
       if (this.validation.errors.password) {
-        this.clearFieldError('password');
+        this.clearFieldError("password");
       }
-    }
+    },
   },
 
   mounted() {
     try {
       this.initializeComponent();
       this.componentState.isMounted = true;
-      console.log('LoginPage component mounted successfully');
+      console.log("LoginPage component mounted successfully");
     } catch (error) {
-      console.error('Error mounting LoginPage component:', error);
-      this.handleComponentError(error, 'mount');
+      console.error("Error mounting LoginPage component:", error);
+      this.handleComponentError(error, "mount");
     }
   },
 
@@ -327,7 +312,7 @@ const LoginPage = {template: `
     try {
       this.cleanupComponent();
     } catch (error) {
-      console.error('Error cleaning up LoginPage component:', error);
+      console.error("Error cleaning up LoginPage component:", error);
     }
   },
 
@@ -341,25 +326,25 @@ const LoginPage = {template: `
         this.analytics.formStartTime = Date.now();
 
         // Load remembered email if available
-        this.loadRememberedEmail();        // Initialize validation service if available
+        this.loadRememberedEmail(); // Initialize validation service if available
         if (window.ValidationService) {
           this.validation.validator = window.ValidationService;
         }
 
         // Track component load
-        this.trackEvent('component_load', {
-          component: 'LoginPage',
-          timestamp: Date.now()
+        this.trackEvent("component_load", {
+          component: "LoginPage",
+          timestamp: Date.now(),
         });
 
         this.componentState.hasInitialized = true;
-
       } catch (error) {
-        console.error('Error initializing LoginPage:', error);
-        this.componentState.loadError = 'Failed to initialize login form. Please refresh the page.';
+        console.error("Error initializing LoginPage:", error);
+        this.componentState.loadError =
+          "Failed to initialize login form. Please refresh the page.";
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'initializeComponent'
+          component: "LoginPage",
+          method: "initializeComponent",
         });
       }
     },
@@ -369,18 +354,18 @@ const LoginPage = {template: `
      */
     loadRememberedEmail() {
       try {
-        const rememberedEmail = localStorage.getItem('rememberedEmail');
+        const rememberedEmail = localStorage.getItem("rememberedEmail");
         if (rememberedEmail) {
           this.formData.email = rememberedEmail;
           this.formData.rememberMe = true;
         }
       } catch (error) {
-        console.error('Error loading remembered email:', error);
+        console.error("Error loading remembered email:", error);
       }
-    },    /**
+    },
+    /**
      * Enhanced email validation with debouncing
-     */
-    validateEmail(showErrors = false) {
+     */ validateEmail(showErrors = false) {
       // Use debounced version if available, otherwise call directly
       if (this.validateEmailDebounced && !showErrors) {
         return this.validateEmailDebounced(showErrors);
@@ -390,7 +375,7 @@ const LoginPage = {template: `
     },
 
     /**
-     * Enhanced password validation with debouncing  
+     * Enhanced password validation with debouncing
      */
     validatePassword(showErrors = false) {
       // Use debounced version if available, otherwise call directly
@@ -403,70 +388,90 @@ const LoginPage = {template: `
 
     /**
      * Validate email field
-     */    _validateEmail(showErrors = false) {
+     */ _validateEmail(showErrors = false) {
       try {
         this.analytics.validationAttempts++;
-        
-        if (showErrors || this.validation.touched.email || this.uiState.submitted) {
+
+        if (
+          showErrors ||
+          this.validation.touched.email ||
+          this.uiState.submitted
+        ) {
           this.validation.touched.email = true;
-          
+
           if (!this.formData.email) {
-            this.validation.errors.email = 'Email is required';
-          } else if (this.formData.email === 'admin') {
+            this.validation.errors.email = "Email is required";
+          } else if (this.formData.email === "admin") {
             // Special case for admin login - always valid
             delete this.validation.errors.email;
           } else if (this.validation.validator) {
-            const result = this.validation.validator.validateEmail(this.formData.email);
+            const result = this.validation.validator.validateEmail(
+              this.formData.email
+            );
             if (!result.isValid) {
               this.validation.errors.email = result.message;
             }
           } else {
             // Fallback validation
-            const emailPattern = window.APP_CONSTANTS?.VALIDATION?.EMAIL_PATTERN || /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            const emailPattern =
+              window.APP_CONSTANTS?.VALIDATION?.EMAIL_PATTERN ||
+              /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailPattern.test(this.formData.email)) {
-              this.validation.errors.email = 'Please enter a valid email address';
+              this.validation.errors.email =
+                "Please enter a valid email address";
             }
           }
         }
       } catch (error) {
-        console.error('Error validating email:', error);
+        console.error("Error validating email:", error);
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'validateEmail'
+          component: "LoginPage",
+          method: "validateEmail",
         });
       }
-    },/**
+    },
+    /**
      * Validate password field
-     */    _validatePassword(showErrors = false) {
+     */ _validatePassword(showErrors = false) {
       try {
         this.analytics.validationAttempts++;
-        
-        if (showErrors || this.validation.touched.password || this.uiState.submitted) {
+
+        if (
+          showErrors ||
+          this.validation.touched.password ||
+          this.uiState.submitted
+        ) {
           this.validation.touched.password = true;
-          
+
           if (!this.formData.password) {
-            this.validation.errors.password = 'Password is required';
-          } else if (this.formData.email === 'admin' && this.formData.password === 'admin') {
+            this.validation.errors.password = "Password is required";
+          } else if (
+            this.formData.email === "admin" &&
+            this.formData.password === "admin"
+          ) {
             // Special case for admin login - always valid
             delete this.validation.errors.password;
           } else if (this.validation.validator) {
-            const result = this.validation.validator.validatePassword(this.formData.password);
+            const result = this.validation.validator.validatePassword(
+              this.formData.password
+            );
             if (!result.isValid) {
               this.validation.errors.password = result.message;
             }
           } else {
             // Fallback validation
-            const minLength = window.APP_CONSTANTS?.VALIDATION?.MIN_PASSWORD_LENGTH || 8;
+            const minLength =
+              window.APP_CONSTANTS?.VALIDATION?.MIN_PASSWORD_LENGTH || 8;
             if (this.formData.password.length < minLength) {
               this.validation.errors.password = `Password must be at least ${minLength} characters`;
             }
           }
         }
       } catch (error) {
-        console.error('Error validating password:', error);
+        console.error("Error validating password:", error);
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'validatePassword'
+          component: "LoginPage",
+          method: "validatePassword",
         });
       }
     },
@@ -478,43 +483,43 @@ const LoginPage = {template: `
       try {
         this.uiState.submitted = true;
         this.analytics.formSubmissionAttempts++;
-        
+
         // Clear previous errors
         this.clearAllErrors();
-        
+
         // Validate all fields
         this._validateEmail(true);
         this._validatePassword(true);
-        
+
         const isValid = this.isFormValid;
-        
+
         // Track validation result
-        this.trackEvent('form_validation', {
+        this.trackEvent("form_validation", {
           isValid,
           errors: Object.keys(this.validation.errors),
-          attempt: this.analytics.formSubmissionAttempts
+          attempt: this.analytics.formSubmissionAttempts,
         });
-        
+
         return isValid;
       } catch (error) {
-        console.error('Error validating form:', error);
+        console.error("Error validating form:", error);
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'validateForm'
+          component: "LoginPage",
+          method: "validateForm",
         });
         return false;
       }
-    },    /**
+    },
+    /**
      * Clear field-specific error
-     */
-    clearFieldError(fieldName) {
+     */ clearFieldError(fieldName) {
       if (this.validation.errors[fieldName]) {
         delete this.validation.errors[fieldName];
       }
-    },    /**
+    },
+    /**
      * Clear all validation errors
-     */
-    clearAllErrors() {
+     */ clearAllErrors() {
       this.validation.errors = {};
       this.errorState.error = null;
     },
@@ -525,11 +530,11 @@ const LoginPage = {template: `
     togglePasswordVisibility() {
       try {
         this.uiState.showPassword = !this.uiState.showPassword;
-        this.trackEvent('password_visibility_toggle', {
-          visible: this.uiState.showPassword
+        this.trackEvent("password_visibility_toggle", {
+          visible: this.uiState.showPassword,
         });
       } catch (error) {
-        console.error('Error toggling password visibility:', error);
+        console.error("Error toggling password visibility:", error);
       }
     },
 
@@ -553,25 +558,24 @@ const LoginPage = {template: `
         this.handleRememberMe();
 
         // Track login attempt
-        this.trackEvent('login_attempt', {
+        this.trackEvent("login_attempt", {
           email: this.formData.email,
           rememberMe: this.formData.rememberMe,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
 
         // Attempt authentication
         const response = await this.authenticateUser();
-        
+
         if (response.success) {
           await this.handleLoginSuccess(response);
         } else {
           this.handleLoginError(response);
         }
-
       } catch (error) {
-        this.handleLoginError({ 
-          message: 'An unexpected error occurred. Please try again.',
-          error 
+        this.handleLoginError({
+          message: "An unexpected error occurred. Please try again.",
+          error,
         });
       } finally {
         this.uiState.isLoading = false;
@@ -590,11 +594,11 @@ const LoginPage = {template: `
         try {
           // Add delay for retry attempts
           if (attempt > 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
           }
 
           const response = await window.AuthService?.login(
-            this.formData.email, 
+            this.formData.email,
             this.formData.password
           );
 
@@ -602,19 +606,18 @@ const LoginPage = {template: `
             return response;
           }
 
-          throw new Error('No response received from authentication service');
-
+          throw new Error("No response received from authentication service");
         } catch (error) {
           lastError = error;
-          
+
           if (attempt === maxRetries) {
             throw error;
           }
 
           // Track retry attempt
-          this.trackEvent('login_retry', {
+          this.trackEvent("login_retry", {
             attempt,
-            error: error.message
+            error: error.message,
           });
         }
       }
@@ -628,33 +631,35 @@ const LoginPage = {template: `
     async handleLoginSuccess(response) {
       try {
         this.uiState.loginSuccess = true;
-        
+
         // Calculate login time
         const loginTime = Date.now() - this.analytics.formStartTime;
-        
+
         // Track successful login
-        this.trackEvent('login_success', {
+        this.trackEvent("login_success", {
           loginTime,
           validationAttempts: this.analytics.validationAttempts,
-          formSubmissionAttempts: this.analytics.formSubmissionAttempts
-        });        // Show success message
+          formSubmissionAttempts: this.analytics.formSubmissionAttempts,
+        }); // Show success message
         window.ToastService?.success(
-          window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.LOGIN || 'Login successful! Redirecting...'
+          window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.LOGIN ||
+            "Login successful! Redirecting..."
         );
 
         // Dispatch auth update event
-        window.dispatchEvent(new CustomEvent('auth-updated', {
-          detail: { user: response.user }
-        }));
+        window.dispatchEvent(
+          new CustomEvent("auth-updated", {
+            detail: { user: response.user },
+          })
+        );
 
         // Handle redirect
         await this.handleRedirect();
-
       } catch (error) {
-        console.error('Error handling login success:', error);
+        console.error("Error handling login success:", error);
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'handleLoginSuccess'
+          component: "LoginPage",
+          method: "handleLoginSuccess",
         });
       }
     },
@@ -665,25 +670,28 @@ const LoginPage = {template: `
     handleLoginError(response) {
       try {
         const error = response.error || response;
-        
+
         // Determine error type and message
-        if (error.code === 'NETWORK_ERROR' || error.name === 'NetworkError') {
-          this.errorState.networkError = 'Network connection failed. Please check your internet connection.';
+        if (error.code === "NETWORK_ERROR" || error.name === "NetworkError") {
+          this.errorState.networkError =
+            "Network connection failed. Please check your internet connection.";
           this.errorState.canRetry = true;
-        } else if (error.code === 'INVALID_CREDENTIALS') {
-          this.errorState.loginError = 'Invalid email or password. Please try again.';
+        } else if (error.code === "INVALID_CREDENTIALS") {
+          this.errorState.loginError =
+            "Invalid email or password. Please try again.";
           this.errorState.canRetry = false;
         } else {
-          this.errorState.loginError = response.message || 'Login failed. Please try again.';
+          this.errorState.loginError =
+            response.message || "Login failed. Please try again.";
           this.errorState.canRetry = true;
         }
 
         // Track login failure
-        this.trackEvent('login_failure', {
-          error: error.message || 'Unknown error',
+        this.trackEvent("login_failure", {
+          error: error.message || "Unknown error",
           errorCode: error.code,
-          canRetry: this.errorState.canRetry
-        });        // Show error toast
+          canRetry: this.errorState.canRetry,
+        }); // Show error toast
         window.ToastService?.error(
           this.errorState.loginError || this.errorState.networkError
         );
@@ -692,12 +700,11 @@ const LoginPage = {template: `
         this.$nextTick(() => {
           this.focusEmailInput();
         });
-
       } catch (error) {
-        console.error('Error handling login error:', error);
+        console.error("Error handling login error:", error);
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
-          method: 'handleLoginError'
+          component: "LoginPage",
+          method: "handleLoginError",
         });
       }
     },
@@ -707,15 +714,16 @@ const LoginPage = {template: `
      */
     handleRememberMe() {
       try {
-        const storageKey = window.APP_CONSTANTS?.STORAGE?.REMEMBERED_EMAIL || 'rememberedEmail';
-        
+        const storageKey =
+          window.APP_CONSTANTS?.STORAGE?.REMEMBERED_EMAIL || "rememberedEmail";
+
         if (this.formData.rememberMe) {
           localStorage.setItem(storageKey, this.formData.email);
         } else {
           localStorage.removeItem(storageKey);
         }
       } catch (error) {
-        console.error('Error handling remember me:', error);
+        console.error("Error handling remember me:", error);
       }
     },
 
@@ -725,7 +733,8 @@ const LoginPage = {template: `
     async handleRedirect() {
       try {
         const redirectDelay = window.APP_CONSTANTS?.UI?.REDIRECT_DELAY || 1500;
-        const defaultRedirect = window.APP_CONSTANTS?.ROUTES?.DEFAULT_REDIRECT || '/';
+        const defaultRedirect =
+          window.APP_CONSTANTS?.ROUTES?.DEFAULT_REDIRECT || "/";
         const redirectPath = this.$route?.query?.redirect || defaultRedirect;
 
         setTimeout(() => {
@@ -735,12 +744,11 @@ const LoginPage = {template: `
             window.location.href = redirectPath;
           }
         }, redirectDelay);
-
       } catch (error) {
-        console.error('Error handling redirect:', error);
+        console.error("Error handling redirect:", error);
         // Fallback redirect
         setTimeout(() => {
-          window.location.href = '/';
+          window.location.href = "/";
         }, 2000);
       }
     },
@@ -750,7 +758,7 @@ const LoginPage = {template: `
      */
     focusFirstError() {
       this.$nextTick(() => {
-        const firstErrorField = document.querySelector('.is-invalid, .error');
+        const firstErrorField = document.querySelector(".is-invalid, .error");
         if (firstErrorField) {
           firstErrorField.focus();
         } else if (this.$refs.emailInput) {
@@ -778,17 +786,17 @@ const LoginPage = {template: `
         if (!this.analytics.fieldInteractions[fieldName]) {
           this.analytics.fieldInteractions[fieldName] = {};
         }
-        
-        this.analytics.fieldInteractions[fieldName][action] = 
+
+        this.analytics.fieldInteractions[fieldName][action] =
           (this.analytics.fieldInteractions[fieldName][action] || 0) + 1;
-        
+
         this.analytics.lastInteraction = {
           field: fieldName,
           action,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
       } catch (error) {
-        console.error('Error tracking field interaction:', error);
+        console.error("Error tracking field interaction:", error);
       }
     },
 
@@ -800,13 +808,13 @@ const LoginPage = {template: `
         const event = {
           event: eventName,
           timestamp: Date.now(),
-          component: 'LoginPage',
-          ...eventData
+          component: "LoginPage",
+          ...eventData,
         };
 
         // Log to console in development
         if (window.APP_CONSTANTS?.DEBUG?.ANALYTICS_LOGGING) {
-          console.log('Analytics Event:', event);
+          console.log("Analytics Event:", event);
         }
 
         // Send to analytics service if available
@@ -816,43 +824,46 @@ const LoginPage = {template: `
 
         // Store in session for debugging
         if (window.APP_CONSTANTS?.DEBUG?.STORE_ANALYTICS) {
-          const events = JSON.parse(sessionStorage.getItem('analyticsEvents') || '[]');
+          const events = JSON.parse(
+            sessionStorage.getItem("analyticsEvents") || "[]"
+          );
           events.push(event);
-          sessionStorage.setItem('analyticsEvents', JSON.stringify(events.slice(-100))); // Keep last 100 events
+          sessionStorage.setItem(
+            "analyticsEvents",
+            JSON.stringify(events.slice(-100))
+          ); // Keep last 100 events
         }
-
       } catch (error) {
-        console.error('Error tracking event:', error);
+        console.error("Error tracking event:", error);
       }
     },
 
     /**
      * Handle component errors
      */
-    handleComponentError(error, context = 'unknown') {
+    handleComponentError(error, context = "unknown") {
       try {
         this.componentState.hasError = true;
         this.componentState.errorMessage = `An error occurred in ${context}. Please refresh the page.`;
-        
+
         // Log error
         console.error(`LoginPage component error in ${context}:`, error);
-        
+
         // Report to error handler
         window.ErrorHandler?.logError(error, {
-          component: 'LoginPage',
+          component: "LoginPage",
           context,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
 
         // Track error event
-        this.trackEvent('component_error', {
+        this.trackEvent("component_error", {
           context,
           error: error.message,
-          stack: error.stack
+          stack: error.stack,
         });
-
       } catch (trackingError) {
-        console.error('Error handling component error:', trackingError);
+        console.error("Error handling component error:", trackingError);
       }
     },
 
@@ -863,42 +874,51 @@ const LoginPage = {template: `
       try {
         // Clear any pending timeouts
         if (this.componentState.timeouts) {
-          this.componentState.timeouts.forEach(timeout => clearTimeout(timeout));
+          this.componentState.timeouts.forEach((timeout) =>
+            clearTimeout(timeout)
+          );
         }
 
         // Clear intervals
         if (this.componentState.intervals) {
-          this.componentState.intervals.forEach(interval => clearInterval(interval));
+          this.componentState.intervals.forEach((interval) =>
+            clearInterval(interval)
+          );
         }
 
         // Track component cleanup
-        this.trackEvent('component_cleanup', {
+        this.trackEvent("component_cleanup", {
           sessionDuration: Date.now() - this.analytics.formStartTime,
-          interactions: this.analytics.fieldInteractions
+          interactions: this.analytics.fieldInteractions,
         });
-
       } catch (error) {
-        console.error('Error cleaning up component:', error);
+        console.error("Error cleaning up component:", error);
       }
-    }
-  },  created() {
+    },
+  },
+  created() {
     try {
       // Set up debounced validation methods - note the capital H in Helpers
       if (window.Helpers?.debounce) {
-        this.validateEmailDebounced = window.Helpers.debounce(this._validateEmail.bind(this), 300);
-        this.validatePasswordDebounced = window.Helpers.debounce(this._validatePassword.bind(this), 300);
+        this.validateEmailDebounced = window.Helpers.debounce(
+          this._validateEmail.bind(this),
+          300
+        );
+        this.validatePasswordDebounced = window.Helpers.debounce(
+          this._validatePassword.bind(this),
+          300
+        );
       }
-      
+
       // Track component creation
-      this.trackEvent('component_created', {
-        timestamp: Date.now()
+      this.trackEvent("component_created", {
+        timestamp: Date.now(),
       });
-      
     } catch (error) {
-      console.error('Error in created hook:', error);
-      this.handleComponentError(error, 'created');
+      console.error("Error in created hook:", error);
+      this.handleComponentError(error, "created");
     }
-  }
+  },
 };
 
 // Make the component globally available

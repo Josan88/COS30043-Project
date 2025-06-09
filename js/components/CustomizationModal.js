@@ -2,16 +2,16 @@
  * CustomizationModal Component
  * Modal for customizing food item ingredients (add/remove ingredients)
  */
-window.app.component('customization-modal', {
+window.app.component("customization-modal", {
   props: {
     product: {
       type: Object,
-      required: true
+      required: true,
     },
     show: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   template: `
     <div class="customization-modal" v-if="show">
@@ -127,8 +127,8 @@ window.app.component('customization-modal', {
     return {
       baseIngredients: [],
       availableExtras: [],
-      specialInstructions: '',
-      basePrice: 0
+      specialInstructions: "",
+      basePrice: 0,
     };
   },
   computed: {
@@ -144,18 +144,18 @@ window.app.component('customization-modal', {
     customization() {
       return {
         removedIngredients: this.baseIngredients
-          .filter(item => !item.included)
-          .map(item => item.name),
+          .filter((item) => !item.included)
+          .map((item) => item.name),
         addedIngredients: this.availableExtras
-          .filter(item => item.selected)
-          .map(item => ({
+          .filter((item) => item.selected)
+          .map((item) => ({
             name: item.name,
-            price: item.price
+            price: item.price,
           })),
         specialInstructions: this.specialInstructions,
-        extraPrice: this.extraPrice
+        extraPrice: this.extraPrice,
       };
-    }
+    },
   },
   watch: {
     product: {
@@ -164,43 +164,43 @@ window.app.component('customization-modal', {
         if (newProduct) {
           this.initializeIngredients();
           this.initializeExtras();
-          this.specialInstructions = newProduct.specialInstructions || '';
+          this.specialInstructions = newProduct.specialInstructions || "";
           this.basePrice = newProduct.price || 0;
         }
-      }
+      },
     },
     show(newVal) {
       if (newVal) {
         // Reset form when modal is opened
         this.initializeIngredients();
         this.initializeExtras();
-        this.specialInstructions = this.product.specialInstructions || '';
+        this.specialInstructions = this.product.specialInstructions || "";
       }
-    }
+    },
   },
   methods: {
     initializeIngredients() {
       if (!this.product) return;
-      
+
       // Initialize base ingredients from product
       if (this.product.ingredients && Array.isArray(this.product.ingredients)) {
         this.baseIngredients = this.product.ingredients.map((ing, index) => {
           // If the ingredient is already an object with inclusion state, use it
-          if (typeof ing === 'object') {
+          if (typeof ing === "object") {
             return {
               id: ing.id || index,
               name: ing.name,
               included: ing.included !== false, // Default to true if not specified
-              required: ing.required || false
+              required: ing.required || false,
             };
-          } 
+          }
           // If it's just a string, create a new object
           else {
             return {
               id: index,
               name: ing,
               included: true, // Default to included
-              required: false // Default to not required
+              required: false, // Default to not required
             };
           }
         });
@@ -209,54 +209,67 @@ window.app.component('customization-modal', {
       }
 
       // If product already has customization, restore removed ingredients
-      if (this.product.customization && this.product.customization.removedIngredients) {
+      if (
+        this.product.customization &&
+        this.product.customization.removedIngredients
+      ) {
         const removedNames = this.product.customization.removedIngredients;
-        this.baseIngredients.forEach(ing => {
+        this.baseIngredients.forEach((ing) => {
           if (removedNames.includes(ing.name)) {
             ing.included = false;
           }
         });
       }
     },
-    
+
     initializeExtras() {
       if (!this.product) return;
-      
+
       // Initialize extra ingredients that can be added
-      if (this.product.availableExtras && Array.isArray(this.product.availableExtras)) {
-        this.availableExtras = this.product.availableExtras.map((extra, index) => {
-          return {
-            id: extra.id || index,
-            name: extra.name,
-            price: extra.price || 0,
-            selected: false
-          };
-        });
+      if (
+        this.product.availableExtras &&
+        Array.isArray(this.product.availableExtras)
+      ) {
+        this.availableExtras = this.product.availableExtras.map(
+          (extra, index) => {
+            return {
+              id: extra.id || index,
+              name: extra.name,
+              price: extra.price || 0,
+              selected: false,
+            };
+          }
+        );
       } else {
         this.availableExtras = [];
       }
 
       // If product already has customization, restore added ingredients
-      if (this.product.customization && this.product.customization.addedIngredients) {
-        const addedNames = this.product.customization.addedIngredients.map(item => item.name);
-        this.availableExtras.forEach(extra => {
+      if (
+        this.product.customization &&
+        this.product.customization.addedIngredients
+      ) {
+        const addedNames = this.product.customization.addedIngredients.map(
+          (item) => item.name
+        );
+        this.availableExtras.forEach((extra) => {
           if (addedNames.includes(extra.name)) {
             extra.selected = true;
           }
         });
       }
     },
-    
+
     saveCustomization() {
       // Emit event with customization details
-      this.$emit('save', this.customization);
-      this.$emit('close');
-    }
-  }
+      this.$emit("save", this.customization);
+      this.$emit("close");
+    },
+  },
 });
 
 // Add these styles to the document to ensure proper modal display
-const style = document.createElement('style');
+const style = document.createElement("style");
 style.textContent = `
   .customization-modal {
     position: fixed;

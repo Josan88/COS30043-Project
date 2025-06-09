@@ -8,51 +8,53 @@ class ToastService {
     this.config = {
       // Default durations from constants
       DEFAULT_DURATION: window.APP_CONSTANTS?.UI?.TOAST_DURATION || 3000,
-      SUCCESS_DURATION: window.APP_CONSTANTS?.UI?.SUCCESS_TOAST_DURATION || 2000,
+      SUCCESS_DURATION:
+        window.APP_CONSTANTS?.UI?.SUCCESS_TOAST_DURATION || 2000,
       ERROR_DURATION: window.APP_CONSTANTS?.UI?.ERROR_TOAST_DURATION || 5000,
-      WARNING_DURATION: window.APP_CONSTANTS?.UI?.WARNING_TOAST_DURATION || 4000,
+      WARNING_DURATION:
+        window.APP_CONSTANTS?.UI?.WARNING_TOAST_DURATION || 4000,
       INFO_DURATION: window.APP_CONSTANTS?.UI?.INFO_TOAST_DURATION || 3000,
-      
+
       // Maximum number of toasts to show at once
       MAX_TOASTS: window.APP_CONSTANTS?.UI?.MAX_TOASTS || 5,
-      
+
       // Animation settings
       ANIMATION_DURATION: 300,
-      
+
       // Position settings
-      DEFAULT_POSITION: 'top-right'
+      DEFAULT_POSITION: "top-right",
     };
 
     // Toast types configuration
     this.types = {
       success: {
-        icon: 'fas fa-check-circle',
-        bgClass: 'bg-success',
-        textClass: 'text-white',
+        icon: "fas fa-check-circle",
+        bgClass: "bg-success",
+        textClass: "text-white",
         duration: this.config.SUCCESS_DURATION,
-        ariaRole: 'status'
+        ariaRole: "status",
       },
       error: {
-        icon: 'fas fa-exclamation-circle',
-        bgClass: 'bg-danger',
-        textClass: 'text-white',
+        icon: "fas fa-exclamation-circle",
+        bgClass: "bg-danger",
+        textClass: "text-white",
         duration: this.config.ERROR_DURATION,
-        ariaRole: 'alert'
+        ariaRole: "alert",
       },
       warning: {
-        icon: 'fas fa-exclamation-triangle',
-        bgClass: 'bg-warning',
-        textClass: 'text-dark',
+        icon: "fas fa-exclamation-triangle",
+        bgClass: "bg-warning",
+        textClass: "text-dark",
         duration: this.config.WARNING_DURATION,
-        ariaRole: 'alert'
+        ariaRole: "alert",
       },
       info: {
-        icon: 'fas fa-info-circle',
-        bgClass: 'bg-info',
-        textClass: 'text-white',
+        icon: "fas fa-info-circle",
+        bgClass: "bg-info",
+        textClass: "text-white",
         duration: this.config.INFO_DURATION,
-        ariaRole: 'status'
-      }
+        ariaRole: "status",
+      },
     };
 
     // Active toasts tracking
@@ -68,16 +70,16 @@ class ToastService {
    */
   initializeContainer() {
     // Check if container already exists
-    let container = document.getElementById('toast-container');
-    
+    let container = document.getElementById("toast-container");
+
     if (!container) {
-      container = document.createElement('div');
-      container.id = 'toast-container';
-      container.className = 'toast-container position-fixed top-0 end-0 p-3';
-      container.style.zIndex = '9999';
-      container.setAttribute('aria-live', 'polite');
-      container.setAttribute('aria-atomic', 'true');
-      
+      container = document.createElement("div");
+      container.id = "toast-container";
+      container.className = "toast-container position-fixed top-0 end-0 p-3";
+      container.style.zIndex = "9999";
+      container.setAttribute("aria-live", "polite");
+      container.setAttribute("aria-atomic", "true");
+
       document.body.appendChild(container);
     }
 
@@ -91,29 +93,32 @@ class ToastService {
    * @param {Object} options - Additional options
    * @returns {string} - Toast ID for managing the toast
    */
-  show(message, type = 'info', options = {}) {
+  show(message, type = "info", options = {}) {
     try {
       // Validate parameters
-      if (!message || typeof message !== 'string') {
-        console.error('ToastService: Invalid message provided');
+      if (!message || typeof message !== "string") {
+        console.error("ToastService: Invalid message provided");
         return null;
       }
 
       if (!this.types[type]) {
-        console.warn(`ToastService: Unknown toast type '${type}', using 'info' instead`);
-        type = 'info';
+        console.warn(
+          `ToastService: Unknown toast type '${type}', using 'info' instead`
+        );
+        type = "info";
       }
 
       // Generate unique ID
       const toastId = `toast-${++this.toastCounter}-${Date.now()}`;
-      
+
       // Merge options with defaults
       const toastConfig = {
         ...this.types[type],
         ...options,
         id: toastId,
-        message,      type,
-        timestamp: Date.now()
+        message,
+        type,
+        timestamp: Date.now(),
       };
 
       // Limit number of active toasts
@@ -122,12 +127,12 @@ class ToastService {
       // Create and show toast
       const toastElement = this.createToastElement(toastConfig);
       this.container.appendChild(toastElement);
-      
+
       // Store toast reference
       this.activeToasts.set(toastId, {
         element: toastElement,
         config: toastConfig,
-        timeoutId: null
+        timeoutId: null,
       });
 
       // Animate in
@@ -142,30 +147,33 @@ class ToastService {
       this.trackToast(toastConfig);
 
       return toastId;
-
     } catch (error) {
-      console.error('Error showing toast:', error);
-      window.ErrorHandler?.logError(error, { 
-        service: 'ToastService', 
-        method: 'show',
+      console.error("Error showing toast:", error);
+      window.ErrorHandler?.logError(error, {
+        service: "ToastService",
+        method: "show",
         message,
-        type 
+        type,
       });
       return null;
-    }  }
+    }
+  }
 
   /**
    * Enforce the maximum number of active toasts
    * Removes oldest toasts if the limit is exceeded
    */
   enforceToastLimit() {
-    const activeToasts = this.container.querySelectorAll('.toast.show');
+    const activeToasts = this.container.querySelectorAll(".toast.show");
     const maxToasts = window.APP_CONSTANTS?.UI?.MAX_TOASTS || 5;
-    
+
     if (activeToasts.length >= maxToasts) {
       // Remove oldest toasts (first in DOM)
-      const toastsToRemove = Array.from(activeToasts).slice(0, activeToasts.length - maxToasts + 1);
-      toastsToRemove.forEach(toast => {
+      const toastsToRemove = Array.from(activeToasts).slice(
+        0,
+        activeToasts.length - maxToasts + 1
+      );
+      toastsToRemove.forEach((toast) => {
         this.removeToast(toast.id);
       });
     }
@@ -177,14 +185,14 @@ class ToastService {
    * @returns {HTMLElement} - Toast element
    */
   createToastElement(config) {
-    const toast = document.createElement('div');
+    const toast = document.createElement("div");
     toast.id = config.id;
     toast.className = `toast show ${config.bgClass} ${config.textClass} border-0`;
-    toast.setAttribute('role', config.ariaRole);
-    toast.setAttribute('aria-live', 'assertive');
-    toast.setAttribute('aria-atomic', 'true');
-    toast.style.minWidth = '300px';
-    toast.style.maxWidth = '400px';
+    toast.setAttribute("role", config.ariaRole);
+    toast.setAttribute("aria-live", "assertive");
+    toast.setAttribute("aria-atomic", "true");
+    toast.style.minWidth = "300px";
+    toast.style.maxWidth = "400px";
 
     // Create toast content
     toast.innerHTML = `
@@ -194,11 +202,19 @@ class ToastService {
         </div>
         <div class="toast-body flex-grow-1">
           <div class="fw-bold">${this.escapeHtml(config.message)}</div>
-          ${config.subtitle ? `<div class="small opacity-75">${this.escapeHtml(config.subtitle)}</div>` : ''}
+          ${
+            config.subtitle
+              ? `<div class="small opacity-75">${this.escapeHtml(
+                  config.subtitle
+                )}</div>`
+              : ""
+          }
         </div>
         <button 
           type="button" 
-          class="btn-close ${config.textClass === 'text-dark' ? '' : 'btn-close-white'} ms-2" 
+          class="btn-close ${
+            config.textClass === "text-dark" ? "" : "btn-close-white"
+          } ms-2" 
           aria-label="Close notification"
           data-toast-id="${config.id}"
         ></button>
@@ -206,15 +222,15 @@ class ToastService {
     `;
 
     // Add close event listener
-    const closeButton = toast.querySelector('.btn-close');
-    closeButton.addEventListener('click', () => {
+    const closeButton = toast.querySelector(".btn-close");
+    closeButton.addEventListener("click", () => {
       this.dismiss(config.id);
     });
 
     // Add click-to-dismiss functionality
     if (config.clickToDismiss !== false) {
-      toast.style.cursor = 'pointer';
-      toast.addEventListener('click', (e) => {
+      toast.style.cursor = "pointer";
+      toast.addEventListener("click", (e) => {
         if (e.target !== closeButton) {
           this.dismiss(config.id);
         }
@@ -245,9 +261,8 @@ class ToastService {
         }
         this.activeToasts.delete(toastId);
       });
-
     } catch (error) {
-      console.error('Error dismissing toast:', error);
+      console.error("Error dismissing toast:", error);
     }
   }
 
@@ -256,7 +271,7 @@ class ToastService {
    */
   dismissAll() {
     const toastIds = Array.from(this.activeToasts.keys());
-    toastIds.forEach(id => this.dismiss(id));
+    toastIds.forEach((id) => this.dismiss(id));
   }
 
   /**
@@ -278,16 +293,16 @@ class ToastService {
    * @param {HTMLElement} element - Toast element
    */
   animateIn(element) {
-    element.style.opacity = '0';
-    element.style.transform = 'translateX(100%)';
+    element.style.opacity = "0";
+    element.style.transform = "translateX(100%)";
     element.style.transition = `all ${this.config.ANIMATION_DURATION}ms ease-out`;
 
     // Force reflow
     element.offsetHeight;
 
     // Animate in
-    element.style.opacity = '1';
-    element.style.transform = 'translateX(0)';
+    element.style.opacity = "1";
+    element.style.transform = "translateX(0)";
   }
 
   /**
@@ -297,8 +312,8 @@ class ToastService {
    */
   animateOut(element, callback) {
     element.style.transition = `all ${this.config.ANIMATION_DURATION}ms ease-in`;
-    element.style.opacity = '0';
-    element.style.transform = 'translateX(100%)';
+    element.style.opacity = "0";
+    element.style.transform = "translateX(100%)";
 
     setTimeout(() => {
       if (callback) callback();
@@ -322,7 +337,7 @@ class ToastService {
    * @returns {string} - Escaped text
    */
   escapeHtml(text) {
-    const div = document.createElement('div');
+    const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
   }
@@ -332,25 +347,25 @@ class ToastService {
    * @param {Object} config - Toast configuration
    */
   trackToast(config) {
-    if (window.analytics && typeof window.analytics.track === 'function') {
-      window.analytics.track('Toast Shown', {
+    if (window.analytics && typeof window.analytics.track === "function") {
+      window.analytics.track("Toast Shown", {
         type: config.type,
         hasSubtitle: !!config.subtitle,
         duration: config.duration,
-        timestamp: config.timestamp
+        timestamp: config.timestamp,
       });
     }
   }
 
   // Convenience methods for different toast types
-  
+
   /**
    * Show success toast
    * @param {string} message - Success message
    * @param {Object} options - Additional options
    */
   success(message, options = {}) {
-    return this.show(message, 'success', options);
+    return this.show(message, "success", options);
   }
 
   /**
@@ -359,7 +374,7 @@ class ToastService {
    * @param {Object} options - Additional options
    */
   error(message, options = {}) {
-    return this.show(message, 'error', options);
+    return this.show(message, "error", options);
   }
 
   /**
@@ -368,7 +383,7 @@ class ToastService {
    * @param {Object} options - Additional options
    */
   warning(message, options = {}) {
-    return this.show(message, 'warning', options);
+    return this.show(message, "warning", options);
   }
 
   /**
@@ -377,7 +392,7 @@ class ToastService {
    * @param {Object} options - Additional options
    */
   info(message, options = {}) {
-    return this.show(message, 'info', options);
+    return this.show(message, "info", options);
   }
 
   /**
@@ -386,11 +401,11 @@ class ToastService {
    * @param {Object} options - Additional options
    */
   loading(message, options = {}) {
-    return this.show(message, 'info', {
+    return this.show(message, "info", {
       duration: 0, // Don't auto-dismiss
-      icon: 'fas fa-spinner fa-spin',
+      icon: "fas fa-spinner fa-spin",
       clickToDismiss: false,
-      ...options
+      ...options,
     });
   }
 
@@ -405,20 +420,23 @@ class ToastService {
     if (!toastData) return false;
 
     try {
-      const messageElement = toastData.element.querySelector('.toast-body .fw-bold');
+      const messageElement = toastData.element.querySelector(
+        ".toast-body .fw-bold"
+      );
       if (messageElement) {
         messageElement.textContent = newMessage;
-        
+
         // Update subtitle if provided
         if (options.subtitle !== undefined) {
-          const subtitleElement = toastData.element.querySelector('.toast-body .small');
+          const subtitleElement =
+            toastData.element.querySelector(".toast-body .small");
           if (options.subtitle) {
             if (subtitleElement) {
               subtitleElement.textContent = options.subtitle;
             } else {
               // Create subtitle element
-              const subtitle = document.createElement('div');
-              subtitle.className = 'small opacity-75';
+              const subtitle = document.createElement("div");
+              subtitle.className = "small opacity-75";
               subtitle.textContent = options.subtitle;
               messageElement.parentNode.appendChild(subtitle);
             }
@@ -427,13 +445,13 @@ class ToastService {
             subtitleElement.remove();
           }
         }
-        
+
         return true;
       }
     } catch (error) {
-      console.error('Error updating toast:', error);
+      console.error("Error updating toast:", error);
     }
-    
+
     return false;
   }
 
@@ -445,11 +463,10 @@ class ToastService {
     return {
       activeCount: this.activeToasts.size,
       totalCreated: this.toastCounter,
-      types: Array.from(this.activeToasts.values())
-        .reduce((acc, toast) => {
-          acc[toast.config.type] = (acc[toast.config.type] || 0) + 1;
-          return acc;
-        }, {})
+      types: Array.from(this.activeToasts.values()).reduce((acc, toast) => {
+        acc[toast.config.type] = (acc[toast.config.type] || 0) + 1;
+        return acc;
+      }, {}),
     };
   }
 
@@ -469,6 +486,6 @@ class ToastService {
 window.ToastService = new ToastService();
 
 // Export for module environments
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = ToastService;
 }

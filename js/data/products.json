@@ -11,22 +11,22 @@
       "rating": 4.8,
       "reviewCount": 128,
       "ingredients": [
-        {"name": "Beef patty", "required": true},
-        {"name": "Cheddar cheese", "required": false},
-        {"name": "Lettuce", "required": false},
-        {"name": "Tomato", "required": false},
-        {"name": "Onion", "required": false},
-        {"name": "Pickles", "required": false},
-        {"name": "Special sauce", "required": false},
-        {"name": "Brioche bun", "required": true}
+        { "name": "Beef patty", "required": true },
+        { "name": "Cheddar cheese", "required": false },
+        { "name": "Lettuce", "required": false },
+        { "name": "Tomato", "required": false },
+        { "name": "Onion", "required": false },
+        { "name": "Pickles", "required": false },
+        { "name": "Special sauce", "required": false },
+        { "name": "Brioche bun", "required": true }
       ],
       "availableExtras": [
-        {"name": "Extra beef patty", "price": 4.50},
-        {"name": "Bacon strips", "price": 2.00},
-        {"name": "Avocado", "price": 1.50},
-        {"name": "Fried egg", "price": 1.00},
-        {"name": "Blue cheese", "price": 1.50},
-        {"name": "Caramelized onions", "price": 0.75}
+        { "name": "Extra beef patty", "price": 4.5 },
+        { "name": "Bacon strips", "price": 2.0 },
+        { "name": "Avocado", "price": 1.5 },
+        { "name": "Fried egg", "price": 1.0 },
+        { "name": "Blue cheese", "price": 1.5 },
+        { "name": "Caramelized onions", "price": 0.75 }
       ],
       "dietaryOptions": [],
       "stock": 50,
@@ -44,22 +44,22 @@
       "rating": 4.9,
       "reviewCount": 243,
       "ingredients": [
-        {"name": "House-made dough", "required": true},
-        {"name": "San Marzano tomato sauce", "required": true},
-        {"name": "Fresh mozzarella", "required": false},
-        {"name": "Fresh basil", "required": false},
-        {"name": "Extra virgin olive oil", "required": false},
-        {"name": "Sea salt", "required": false}
+        { "name": "House-made dough", "required": true },
+        { "name": "San Marzano tomato sauce", "required": true },
+        { "name": "Fresh mozzarella", "required": false },
+        { "name": "Fresh basil", "required": false },
+        { "name": "Extra virgin olive oil", "required": false },
+        { "name": "Sea salt", "required": false }
       ],
       "availableExtras": [
-        {"name": "Extra cheese", "price": 2.00},
-        {"name": "Mushrooms", "price": 1.50},
-        {"name": "Bell peppers", "price": 1.00},
-        {"name": "Pepperoni", "price": 2.50},
-        {"name": "Italian sausage", "price": 2.50},
-        {"name": "Spinach", "price": 1.00},
-        {"name": "Artichoke hearts", "price": 2.00},
-        {"name": "Black olives", "price": 1.00}
+        { "name": "Extra cheese", "price": 2.0 },
+        { "name": "Mushrooms", "price": 1.5 },
+        { "name": "Bell peppers", "price": 1.0 },
+        { "name": "Pepperoni", "price": 2.5 },
+        { "name": "Italian sausage", "price": 2.5 },
+        { "name": "Spinach", "price": 1.0 },
+        { "name": "Artichoke hearts", "price": 2.0 },
+        { "name": "Black olives", "price": 1.0 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 30,
@@ -77,18 +77,18 @@
       "rating": 4.7,
       "reviewCount": 187,
       "ingredients": [
-        {"name": "Romaine lettuce", "required": true},
-        {"name": "Grilled chicken breast", "required": false},
-        {"name": "Parmesan cheese", "required": false},
-        {"name": "House-made croutons", "required": false},
-        {"name": "Caesar dressing", "required": false}
+        { "name": "Romaine lettuce", "required": true },
+        { "name": "Grilled chicken breast", "required": false },
+        { "name": "Parmesan cheese", "required": false },
+        { "name": "House-made croutons", "required": false },
+        { "name": "Caesar dressing", "required": false }
       ],
       "availableExtras": [
-        {"name": "Extra chicken", "price": 3.50},
-        {"name": "Bacon bits", "price": 1.50},
-        {"name": "Cherry tomatoes", "price": 1.00},
-        {"name": "Boiled egg", "price": 1.00},
-        {"name": "Avocado", "price": 1.50}
+        { "name": "Extra chicken", "price": 3.5 },
+        { "name": "Bacon bits", "price": 1.5 },
+        { "name": "Cherry tomatoes", "price": 1.0 },
+        { "name": "Boiled egg", "price": 1.0 },
+        { "name": "Avocado", "price": 1.5 }
       ],
       "dietaryOptions": [],
       "stock": 25,
@@ -106,22 +106,22 @@
       "rating": 4.6,
       "reviewCount": 95,
       "ingredients": [
-        {"name": "Bell peppers", "required": false},
-        {"name": "Broccoli", "required": false},
-        {"name": "Carrots", "required": false},
-        {"name": "Snow peas", "required": false},
-        {"name": "Mushrooms", "required": false},
-        {"name": "Onions", "required": false},
-        {"name": "Teriyaki sauce", "required": true},
-        {"name": "Steamed rice or noodles", "required": true}
+        { "name": "Bell peppers", "required": false },
+        { "name": "Broccoli", "required": false },
+        { "name": "Carrots", "required": false },
+        { "name": "Snow peas", "required": false },
+        { "name": "Mushrooms", "required": false },
+        { "name": "Onions", "required": false },
+        { "name": "Teriyaki sauce", "required": true },
+        { "name": "Steamed rice or noodles", "required": true }
       ],
       "availableExtras": [
-        {"name": "Tofu", "price": 2.00},
-        {"name": "Grilled chicken", "price": 3.50},
-        {"name": "Shrimp", "price": 4.00},
-        {"name": "Cashews", "price": 1.50},
-        {"name": "Bean sprouts", "price": 1.00},
-        {"name": "Water chestnuts", "price": 1.00}
+        { "name": "Tofu", "price": 2.0 },
+        { "name": "Grilled chicken", "price": 3.5 },
+        { "name": "Shrimp", "price": 4.0 },
+        { "name": "Cashews", "price": 1.5 },
+        { "name": "Bean sprouts", "price": 1.0 },
+        { "name": "Water chestnuts", "price": 1.0 }
       ],
       "dietaryOptions": ["vegetarian", "vegan"],
       "stock": 20,
@@ -139,19 +139,19 @@
       "rating": 4.8,
       "reviewCount": 162,
       "ingredients": [
-        {"name": "Chicken wings", "required": true},
-        {"name": "Butter", "required": false},
-        {"name": "Garlic", "required": false},
-        {"name": "Parmesan cheese", "required": false},
-        {"name": "Herbs", "required": false},
-        {"name": "Ranch dressing", "required": false}
+        { "name": "Chicken wings", "required": true },
+        { "name": "Butter", "required": false },
+        { "name": "Garlic", "required": false },
+        { "name": "Parmesan cheese", "required": false },
+        { "name": "Herbs", "required": false },
+        { "name": "Ranch dressing", "required": false }
       ],
       "availableExtras": [
-        {"name": "Blue cheese dressing", "price": 1.00},
-        {"name": "Extra parmesan", "price": 1.00},
-        {"name": "Buffalo sauce on side", "price": 0.75},
-        {"name": "Celery sticks", "price": 0.50},
-        {"name": "Carrot sticks", "price": 0.50}
+        { "name": "Blue cheese dressing", "price": 1.0 },
+        { "name": "Extra parmesan", "price": 1.0 },
+        { "name": "Buffalo sauce on side", "price": 0.75 },
+        { "name": "Celery sticks", "price": 0.5 },
+        { "name": "Carrot sticks", "price": 0.5 }
       ],
       "dietaryOptions": [],
       "stock": 40,
@@ -169,18 +169,18 @@
       "rating": 4.7,
       "reviewCount": 118,
       "ingredients": [
-        {"name": "Fresh seasonal fruits", "required": true},
-        {"name": "Greek yogurt", "required": false},
-        {"name": "Honey", "required": false},
-        {"name": "Ice", "required": true}
+        { "name": "Fresh seasonal fruits", "required": true },
+        { "name": "Greek yogurt", "required": false },
+        { "name": "Honey", "required": false },
+        { "name": "Ice", "required": true }
       ],
       "availableExtras": [
-        {"name": "Protein powder", "price": 1.50},
-        {"name": "Almond milk (instead of yogurt)", "price": 0.50},
-        {"name": "Chia seeds", "price": 0.75},
-        {"name": "Flax seeds", "price": 0.75},
-        {"name": "Spinach", "price": 0.50},
-        {"name": "Peanut butter", "price": 1.00}
+        { "name": "Protein powder", "price": 1.5 },
+        { "name": "Almond milk (instead of yogurt)", "price": 0.5 },
+        { "name": "Chia seeds", "price": 0.75 },
+        { "name": "Flax seeds", "price": 0.75 },
+        { "name": "Spinach", "price": 0.5 },
+        { "name": "Peanut butter", "price": 1.0 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 30,
@@ -198,21 +198,21 @@
       "rating": 4.8,
       "reviewCount": 73,
       "ingredients": [
-        {"name": "Tortilla chips", "required": true},
-        {"name": "Cheddar and Monterey Jack cheese", "required": false},
-        {"name": "Black beans", "required": false},
-        {"name": "Jalapeños", "required": false},
-        {"name": "Fresh salsa", "required": false},
-        {"name": "Guacamole", "required": false},
-        {"name": "Sour cream", "required": false}
+        { "name": "Tortilla chips", "required": true },
+        { "name": "Cheddar and Monterey Jack cheese", "required": false },
+        { "name": "Black beans", "required": false },
+        { "name": "Jalapeños", "required": false },
+        { "name": "Fresh salsa", "required": false },
+        { "name": "Guacamole", "required": false },
+        { "name": "Sour cream", "required": false }
       ],
       "availableExtras": [
-        {"name": "Ground beef", "price": 2.50},
-        {"name": "Grilled chicken", "price": 3.00},
-        {"name": "Extra cheese", "price": 1.50},
-        {"name": "Extra guacamole", "price": 2.00},
-        {"name": "Pico de gallo", "price": 1.00},
-        {"name": "Cilantro", "price": 0.50}
+        { "name": "Ground beef", "price": 2.5 },
+        { "name": "Grilled chicken", "price": 3.0 },
+        { "name": "Extra cheese", "price": 1.5 },
+        { "name": "Extra guacamole", "price": 2.0 },
+        { "name": "Pico de gallo", "price": 1.0 },
+        { "name": "Cilantro", "price": 0.5 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 25,
@@ -230,18 +230,18 @@
       "rating": 4.9,
       "reviewCount": 89,
       "ingredients": [
-        {"name": "Dark chocolate cake", "required": true},
-        {"name": "Molten chocolate center", "required": true},
-        {"name": "Vanilla ice cream", "required": false},
-        {"name": "Fresh berries", "required": false},
-        {"name": "Powdered sugar", "required": false}
+        { "name": "Dark chocolate cake", "required": true },
+        { "name": "Molten chocolate center", "required": true },
+        { "name": "Vanilla ice cream", "required": false },
+        { "name": "Fresh berries", "required": false },
+        { "name": "Powdered sugar", "required": false }
       ],
       "availableExtras": [
-        {"name": "Extra ice cream scoop", "price": 1.50},
-        {"name": "Chocolate sauce drizzle", "price": 0.75},
-        {"name": "Whipped cream", "price": 0.75},
-        {"name": "Mint leaves", "price": 0.50},
-        {"name": "Caramel sauce", "price": 0.75}
+        { "name": "Extra ice cream scoop", "price": 1.5 },
+        { "name": "Chocolate sauce drizzle", "price": 0.75 },
+        { "name": "Whipped cream", "price": 0.75 },
+        { "name": "Mint leaves", "price": 0.5 },
+        { "name": "Caramel sauce", "price": 0.75 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 20,
@@ -259,21 +259,21 @@
       "rating": 4.5,
       "reviewCount": 56,
       "ingredients": [
-        {"name": "Mixed greens", "required": true},
-        {"name": "Cherry tomatoes", "required": false},
-        {"name": "Cucumber", "required": false},
-        {"name": "Red onion", "required": false},
-        {"name": "Bell peppers", "required": false},
-        {"name": "Carrots", "required": false},
-        {"name": "Choice of dressing", "required": false}
+        { "name": "Mixed greens", "required": true },
+        { "name": "Cherry tomatoes", "required": false },
+        { "name": "Cucumber", "required": false },
+        { "name": "Red onion", "required": false },
+        { "name": "Bell peppers", "required": false },
+        { "name": "Carrots", "required": false },
+        { "name": "Choice of dressing", "required": false }
       ],
       "availableExtras": [
-        {"name": "Grilled chicken", "price": 3.50},
-        {"name": "Avocado", "price": 1.50},
-        {"name": "Crumbled feta", "price": 1.00},
-        {"name": "Candied walnuts", "price": 1.25},
-        {"name": "Dried cranberries", "price": 1.00},
-        {"name": "Hard-boiled egg", "price": 1.00}
+        { "name": "Grilled chicken", "price": 3.5 },
+        { "name": "Avocado", "price": 1.5 },
+        { "name": "Crumbled feta", "price": 1.0 },
+        { "name": "Candied walnuts", "price": 1.25 },
+        { "name": "Dried cranberries", "price": 1.0 },
+        { "name": "Hard-boiled egg", "price": 1.0 }
       ],
       "dietaryOptions": ["vegetarian", "vegan", "gluten-free"],
       "stock": 30,
@@ -291,20 +291,20 @@
       "rating": 4.7,
       "reviewCount": 42,
       "ingredients": [
-        {"name": "Assorted artisanal cheeses", "required": true},
-        {"name": "Crackers", "required": false},
-        {"name": "Grapes", "required": false},
-        {"name": "Apple slices", "required": false},
-        {"name": "Walnuts", "required": false},
-        {"name": "Honey", "required": false}
+        { "name": "Assorted artisanal cheeses", "required": true },
+        { "name": "Crackers", "required": false },
+        { "name": "Grapes", "required": false },
+        { "name": "Apple slices", "required": false },
+        { "name": "Walnuts", "required": false },
+        { "name": "Honey", "required": false }
       ],
       "availableExtras": [
-        {"name": "Prosciutto", "price": 3.00},
-        {"name": "Olives", "price": 1.50},
-        {"name": "Fig jam", "price": 1.00},
-        {"name": "Salami", "price": 2.50},
-        {"name": "Truffle honey", "price": 2.00},
-        {"name": "Marcona almonds", "price": 1.50}
+        { "name": "Prosciutto", "price": 3.0 },
+        { "name": "Olives", "price": 1.5 },
+        { "name": "Fig jam", "price": 1.0 },
+        { "name": "Salami", "price": 2.5 },
+        { "name": "Truffle honey", "price": 2.0 },
+        { "name": "Marcona almonds", "price": 1.5 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 15,
@@ -322,23 +322,23 @@
       "rating": 4.9,
       "reviewCount": 67,
       "ingredients": [
-        {"name": "Arborio rice", "required": true},
-        {"name": "Saffron", "required": true},
-        {"name": "Shrimp", "required": false},
-        {"name": "Mussels", "required": false},
-        {"name": "Clams", "required": false},
-        {"name": "Calamari", "required": false},
-        {"name": "Bell peppers", "required": false},
-        {"name": "Onions", "required": false},
-        {"name": "Garlic", "required": false},
-        {"name": "Seafood stock", "required": true}
+        { "name": "Arborio rice", "required": true },
+        { "name": "Saffron", "required": true },
+        { "name": "Shrimp", "required": false },
+        { "name": "Mussels", "required": false },
+        { "name": "Clams", "required": false },
+        { "name": "Calamari", "required": false },
+        { "name": "Bell peppers", "required": false },
+        { "name": "Onions", "required": false },
+        { "name": "Garlic", "required": false },
+        { "name": "Seafood stock", "required": true }
       ],
       "availableExtras": [
-        {"name": "Lobster tail", "price": 10.00},
-        {"name": "Extra shrimp", "price": 4.00},
-        {"name": "Scallops", "price": 5.00},
-        {"name": "Spanish chorizo", "price": 3.00},
-        {"name": "Peas", "price": 1.00}
+        { "name": "Lobster tail", "price": 10.0 },
+        { "name": "Extra shrimp", "price": 4.0 },
+        { "name": "Scallops", "price": 5.0 },
+        { "name": "Spanish chorizo", "price": 3.0 },
+        { "name": "Peas", "price": 1.0 }
       ],
       "dietaryOptions": [],
       "stock": 10,
@@ -356,18 +356,18 @@
       "rating": 4.8,
       "reviewCount": 105,
       "ingredients": [
-        {"name": "Hand-cut potatoes", "required": true},
-        {"name": "Truffle oil", "required": true},
-        {"name": "Parmesan cheese", "required": false},
-        {"name": "Fresh parsley", "required": false},
-        {"name": "Sea salt", "required": false}
+        { "name": "Hand-cut potatoes", "required": true },
+        { "name": "Truffle oil", "required": true },
+        { "name": "Parmesan cheese", "required": false },
+        { "name": "Fresh parsley", "required": false },
+        { "name": "Sea salt", "required": false }
       ],
       "availableExtras": [
-        {"name": "Extra parmesan", "price": 1.00},
-        {"name": "Garlic aioli", "price": 1.00},
-        {"name": "Sriracha mayo", "price": 1.00},
-        {"name": "Bacon bits", "price": 1.50},
-        {"name": "Chili flakes", "price": 0.50}
+        { "name": "Extra parmesan", "price": 1.0 },
+        { "name": "Garlic aioli", "price": 1.0 },
+        { "name": "Sriracha mayo", "price": 1.0 },
+        { "name": "Bacon bits", "price": 1.5 },
+        { "name": "Chili flakes", "price": 0.5 }
       ],
       "dietaryOptions": ["vegetarian"],
       "stock": 35,

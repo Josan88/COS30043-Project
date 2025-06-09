@@ -10,19 +10,19 @@ class CartService {
       subtotal: 0,
       tax: 0,
       deliveryFee: 0,
-      total: 0
+      total: 0,
     };
     this.eventListeners = {};
-    
+
     // Configuration constants
     this.config = {
       TAX_RATE: 0.1,
       FREE_DELIVERY_THRESHOLD: 15,
       DELIVERY_FEE: 2.99,
-      STORAGE_KEY: 'foodCart',
-      ORDERS_STORAGE_KEY: 'foodOrders'
+      STORAGE_KEY: "foodCart",
+      ORDERS_STORAGE_KEY: "foodOrders",
     };
-    
+
     this.loadCart();
   }
   /**
@@ -39,7 +39,7 @@ class CartService {
         this.cart = [];
       }
     } catch (error) {
-      console.error('Error loading cart:', error);
+      console.error("Error loading cart:", error);
       this.cart = [];
       this.clearCorruptedStorage();
     }
@@ -52,9 +52,9 @@ class CartService {
   clearCorruptedStorage() {
     try {
       localStorage.removeItem(this.config.STORAGE_KEY);
-      console.log('Corrupted cart data cleared');
+      console.log("Corrupted cart data cleared");
     } catch (error) {
-      console.error('Error clearing corrupted storage:', error);
+      console.error("Error clearing corrupted storage:", error);
     }
   }
   /**
@@ -64,9 +64,9 @@ class CartService {
     try {
       const cartData = JSON.stringify(this.cart);
       localStorage.setItem(this.config.STORAGE_KEY, cartData);
-      this.notifyListeners('update', this.cart);
+      this.notifyListeners("update", this.cart);
     } catch (error) {
-      console.error('Error saving cart:', error);
+      console.error("Error saving cart:", error);
       this.handleStorageError(error);
     }
   }
@@ -78,12 +78,12 @@ class CartService {
    */
   handleStorageError(error) {
     // Check if storage quota exceeded
-    if (error.name === 'QuotaExceededError') {
-      console.warn('Storage quota exceeded. Consider clearing old data.');
-      this.notifyListeners('storage-error', { type: 'quota-exceeded' });
+    if (error.name === "QuotaExceededError") {
+      console.warn("Storage quota exceeded. Consider clearing old data.");
+      this.notifyListeners("storage-error", { type: "quota-exceeded" });
     } else {
-      console.error('Storage error:', error);
-      this.notifyListeners('storage-error', { type: 'general', error });
+      console.error("Storage error:", error);
+      this.notifyListeners("storage-error", { type: "general", error });
     }
   }
 
@@ -112,7 +112,7 @@ class CartService {
   addToCart(item, quantity = 1, options = {}) {
     // Check if item already exists in cart with same options
     const existingItemIndex = this.findItemInCart(item.id, options);
-    
+
     if (existingItemIndex !== -1) {
       // Update quantity if item already exists
       this.cart[existingItemIndex].quantity += quantity;
@@ -122,18 +122,18 @@ class CartService {
         id: item.id,
         name: item.name,
         price: item.price,
-        image: item.image || '',
+        image: item.image || "",
         quantity: quantity,
-        specialInstructions: options.specialInstructions || '',
+        specialInstructions: options.specialInstructions || "",
         customizations: options.customizations || [],
         options: options.options || {},
-        subTotal: item.price * quantity
+        subTotal: item.price * quantity,
       });
     }
-    
+
     this.updateCartTotals();
     this.saveCart();
-    
+
     return this.cart;
   }
 
@@ -150,11 +150,11 @@ class CartService {
         this.removeFromCart(index);
         return this.cart;
       }
-      
+
       this.updateCartTotals();
       this.saveCart();
     }
-    
+
     return this.cart;
   }
 
@@ -167,7 +167,7 @@ class CartService {
       this.updateCartTotals();
       this.saveCart();
     }
-    
+
     return this.cart;
   }
 
@@ -179,7 +179,7 @@ class CartService {
       this.cart[index].specialInstructions = instructions;
       this.saveCart();
     }
-    
+
     return this.cart;
   }
 
@@ -189,24 +189,24 @@ class CartService {
   updateItemCustomizations(index, customizations) {
     if (index >= 0 && index < this.cart.length) {
       this.cart[index].customizations = customizations;
-      
+
       // Recalculate price with customizations
       let basePrice = this.cart[index].price;
-      
+
       // Add cost of customizations if they have a price
-      customizations.forEach(custom => {
+      customizations.forEach((custom) => {
         if (custom.price) {
           basePrice += custom.price;
         }
       });
-      
+
       this.cart[index].price = basePrice;
       this.cart[index].subTotal = basePrice * this.cart[index].quantity;
-      
+
       this.updateCartTotals();
       this.saveCart();
     }
-    
+
     return this.cart;
   }
 
@@ -214,49 +214,52 @@ class CartService {
    * Find an item in the cart by ID and options
    */
   findItemInCart(itemId, options = {}) {
-    return this.cart.findIndex(cartItem => {
+    return this.cart.findIndex((cartItem) => {
       if (cartItem.id !== itemId) {
         return false;
       }
-      
+
       // Check if special instructions match
-      if ((cartItem.specialInstructions || '') !== (options.specialInstructions || '')) {
+      if (
+        (cartItem.specialInstructions || "") !==
+        (options.specialInstructions || "")
+      ) {
         return false;
       }
-      
+
       // Check if customizations match
       const cartCustomizations = cartItem.customizations || [];
       const newCustomizations = options.customizations || [];
-      
+
       if (cartCustomizations.length !== newCustomizations.length) {
         return false;
       }
-      
+
       // Compare customizations
       for (let i = 0; i < cartCustomizations.length; i++) {
         if (cartCustomizations[i].id !== newCustomizations[i].id) {
           return false;
         }
       }
-      
+
       // Check if other options match
       const cartOptions = cartItem.options || {};
       const newOptions = options.options || {};
-      
+
       // Compare option keys
       const cartOptKeys = Object.keys(cartOptions);
       const newOptKeys = Object.keys(newOptions);
-      
+
       if (cartOptKeys.length !== newOptKeys.length) {
         return false;
       }
-      
+
       for (const key of cartOptKeys) {
         if (cartOptions[key] !== newOptions[key]) {
           return false;
         }
       }
-      
+
       return true;
     });
   }
@@ -279,29 +282,32 @@ class CartService {
       const subtotal = this.cart.reduce((total, item) => {
         const itemPrice = item.price || 0;
         const itemQuantity = item.quantity || 0;
-        return total + (itemPrice * itemQuantity);
+        return total + itemPrice * itemQuantity;
       }, 0);
-      
+
       // Calculate tax using configured rate
       const tax = subtotal * this.config.TAX_RATE;
-      
+
       // Calculate delivery fee with free threshold
-      const deliveryFee = subtotal < this.config.FREE_DELIVERY_THRESHOLD ? this.config.DELIVERY_FEE : 0;
-      
+      const deliveryFee =
+        subtotal < this.config.FREE_DELIVERY_THRESHOLD
+          ? this.config.DELIVERY_FEE
+          : 0;
+
       // Calculate total
       const total = subtotal + tax + deliveryFee;
-      
+
       // Update totals object
       this.totals = {
         subtotal: Math.round(subtotal * 100) / 100,
         tax: Math.round(tax * 100) / 100,
         deliveryFee: Math.round(deliveryFee * 100) / 100,
-        total: Math.round(total * 100) / 100
+        total: Math.round(total * 100) / 100,
       };
-      
+
       return this.totals;
     } catch (error) {
-      console.error('Error calculating cart totals:', error);
+      console.error("Error calculating cart totals:", error);
       // Return safe default totals
       this.totals = { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
       return this.totals;
@@ -327,7 +333,7 @@ class CartService {
    * Check if cart has specific item
    */
   hasItem(itemId) {
-    return this.cart.some(item => item.id === itemId);
+    return this.cart.some((item) => item.id === itemId);
   }
 
   /**
@@ -337,15 +343,16 @@ class CartService {
     // Calculate random delivery time between 20-40 minutes
     const minTime = 20;
     const maxTime = 40;
-    const deliveryTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
-    
+    const deliveryTime =
+      Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+
     // Create delivery time date object
     const now = new Date();
     const deliveryDate = new Date(now.getTime() + deliveryTime * 60000);
-    
+
     return {
       minutes: deliveryTime,
-      estimatedTime: deliveryDate
+      estimatedTime: deliveryDate,
     };
   }
 
@@ -355,29 +362,29 @@ class CartService {
   getDeliveryOptions() {
     return [
       {
-        id: 'dine-in',
-        name: 'Dine-in',
+        id: "dine-in",
+        name: "Dine-in",
         price: 0, // Or calculate if there's a specific dine-in service charge
-        estimatedTime: 'N/A' // Or link to preparation time
+        estimatedTime: "N/A", // Or link to preparation time
       },
       {
-        id: 'pickup',
-        name: 'Pick-up',
+        id: "pickup",
+        name: "Pick-up",
         price: 0,
-        estimatedTime: '15-20 min' // Or dynamically calculate
+        estimatedTime: "15-20 min", // Or dynamically calculate
       },
       {
-        id: 'standard_delivery',
-        name: 'Standard Delivery',
+        id: "standard_delivery",
+        name: "Standard Delivery",
         price: this.totals.subtotal < 15 ? 2.99 : 0, // Example fee
-        estimatedTime: '30-45 min'
+        estimatedTime: "30-45 min",
       },
       {
-        id: 'express_delivery',
-        name: 'Express Delivery',
+        id: "express_delivery",
+        name: "Express Delivery",
         price: 4.99, // Example fee
-        estimatedTime: '15-25 min'
-      }
+        estimatedTime: "15-25 min",
+      },
     ];
   }
 
@@ -391,46 +398,48 @@ class CartService {
       orderDetails.totals = this.totals;
       orderDetails.orderDate = new Date().toISOString();
       orderDetails.orderNumber = this.generateOrderNumber();
-      
+
       // Generate estimated delivery/pickup time
       const deliveryInfo = this.getEstimatedDeliveryTime();
       orderDetails.estimatedDelivery = deliveryInfo.estimatedTime;
       orderDetails.estimatedMinutes = deliveryInfo.minutes;
-      
+
       // Submit order to database service - using correct method name addOrder
       const orderId = await DatabaseService.addOrder(orderDetails);
       orderDetails.id = orderId; // Add the ID to the order details
-      
+
       // Clear cart after successful order
       this.clearCart();
-      
+
       // Notify listeners about successful order
-      this.notifyListeners('orderPlaced', orderDetails);
-      
+      this.notifyListeners("orderPlaced", orderDetails);
+
       return { success: true, order: orderDetails };
     } catch (error) {
-      console.error('Error submitting order:', error);
+      console.error("Error submitting order:", error);
       // Save order to local storage as fallback
-      const savedOrders = JSON.parse(localStorage.getItem('foodOrders') || '[]');
-      
+      const savedOrders = JSON.parse(
+        localStorage.getItem("foodOrders") || "[]"
+      );
+
       const localOrder = {
         ...orderDetails,
         items: this.cart,
         totals: this.totals,
         orderDate: new Date().toISOString(),
         orderNumber: this.generateOrderNumber(),
-        id: Date.now().toString()
+        id: Date.now().toString(),
       };
-      
+
       savedOrders.push(localOrder);
-      localStorage.setItem('foodOrders', JSON.stringify(savedOrders));
-      
+      localStorage.setItem("foodOrders", JSON.stringify(savedOrders));
+
       // Clear cart after successful local order
       this.clearCart();
-      
+
       // Notify listeners
-      this.notifyListeners('orderPlaced', localOrder);
-      
+      this.notifyListeners("orderPlaced", localOrder);
+
       return { success: true, order: localOrder };
     }
   }
@@ -440,7 +449,9 @@ class CartService {
    */
   generateOrderNumber() {
     const timestamp = new Date().getTime().toString().slice(-6);
-    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const random = Math.floor(Math.random() * 10000)
+      .toString()
+      .padStart(4, "0");
     return `FO-${timestamp}-${random}`;
   }
 
@@ -452,12 +463,14 @@ class CartService {
   getUserOrders(userId) {
     try {
       // Try to load orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem('foodOrders') || '[]');
-      
+      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+
       // Filter orders by userId
-      return allOrders.filter(order => order.userId === userId || order.user?.id === userId);
+      return allOrders.filter(
+        (order) => order.userId === userId || order.user?.id === userId
+      );
     } catch (error) {
-      console.error('Error getting user orders:', error);
+      console.error("Error getting user orders:", error);
       return [];
     }
   }
@@ -470,13 +483,16 @@ class CartService {
   getOrder(orderId) {
     try {
       // Try to load orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem('foodOrders') || '[]');
-      
+      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+
       // Find the specific order
-      return allOrders.find(order => order.id.toString() === orderId.toString() || 
-                                     order.orderNumber === orderId.toString());
+      return allOrders.find(
+        (order) =>
+          order.id.toString() === orderId.toString() ||
+          order.orderNumber === orderId.toString()
+      );
     } catch (error) {
-      console.error('Error getting order:', error);
+      console.error("Error getting order:", error);
       return null;
     }
   }
@@ -489,43 +505,47 @@ class CartService {
   cancelOrder(orderId) {
     try {
       // Load all orders
-      const allOrders = JSON.parse(localStorage.getItem('foodOrders') || '[]');
-      
+      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+
       // Find the order
-      const orderIndex = allOrders.findIndex(order => 
-        order.id.toString() === orderId.toString() || 
-        order.orderNumber === orderId.toString()
+      const orderIndex = allOrders.findIndex(
+        (order) =>
+          order.id.toString() === orderId.toString() ||
+          order.orderNumber === orderId.toString()
       );
-      
+
       if (orderIndex === -1) {
-        return { success: false, message: 'Order not found' };
+        return { success: false, message: "Order not found" };
       }
-      
+
       // Check if order is in a state that can be cancelled
       const order = allOrders[orderIndex];
-      if (!['pending', 'confirmed'].includes(order.status)) {
-        return { 
-          success: false, 
-          message: 'Cannot cancel order in current status: ' + order.status 
+      if (!["pending", "confirmed"].includes(order.status)) {
+        return {
+          success: false,
+          message: "Cannot cancel order in current status: " + order.status,
         };
       }
-      
+
       // Update order status to cancelled
-      order.status = 'cancelled';
+      order.status = "cancelled";
       order.statusUpdates = order.statusUpdates || {};
       order.statusUpdates.cancelled = new Date().toISOString();
-      order.cancellationReason = 'Cancelled by customer';
-      
+      order.cancellationReason = "Cancelled by customer";
+
       // Save updated orders list
-      localStorage.setItem('foodOrders', JSON.stringify(allOrders));
-      
+      localStorage.setItem("foodOrders", JSON.stringify(allOrders));
+
       // Notify listeners
-      this.notifyListeners('orderCancelled', order);
-      
+      this.notifyListeners("orderCancelled", order);
+
       return { success: true, order };
     } catch (error) {
-      console.error('Error cancelling order:', error);
-      return { success: false, message: 'An error occurred while cancelling the order' };
+      console.error("Error cancelling order:", error);
+      return {
+        success: false,
+        message: "An error occurred while cancelling the order",
+      };
     }
   }
 
@@ -537,31 +557,32 @@ class CartService {
   updateUserOrder(updatedOrder) {
     try {
       // Load all orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem('foodOrders') || '[]');
-      
+      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+
       // Find the order index
-      const orderIndex = allOrders.findIndex(order => 
-        order.id.toString() === updatedOrder.id.toString() || 
-        order.orderNumber === updatedOrder.orderNumber
+      const orderIndex = allOrders.findIndex(
+        (order) =>
+          order.id.toString() === updatedOrder.id.toString() ||
+          order.orderNumber === updatedOrder.orderNumber
       );
-      
+
       if (orderIndex === -1) {
-        console.error('Order not found for update:', updatedOrder.id);
+        console.error("Order not found for update:", updatedOrder.id);
         return false;
       }
-      
+
       // Update the order
       allOrders[orderIndex] = updatedOrder;
-      
+
       // Save back to localStorage
-      localStorage.setItem('foodOrders', JSON.stringify(allOrders));
-      
+      localStorage.setItem("foodOrders", JSON.stringify(allOrders));
+
       // Notify listeners about the updated order
-      this.notifyListeners('orderUpdated', updatedOrder);
-      
+      this.notifyListeners("orderUpdated", updatedOrder);
+
       return true;
     } catch (error) {
-      console.error('Error updating user order:', error);
+      console.error("Error updating user order:", error);
       return false;
     }
   }
@@ -581,7 +602,9 @@ class CartService {
    */
   removeEventListener(event, callback) {
     if (this.eventListeners[event]) {
-      this.eventListeners[event] = this.eventListeners[event].filter(cb => cb !== callback);
+      this.eventListeners[event] = this.eventListeners[event].filter(
+        (cb) => cb !== callback
+      );
     }
   }
 
@@ -590,7 +613,7 @@ class CartService {
    */
   notifyListeners(event, data) {
     if (this.eventListeners[event]) {
-      this.eventListeners[event].forEach(callback => {
+      this.eventListeners[event].forEach((callback) => {
         try {
           callback(data);
         } catch (error) {
@@ -607,33 +630,36 @@ class CartService {
   getCartWithDetails() {
     // First get the current cart
     const cartItems = this.getCart();
-    
+
     // If cart is empty, return empty array
     if (!cartItems.length) return [];
-    
+
     // For each cart item, fetch full product details from ProductService
-    return cartItems.map(item => {
+    return cartItems.map((item) => {
       try {
         // Get full product details from ProductService using the correct method name
         const productDetails = window.ProductService.getProductById(item.id);
-        
+
         // Return a promise since getProductById is async
         return Promise.resolve(productDetails)
-          .then(details => {
+          .then((details) => {
             // If product details found, merge with cart item
             if (details) {
               return {
                 ...details,
                 quantity: item.quantity,
-                specialInstructions: item.specialInstructions || '',
-                subTotal: item.price * item.quantity
+                specialInstructions: item.specialInstructions || "",
+                subTotal: item.price * item.quantity,
               };
             }
             // If product not found, return original cart item
             return item;
           })
-          .catch(error => {
-            console.error(`Error resolving product details for ${item.id}:`, error);
+          .catch((error) => {
+            console.error(
+              `Error resolving product details for ${item.id}:`,
+              error
+            );
             return item;
           });
       } catch (error) {
@@ -648,8 +674,10 @@ class CartService {
 window.CartService = new CartService();
 
 // Debug logging
-console.log('CartService initialized:', {
-  hasAddItem: typeof window.CartService.addItem === 'function',
-  hasAddToCart: typeof window.CartService.addToCart === 'function',
-  methods: Object.getOwnPropertyNames(CartService.prototype).filter(name => name !== 'constructor')
+console.log("CartService initialized:", {
+  hasAddItem: typeof window.CartService.addItem === "function",
+  hasAddToCart: typeof window.CartService.addToCart === "function",
+  methods: Object.getOwnPropertyNames(CartService.prototype).filter(
+    (name) => name !== "constructor"
+  ),
 });

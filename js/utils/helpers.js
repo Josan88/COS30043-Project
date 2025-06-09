@@ -1,7 +1,7 @@
 /**
  * Utility Functions v2.0.0 - Enhanced Edition
  * Common helper functions for improved code reusability and maintainability
- * 
+ *
  * FEATURES:
  * - ✅ Performance Optimized: Debounce and throttle functions for optimal performance
  * - ✅ Data Validation: Comprehensive validation utilities for forms and inputs
@@ -21,7 +21,8 @@ window.Helpers = window.Helpers || {};
  * @param {boolean} immediate - Execute on leading edge
  * @returns {Function} Debounced function
  */
-window.Helpers.debounce = function(func, wait, immediate = false) {  let timeout;
+window.Helpers.debounce = function (func, wait, immediate = false) {
+  let timeout;
   return function executedFunction(...args) {
     const later = () => {
       timeout = null;
@@ -40,12 +41,13 @@ window.Helpers.debounce = function(func, wait, immediate = false) {  let timeout
  * @param {number} limit - Time limit in milliseconds
  * @returns {Function} Throttled function
  */
-window.Helpers.throttle = function(func, limit) {  let inThrottle;
-  return function(...args) {
+window.Helpers.throttle = function (func, limit) {
+  let inThrottle;
+  return function (...args) {
     if (!inThrottle) {
       func.apply(this, args);
       inThrottle = true;
-      setTimeout(() => inThrottle = false, limit);
+      setTimeout(() => (inThrottle = false), limit);
     }
   };
 };
@@ -55,12 +57,14 @@ window.Helpers.throttle = function(func, limit) {  let inThrottle;
  * @param {any} obj - Object to clone
  * @returns {any} Cloned object
  */
-window.Helpers.deepClone = function(obj) {  if (obj === null || typeof obj !== 'object') return obj;
+window.Helpers.deepClone = function (obj) {
+  if (obj === null || typeof obj !== "object") return obj;
   if (obj instanceof Date) return new Date(obj.getTime());
-  if (obj instanceof Array) return obj.map(item => window.Helpers.deepClone(item));
-  if (typeof obj === 'object') {
+  if (obj instanceof Array)
+    return obj.map((item) => window.Helpers.deepClone(item));
+  if (typeof obj === "object") {
     const cloned = {};
-    Object.keys(obj).forEach(key => {
+    Object.keys(obj).forEach((key) => {
       cloned[key] = window.Helpers.deepClone(obj[key]);
     });
     return cloned;
@@ -72,44 +76,44 @@ window.Helpers.deepClone = function(obj) {  if (obj === null || typeof obj !== '
  * @param {any} value - Value to check
  * @returns {boolean} True if empty
  */
-window.Helpers.isEmpty = function(value) {
+window.Helpers.isEmpty = function (value) {
   if (value == null) return true;
-  if (typeof value === 'string') return value.trim().length === 0;
+  if (typeof value === "string") return value.trim().length === 0;
   if (Array.isArray(value)) return value.length === 0;
-  if (typeof value === 'object') return Object.keys(value).length === 0;
+  if (typeof value === "object") return Object.keys(value).length === 0;
   return false;
-}
+};
 
 /**
  * Generate a unique ID
  * @param {string} prefix - Optional prefix
  * @returns {string} Unique ID
  */
-window.Helpers.generateId = function(prefix = 'id') {
+window.Helpers.generateId = function (prefix = "id") {
   const timestamp = Date.now().toString(36);
   const randomStr = Math.random().toString(36).substr(2, 5);
   return `${prefix}-${timestamp}-${randomStr}`;
-}
+};
 
 /**
  * Validate email format
  * @param {string} email - Email to validate
  * @returns {boolean} True if valid email
  */
-window.Helpers.isValidEmail = function(email) {
+window.Helpers.isValidEmail = function (email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
-}
+};
 
 /**
  * Validate phone number format
  * @param {string} phone - Phone number to validate
  * @returns {boolean} True if valid phone
  */
-window.Helpers.isValidPhone = function(phone) {
+window.Helpers.isValidPhone = function (phone) {
   const phoneRegex = /^\+?[\d\s\-\(\)]+$/;
-  return phoneRegex.test(phone) && phone.replace(/\D/g, '').length >= 10;
-}
+  return phoneRegex.test(phone) && phone.replace(/\D/g, "").length >= 10;
+};
 
 /**
  * Format price with currency
@@ -118,16 +122,20 @@ window.Helpers.isValidPhone = function(phone) {
  * @param {string} locale - Locale for formatting
  * @returns {string} Formatted price
  */
-window.Helpers.formatPrice = function(price, currency = 'MYR', locale = 'en-MY') {
-  if (typeof price !== 'number' || isNaN(price)) return '0.00';
-  
+window.Helpers.formatPrice = function (
+  price,
+  currency = "MYR",
+  locale = "en-MY"
+) {
+  if (typeof price !== "number" || isNaN(price)) return "0.00";
+
   return new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency: currency,
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(price);
-}
+};
 
 /**
  * Format date for display
@@ -135,21 +143,21 @@ window.Helpers.formatPrice = function(price, currency = 'MYR', locale = 'en-MY')
  * @param {Object} options - Formatting options
  * @returns {string} Formatted date
  */
-window.Helpers.formatDate = function(date, options = {}) {
-  if (!date) return '';
-  
+window.Helpers.formatDate = function (date, options = {}) {
+  if (!date) return "";
+
   const dateObj = date instanceof Date ? date : new Date(date);
-  if (isNaN(dateObj.getTime())) return '';
-  
+  if (isNaN(dateObj.getTime())) return "";
+
   const defaultOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    ...options
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    ...options,
   };
-  
-  return new Intl.DateTimeFormat('en-US', defaultOptions).format(dateObj);
-}
+
+  return new Intl.DateTimeFormat("en-US", defaultOptions).format(dateObj);
+};
 
 /**
  * Calculate estimated delivery time
@@ -157,16 +165,20 @@ window.Helpers.formatDate = function(date, options = {}) {
  * @param {number} maxTime - Maximum delivery time in minutes
  * @returns {Object} Delivery time information
  */
-window.Helpers.calculateDeliveryTime = function(minTime = 20, maxTime = 40) {
-  const deliveryTime = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+window.Helpers.calculateDeliveryTime = function (minTime = 20, maxTime = 40) {
+  const deliveryTime =
+    Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
   const deliveryDate = new Date(Date.now() + deliveryTime * 60000);
-  
+
   return {
     minutes: deliveryTime,
     estimatedTime: deliveryDate,
-    displayTime: formatDate(deliveryDate, { hour: '2-digit', minute: '2-digit' })
+    displayTime: formatDate(deliveryDate, {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
   };
-}
+};
 
 /**
  * Truncate text to specified length
@@ -175,21 +187,21 @@ window.Helpers.calculateDeliveryTime = function(minTime = 20, maxTime = 40) {
  * @param {string} suffix - Suffix to add
  * @returns {string} Truncated text
  */
-window.Helpers.truncateText = function(text, maxLength = 100, suffix = '...') {
-  if (!text || typeof text !== 'string') return '';
+window.Helpers.truncateText = function (text, maxLength = 100, suffix = "...") {
+  if (!text || typeof text !== "string") return "";
   if (text.length <= maxLength) return text;
   return text.substring(0, maxLength).trim() + suffix;
-}
+};
 
 /**
  * Capitalize first letter of each word
  * @param {string} str - String to capitalize
  * @returns {string} Capitalized string
  */
-window.Helpers.capitalizeWords = function(str) {
-  if (!str || typeof str !== 'string') return '';
-  return str.replace(/\b\w/g, letter => letter.toUpperCase());
-}
+window.Helpers.capitalizeWords = function (str) {
+  if (!str || typeof str !== "string") return "";
+  return str.replace(/\b\w/g, (letter) => letter.toUpperCase());
+};
 
 /**
  * Calculate discount price
@@ -197,14 +209,20 @@ window.Helpers.capitalizeWords = function(str) {
  * @param {number} discountPercent - Discount percentage
  * @returns {number} Discounted price
  */
-window.Helpers.calculateDiscountPrice = function(originalPrice, discountPercent) {
-  if (typeof originalPrice !== 'number' || typeof discountPercent !== 'number') {
+window.Helpers.calculateDiscountPrice = function (
+  originalPrice,
+  discountPercent
+) {
+  if (
+    typeof originalPrice !== "number" ||
+    typeof discountPercent !== "number"
+  ) {
     return originalPrice;
   }
-  
+
   const discountAmount = originalPrice * (discountPercent / 100);
   return Math.max(0, originalPrice - discountAmount);
-}
+};
 
 /**
  * Get responsive image URL based on screen size
@@ -212,16 +230,16 @@ window.Helpers.calculateDiscountPrice = function(originalPrice, discountPercent)
  * @param {number} screenWidth - Screen width
  * @returns {string} Responsive image URL
  */
-window.Helpers.getResponsiveImageUrl = function(baseUrl, screenWidth) {
-  if (!baseUrl) return '';
-  
-  let size = 'sm';
-  if (screenWidth >= 1200) size = 'xl';
-  else if (screenWidth >= 992) size = 'lg';
-  else if (screenWidth >= 768) size = 'md';
-  
+window.Helpers.getResponsiveImageUrl = function (baseUrl, screenWidth) {
+  if (!baseUrl) return "";
+
+  let size = "sm";
+  if (screenWidth >= 1200) size = "xl";
+  else if (screenWidth >= 992) size = "lg";
+  else if (screenWidth >= 768) size = "md";
+
   return baseUrl.replace(/\.(jpg|jpeg|png|webp)$/i, `_${size}.$1`);
-}
+};
 
 /**
  * Safe JSON parse with fallback
@@ -229,23 +247,23 @@ window.Helpers.getResponsiveImageUrl = function(baseUrl, screenWidth) {
  * @param {any} fallback - Fallback value
  * @returns {any} Parsed object or fallback
  */
-window.Helpers.safeJsonParse = function(jsonString, fallback = null) {
+window.Helpers.safeJsonParse = function (jsonString, fallback = null) {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
-    console.warn('JSON parse error:', error);
+    console.warn("JSON parse error:", error);
     return fallback;
   }
-}
+};
 
 /**
  * Create a promise that resolves after specified delay
  * @param {number} ms - Delay in milliseconds
  * @returns {Promise} Promise that resolves after delay
  */
-window.Helpers.delay = function(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+window.Helpers.delay = function (ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 /**
  * Get nested object property safely
@@ -254,21 +272,25 @@ window.Helpers.delay = function(ms) {
  * @param {any} defaultValue - Default value if path not found
  * @returns {any} Property value or default
  */
-window.Helpers.getNestedProperty = function(obj, path, defaultValue = undefined) {
+window.Helpers.getNestedProperty = function (
+  obj,
+  path,
+  defaultValue = undefined
+) {
   if (!obj || !path) return defaultValue;
-  
-  const keys = path.split('.');
+
+  const keys = path.split(".");
   let result = obj;
-  
+
   for (const key of keys) {
-    if (result == null || typeof result !== 'object') {
+    if (result == null || typeof result !== "object") {
       return defaultValue;
     }
     result = result[key];
   }
-  
+
   return result !== undefined ? result : defaultValue;
-}
+};
 
 /**
  * Set nested object property safely
@@ -277,29 +299,29 @@ window.Helpers.getNestedProperty = function(obj, path, defaultValue = undefined)
  * @param {any} value - Value to set
  * @returns {Object} Modified object
  */
-window.Helpers.setNestedProperty = function(obj, path, value) {
+window.Helpers.setNestedProperty = function (obj, path, value) {
   if (!obj || !path) return obj;
-  
-  const keys = path.split('.');
+
+  const keys = path.split(".");
   let current = obj;
-  
+
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
-    if (!(key in current) || typeof current[key] !== 'object') {
+    if (!(key in current) || typeof current[key] !== "object") {
       current[key] = {};
     }
     current = current[key];
   }
-  
+
   current[keys[keys.length - 1]] = value;
   return obj;
 };
 
 // Log successful initialization
-console.log('✅ Helpers v2.0.0 - Enhanced Edition loaded successfully');
+console.log("✅ Helpers v2.0.0 - Enhanced Edition loaded successfully");
 
 // Also provide backward compatibility for existing code that might expect individual functions
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   // Export individual functions to global scope for backward compatibility
   window.debounce = window.Helpers.debounce;
   window.throttle = window.Helpers.throttle;

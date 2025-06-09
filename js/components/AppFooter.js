@@ -2,7 +2,7 @@
  * AppFooter Component
  * Footer component for the food ordering application
  */
-window.app.component('app-footer', {
+window.app.component("app-footer", {
   template: `
     <footer class="footer mt-auto">
       <div class="container">
@@ -74,15 +74,17 @@ window.app.component('app-footer', {
   `,
   data() {
     return {
-      email: '',
-      currentYear: new Date().getFullYear()
+      email: "",
+      currentYear: new Date().getFullYear(),
     };
   },
   methods: {
     subscribeNewsletter() {
       // In a real app, would send this to an API
-      alert(`Thank you for subscribing with ${this.email}! You'll receive our special food offers.`);
-      this.email = '';
-    }
-  }
+      alert(
+        `Thank you for subscribing with ${this.email}! You'll receive our special food offers.`
+      );
+      this.email = "";
+    },
+  },
 });

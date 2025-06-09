@@ -1,11 +1,13 @@
 # FoodNow - COS30043 Project Documentation
 
 ## Project Overview
+
 FoodNow is a comprehensive Vue.js food ordering web application that demonstrates all required COS30043 project requirements. This application showcases modern web development practices with full accessibility support, responsive design, and advanced Vue.js features.
 
 ## 🎯 COS30043 Requirements Implementation
 
 ### ✅ 1. Seven Required Pages
+
 The application implements exactly 7 pages as required:
 
 1. **Main Page (HomePage.js)** - Landing page with hero section, featured items, and call-to-action
@@ -19,11 +21,13 @@ The application implements exactly 7 pages as required:
 ### ✅ 2. Context View Grouping with Row-Column Grid System
 
 #### Grid System Implementation
+
 - **Mobile-First Responsive Design**: Starting from 320px width
 - **Custom Grid Classes**: `.context-group`, `.context-cards`, `.row-custom`, `.col-custom`
 - **Context Grouping**: Products grouped by categories, orders by status, user data by sections
 
 #### Responsive Breakpoints
+
 - **Mobile Portrait**: 320px - 575px (1-column grid)
 - **Mobile Landscape**: 576px - 767px (2-column grid)
 - **Tablet**: 768px - 991px (3-column grid)
@@ -45,23 +49,29 @@ The application implements exactly 7 pages as required:
 }
 
 @media (min-width: 576px) {
-  .context-cards { grid-template-columns: repeat(2, 1fr); }
+  .context-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 992px) {
-  .context-cards { grid-template-columns: repeat(4, 1fr); }
+  .context-cards {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 ```
 
 ### ✅ 3. Modules with Controllers and Configuration
 
 #### Service Layer Architecture
+
 - **ProductService.js**: Menu data management and filtering
 - **AuthService.js**: User authentication and session management
 - **CartService.js**: Shopping cart operations and persistence
 - **DatabaseService.js**: Data persistence and API simulation
 
 #### Configuration Modules
+
 - **router.js**: Vue Router configuration with navigation guards
 - **app.js**: Main application initialization and global settings
 - **directives/index.js**: Custom directive library
@@ -70,6 +80,7 @@ The application implements exactly 7 pages as required:
 ### ✅ 4. Custom Directives and Filters
 
 #### Advanced Custom Directives
+
 1. **v-focus-trap**: Accessibility focus management for modals
 2. **v-validate**: Enhanced form validation with ARIA support
 3. **v-accessible-table**: Table accessibility enhancements
@@ -81,6 +92,7 @@ The application implements exactly 7 pages as required:
 9. **v-responsive**: Responsive class switching
 
 #### Comprehensive Filter Library
+
 1. **formatCurrency**: Malaysian Ringgit formatting
 2. **formatDate**: Internationalized date formatting
 3. **truncate**: Text truncation with ellipsis
@@ -95,6 +107,7 @@ The application implements exactly 7 pages as required:
 ### ✅ 5. Arrays Usage and Data Manipulation
 
 #### Complex Array Operations
+
 ```javascript
 // Example: Advanced filtering in ProductService
 filterProducts(criteria) {
@@ -121,12 +134,14 @@ getMenuStatistics() {
 ### ✅ 6. Selection and Repetition Directives
 
 #### Vue Directive Usage
+
 - **v-for**: Product listings, category iterations, pagination
 - **v-if/v-else**: Conditional rendering for loading states, user authentication
 - **v-show**: Toggle advanced filters, dropdown menus
 - **v-model**: Two-way data binding for forms and filters
 
 #### Complex Selection Examples
+
 ```vue
 <!-- Category-based product grouping -->
 <div v-for="(products, category) in groupedProducts" :key="category">
@@ -148,13 +163,16 @@ getMenuStatistics() {
 ### ✅ 7. Mobile-First Responsive Design
 
 #### Three Required Breakpoints
+
 1. **Mobile Portrait** (320px - 575px)
+
    - Single column layout
    - Touch-optimized buttons (min 44px)
    - Collapsed navigation
    - Stacked form elements
 
 2. **Mobile Landscape** (576px - 767px)
+
    - Two-column product grid
    - Side-by-side form fields
    - Expanded search interface
@@ -166,6 +184,7 @@ getMenuStatistics() {
    - Advanced filtering panels
 
 #### CSS Grid and Flexbox Implementation
+
 ```css
 /* Mobile-first approach */
 .product-grid {
@@ -175,46 +194,55 @@ getMenuStatistics() {
 }
 
 @media (min-width: 576px) {
-  .product-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (min-width: 992px) {
-  .product-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
 }
 ```
 
 ### ✅ 8. Accessibility Support
 
 #### Form Accessibility
+
 - **ARIA Labels**: All form elements have proper labels
 - **Error Handling**: Live regions for validation feedback
 - **Keyboard Navigation**: Full keyboard accessibility
 - **Screen Reader Support**: Semantic HTML and ARIA attributes
 
 #### Table Accessibility
+
 - **Header Associations**: Column headers linked to data cells
 - **Sortable Tables**: Keyboard navigation and ARIA sort states
 - **Caption Support**: Table summaries for screen readers
 
 #### Implementation Examples
+
 ```html
 <!-- Accessible form field -->
 <label for="email" class="form-label">
   Email Address <span class="required">*</span>
 </label>
-<input 
-  type="email" 
+<input
+  type="email"
   id="email"
   v-model="email"
   aria-describedby="email-help email-error"
   aria-invalid="false"
   required
->
+/>
 <div id="email-help" class="form-text">We'll never share your email</div>
 <div id="email-error" class="invalid-feedback" aria-live="polite"></div>
 
 <!-- Accessible table -->
-<table v-accessible-table="{ caption: 'Menu items with pricing', sortable: true }">
+<table
+  v-accessible-table="{ caption: 'Menu items with pricing', sortable: true }"
+>
   <thead>
     <tr>
       <th scope="col" id="name-header">Name</th>
@@ -233,6 +261,7 @@ getMenuStatistics() {
 ### ✅ 9. HTML5 Coding Conventions
 
 #### Semantic HTML5 Elements
+
 - `<main>`: Primary content area
 - `<nav>`: Navigation components
 - `<section>`: Content sections
@@ -242,6 +271,7 @@ getMenuStatistics() {
 - `<figure>` and `<figcaption>`: Image content
 
 #### HTML5 Input Types
+
 - `type="email"`: Email validation
 - `type="tel"`: Phone number inputs
 - `type="number"`: Numeric inputs
@@ -251,6 +281,7 @@ getMenuStatistics() {
 ### ✅ 10. Pagination Implementation
 
 #### Advanced Pagination Features
+
 - **Configurable Page Sizes**: 9, 12, 18, 24 items per page
 - **Navigation Controls**: First, Previous, Next, Last buttons
 - **Page Number Display**: Smart page number calculation
@@ -279,6 +310,7 @@ computed: {
 ### ✅ 11. JSON Data Usage
 
 #### Products Data Structure
+
 ```json
 {
   "products": [
@@ -293,12 +325,10 @@ computed: {
       "rating": 4.8,
       "reviewCount": 128,
       "ingredients": [
-        {"name": "Beef patty", "required": true},
-        {"name": "Cheddar cheese", "required": false}
+        { "name": "Beef patty", "required": true },
+        { "name": "Cheddar cheese", "required": false }
       ],
-      "availableExtras": [
-        {"name": "Extra beef patty", "price": 4.50}
-      ],
+      "availableExtras": [{ "name": "Extra beef patty", "price": 4.5 }],
       "dietaryOptions": ["halal", "dairy"],
       "stock": 50,
       "preparationTime": 15,
@@ -311,18 +341,23 @@ computed: {
 ### ✅ 12. Database Integration
 
 #### LocalStorage Database Service
+
 ```javascript
 class DatabaseService {
   async save(collection, data) {
     const existing = this.getCollection(collection);
-    existing.push({ ...data, id: Date.now(), createdAt: new Date().toISOString() });
+    existing.push({
+      ...data,
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+    });
     localStorage.setItem(collection, JSON.stringify(existing));
     return data;
   }
-  
+
   async findByQuery(collection, query) {
     const items = this.getCollection(collection);
-    return items.filter(item => this.matchesQuery(item, query));
+    return items.filter((item) => this.matchesQuery(item, query));
   }
 }
 ```
@@ -330,6 +365,7 @@ class DatabaseService {
 ### ✅ 13. Form Validation
 
 #### Comprehensive Validation System
+
 - **Real-time Validation**: Input event listeners
 - **Custom Validators**: Email, phone, password strength
 - **Visual Feedback**: Success/error states with colors
@@ -337,18 +373,19 @@ class DatabaseService {
 
 ```javascript
 // Custom validation directive
-Vue.directive('validate', {
+Vue.directive("validate", {
   mounted(el, binding) {
     const validator = new FieldValidator(binding.value);
-    el.addEventListener('input', () => validator.validate(el.value));
-    el.addEventListener('blur', () => validator.validateOnBlur(el.value));
-  }
+    el.addEventListener("input", () => validator.validate(el.value));
+    el.addEventListener("blur", () => validator.validateOnBlur(el.value));
+  },
 });
 ```
 
 ### ✅ 14. Bootstrap Integration
 
 #### Bootstrap 5.3.3 Features Used
+
 - **Grid System**: Responsive columns and containers
 - **Components**: Cards, modals, dropdowns, pagination
 - **Utilities**: Spacing, colors, typography
@@ -358,26 +395,52 @@ Vue.directive('validate', {
 ### ✅ 15. Router Implementation
 
 #### Vue Router 4 Configuration
+
 ```javascript
 const routes = [
-  { path: '/', name: 'Home', component: HomePage },
-  { path: '/product', name: 'Menu', component: ProductPage },
-  { path: '/product/:id', name: 'ProductDetails', component: ProductPage, props: true },
-  { path: '/cart', name: 'ShoppingCart', component: ShoppingCart },
-  { path: '/register', name: 'Register', component: RegisterPage, meta: { guest: true } },
-  { path: '/login', name: 'Login', component: LoginPage, meta: { guest: true } },
-  { path: '/account', name: 'Account', component: AccountPage, meta: { requiresAuth: true } },
-  { path: '/purchases', name: 'Purchases', component: PurchasesPage, meta: { requiresAuth: true } }
+  { path: "/", name: "Home", component: HomePage },
+  { path: "/product", name: "Menu", component: ProductPage },
+  {
+    path: "/product/:id",
+    name: "ProductDetails",
+    component: ProductPage,
+    props: true,
+  },
+  { path: "/cart", name: "ShoppingCart", component: ShoppingCart },
+  {
+    path: "/register",
+    name: "Register",
+    component: RegisterPage,
+    meta: { guest: true },
+  },
+  {
+    path: "/login",
+    name: "Login",
+    component: LoginPage,
+    meta: { guest: true },
+  },
+  {
+    path: "/account",
+    name: "Account",
+    component: AccountPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/purchases",
+    name: "Purchases",
+    component: PurchasesPage,
+    meta: { requiresAuth: true },
+  },
 ];
 
 // Navigation guards
 router.beforeEach((to, from, next) => {
   const isAuthenticated = AuthService.isLoggedIn();
-  
+
   if (to.meta.requiresAuth && !isAuthenticated) {
-    next('/login');
+    next("/login");
   } else if (to.meta.guest && isAuthenticated) {
-    next('/account');
+    next("/account");
   } else {
     next();
   }
@@ -387,6 +450,7 @@ router.beforeEach((to, from, next) => {
 ## 🛠️ Technical Implementation
 
 ### Vue.js 3 Features Used
+
 - **Composition API**: Modern reactive programming
 - **Single File Components**: Modular component architecture
 - **Reactive Data**: Vue's reactivity system
@@ -395,12 +459,14 @@ router.beforeEach((to, from, next) => {
 - **Lifecycle Hooks**: Component lifecycle management
 
 ### Performance Optimizations
+
 - **Lazy Loading**: Images and components
 - **Virtual Scrolling**: Large data sets
 - **Debounced Search**: API call optimization
 - **Memoized Computations**: Expensive calculations cached
 
 ### Security Features
+
 - **Input Sanitization**: XSS prevention
 - **Authentication Guards**: Route protection
 - **Data Validation**: Client and server-side validation
@@ -409,12 +475,14 @@ router.beforeEach((to, from, next) => {
 ## 📱 User Experience Features
 
 ### Progressive Web App Capabilities
+
 - **Responsive Design**: Works on all devices
 - **Offline Support**: Cached data availability
 - **Touch Interactions**: Mobile-optimized gestures
 - **Loading States**: User feedback during operations
 
 ### Accessibility Features
+
 - **WCAG 2.1 AA Compliance**: Web accessibility standards
 - **Keyboard Navigation**: Full keyboard accessibility
 - **Screen Reader Support**: ARIA labels and semantics
@@ -424,18 +492,21 @@ router.beforeEach((to, from, next) => {
 ## 🧪 Testing and Quality Assurance
 
 ### Browser Testing
+
 - ✅ Chrome 119+
 - ✅ Firefox 115+
 - ✅ Safari 16+
 - ✅ Edge 119+
 
 ### Device Testing
+
 - ✅ iPhone (Portrait/Landscape)
 - ✅ Android Phones (Portrait/Landscape)
 - ✅ Tablets (iPad, Android)
 - ✅ Desktop (Various resolutions)
 
 ### Performance Metrics
+
 - **First Contentful Paint**: < 1.5s
 - **Largest Contentful Paint**: < 2.5s
 - **Cumulative Layout Shift**: < 0.1
@@ -444,12 +515,14 @@ router.beforeEach((to, from, next) => {
 ## 📊 Code Quality Metrics
 
 ### Code Organization
+
 - **Modular Architecture**: Separated concerns
 - **Component Reusability**: DRY principles followed
 - **Service Layer**: Business logic separation
 - **Configuration Management**: Environment-based configs
 
 ### Documentation Coverage
+
 - **Component Documentation**: All components documented
 - **API Documentation**: Service methods documented
 - **Setup Instructions**: Complete installation guide
@@ -458,12 +531,14 @@ router.beforeEach((to, from, next) => {
 ## 🚀 Deployment and Production
 
 ### Build Process
+
 1. **Development**: Live development server
 2. **Testing**: Automated testing suite
 3. **Building**: Production build optimization
 4. **Deployment**: Static file hosting ready
 
 ### Production Optimizations
+
 - **Code Minification**: Reduced file sizes
 - **Asset Optimization**: Compressed images
 - **CDN Integration**: Fast content delivery
@@ -474,6 +549,7 @@ router.beforeEach((to, from, next) => {
 ## 📋 Project Checklist
 
 ### ✅ Required Features Implemented
+
 - [x] 7 Pages with proper navigation
 - [x] Context view grouping with grid system
 - [x] Modules with controllers and config
@@ -492,6 +568,7 @@ router.beforeEach((to, from, next) => {
 - [x] Router implementation with guards
 
 ### ✅ Additional Features Added
+
 - [x] Advanced filtering and sorting
 - [x] Shopping cart with persistence
 - [x] User authentication system

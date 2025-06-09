@@ -1,4 +1,5 @@
-const HomePage = {  template: `
+const HomePage = {
+  template: `
     <div class="home-page">
       <!-- Main Content Container -->
       <div class="container-fluid px-0">
@@ -302,33 +303,34 @@ const HomePage = {  template: `
           debounceDelay: 300,
           animationDelay: 150,
           toastDuration: 3000,
-          loadingTimeout: 10000
+          loadingTimeout: 10000,
         },
         search: window.APP_CONSTANTS?.SEARCH || {
           minQueryLength: 2,
           maxSuggestions: 10,
-          debounceDelay: 300
+          debounceDelay: 300,
         },
         analytics: window.APP_CONSTANTS?.ANALYTICS || {
           enabled: true,
-          sessionTimeout: 1800000 // 30 minutes
+          sessionTimeout: 1800000, // 30 minutes
         },
         content: window.APP_CONSTANTS?.CONTENT || {
           featuredProductsCount: 8,
           maxCategoriesDisplay: 12,
-          reviewsPerPage: 4
-        },        // Hero section configuration        // Search form configuration (kept for compatibility but not displayed)
-        locationPlaceholder: 'Enter your delivery address',
-        searchPlaceholder: 'Search for food or restaurants',
-        searchButtonLabel: 'Search for food',
-        searchButtonText: 'Find Food',        searchingText: 'Searching...',
+          reviewsPerPage: 4,
+        }, // Hero section configuration        // Search form configuration (kept for compatibility but not displayed)
+        locationPlaceholder: "Enter your delivery address",
+        searchPlaceholder: "Search for food or restaurants",
+        searchButtonLabel: "Search for food",
+        searchButtonText: "Find Food",
+        searchingText: "Searching...",
 
         // Featured section configuration
-        featuredSectionTitle: 'Today\'s Special',
-        featuredSectionSubtitle: 'Most Popular Dishes',
-        viewAllMenuText: 'View All Menu',
-        viewAllMenuAriaLabel: 'View complete menu with all available dishes',
-        loadingMessage: 'Loading delicious options for you...'
+        featuredSectionTitle: "Today's Special",
+        featuredSectionSubtitle: "Most Popular Dishes",
+        viewAllMenuText: "View All Menu",
+        viewAllMenuAriaLabel: "View complete menu with all available dishes",
+        loadingMessage: "Loading delicious options for you...",
       },
 
       // === COMPONENT STATE MANAGEMENT ===
@@ -337,16 +339,16 @@ const HomePage = {  template: `
         isMounted: false,
         isLoading: true,
         hasError: false,
-        errorMessage: '',
+        errorMessage: "",
         retryCount: 0,
         lastLoadTime: null,
         performanceMetrics: {
           loadStartTime: Date.now(),
           loadEndTime: null,
           renderTime: null,
-          initialDataLoadTime: null
+          initialDataLoadTime: null,
         },
-        debugMode: false
+        debugMode: false,
       },
 
       // === CONTENT STATE ===
@@ -358,36 +360,38 @@ const HomePage = {  template: `
         latestNews: [
           {
             id: 1,
-            title: 'New Chef Special - Seafood Paella',
-            date: 'May 5 2025',
-            excerpt: 'Try our new chef special with fresh seafood caught daily.',
-            category: 'special-offers',
-            priority: 'high'
+            title: "New Chef Special - Seafood Paella",
+            date: "May 5 2025",
+            excerpt:
+              "Try our new chef special with fresh seafood caught daily.",
+            category: "special-offers",
+            priority: "high",
           },
           {
             id: 2,
-            title: 'Introducing Our Plant-Based Menu',
-            date: 'May 2 2025',
-            excerpt: 'Enjoy delicious plant-based alternatives to your favorite dishes.',
-            category: 'menu-updates',
-            priority: 'medium'
+            title: "Introducing Our Plant-Based Menu",
+            date: "May 2 2025",
+            excerpt:
+              "Enjoy delicious plant-based alternatives to your favorite dishes.",
+            category: "menu-updates",
+            priority: "medium",
           },
           {
             id: 3,
-            title: 'Extended Delivery Hours on Weekends',
-            date: 'Apr 28 2025',
-            excerpt: 'We now deliver until 2 AM on Fridays and Saturdays!',
-            category: 'service-updates',
-            priority: 'high'
+            title: "Extended Delivery Hours on Weekends",
+            date: "Apr 28 2025",
+            excerpt: "We now deliver until 2 AM on Fridays and Saturdays!",
+            category: "service-updates",
+            priority: "high",
           },
           {
             id: 4,
-            title: 'Join Our Loyalty Program for Exclusive Offers',
-            date: 'Apr 25 2025',
-            excerpt: 'Earn points with every order and redeem for free food.',
-            category: 'loyalty',
-            priority: 'medium'
-          }
+            title: "Join Our Loyalty Program for Exclusive Offers",
+            date: "Apr 25 2025",
+            excerpt: "Earn points with every order and redeem for free food.",
+            category: "loyalty",
+            priority: "medium",
+          },
         ],
         reviews: [
           {
@@ -399,7 +403,7 @@ const HomePage = {  template: `
             date: "2 days ago",
             text: "Amazing food quality and fast delivery! The spicy noodles were perfect.",
             verified: true,
-            helpful: 24
+            helpful: 24,
           },
           {
             id: 2,
@@ -410,7 +414,7 @@ const HomePage = {  template: `
             date: "1 week ago",
             text: "Best food delivery service in town. Great variety and excellent customer service.",
             verified: true,
-            helpful: 18
+            helpful: 18,
           },
           {
             id: 3,
@@ -421,7 +425,7 @@ const HomePage = {  template: `
             date: "3 days ago",
             text: "Really impressed with the quality and packaging. Will definitely order again!",
             verified: true,
-            helpful: 12
+            helpful: 12,
           },
           {
             id: 4,
@@ -432,7 +436,7 @@ const HomePage = {  template: `
             date: "5 days ago",
             text: "Consistent quality and always on time. My go-to food delivery app!",
             verified: true,
-            helpful: 31
+            helpful: 31,
           },
           {
             id: 5,
@@ -441,7 +445,7 @@ const HomePage = {  template: `
             image: "https://randomuser.me/api/portraits/men/71.jpg",
             rating: 5,
             date: "1 week ago",
-            text: "Great selection of restaurants and the app is so easy to use. Customer service is also top notch when I had questions!"
+            text: "Great selection of restaurants and the app is so easy to use. Customer service is also top notch when I had questions!",
           },
           {
             id: 6,
@@ -450,60 +454,60 @@ const HomePage = {  template: `
             image: "https://randomuser.me/api/portraits/women/45.jpg",
             rating: 4.5,
             date: "3 days ago",
-            text: "I love that I can track my order in real-time. The food is always as described and delicious! Just wish there were more dessert options."
-          }
-        ]
+            text: "I love that I can track my order in real-time. The food is always as described and delicious! Just wish there were more dessert options.",
+          },
+        ],
       },
 
       // === UI STATE MANAGEMENT ===
       ui: {
         isMobile: false,
-        screenSize: 'desktop',
+        screenSize: "desktop",
         loadingStates: {
           featuredProducts: true,
           categories: true,
           testimonials: true,
-          promotionalBanners: true
+          promotionalBanners: true,
         },
         modalStates: {
           videoModal: false,
           newsletterModal: false,
-          feedbackModal: false
+          feedbackModal: false,
         },
         carouselStates: {
           currentReviewIndex: 0,
           reviewInterval: null,
           autoPlay: true,
-          reviewsPerPage: 1
+          reviewsPerPage: 1,
         },
         animationStates: {
           heroAnimated: false,
           categoriesAnimated: false,
-          featuredAnimated: false
+          featuredAnimated: false,
         },
         scrollStates: {
           lastScrollPosition: 0,
-          scrollDirection: 'down',
-          isScrollingToSection: false
-        }
+          scrollDirection: "down",
+          isScrollingToSection: false,
+        },
       },
 
       // === SEARCH STATE ===
       search: {
         form: {
-          location: '',
-          query: '',
-          category: '',
-          priceRange: 'all'
+          location: "",
+          query: "",
+          category: "",
+          priceRange: "all",
         },
         suggestions: {
           locations: [],
           queries: [],
-          restaurants: []
+          restaurants: [],
         },
         history: {
           recentSearches: [],
-          popularSearches: []
+          popularSearches: [],
         },
         isSearching: false,
         hasSearched: false,
@@ -511,55 +515,60 @@ const HomePage = {  template: `
         results: {
           restaurants: [],
           dishes: [],
-          categories: []
-        }
+          categories: [],
+        },
       },
 
       // === VALIDATION STATE ===
       validation: {
         search: {
-          location: { isValid: true, message: '' },
-          query: { isValid: true, message: '' }
+          location: { isValid: true, message: "" },
+          query: { isValid: true, message: "" },
         },
         newsletter: {
-          email: { isValid: true, message: '' }
+          email: { isValid: true, message: "" },
         },
         feedback: {
-          rating: { isValid: true, message: '' },
-          comment: { isValid: true, message: '' }
-        }
-      },      // === ANALYTICS STATE ===
+          rating: { isValid: true, message: "" },
+          comment: { isValid: true, message: "" },
+        },
+      }, // === ANALYTICS STATE ===
       analytics: {
         pageLoadTime: Date.now(),
-        sessionId: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        sessionId:
+          "session_" +
+          Date.now() +
+          "_" +
+          Math.random().toString(36).substr(2, 9),
         userInteractions: [],
         searchAnalytics: {
           queriesPerformed: 0,
           categoriesViewed: [],
           productsViewed: [],
-          conversionEvents: []
-        },        performanceMetrics: {
+          conversionEvents: [],
+        },
+        performanceMetrics: {
           timeToFirstByte: null,
           domContentLoaded: null,
           windowLoaded: null,
-          featuredProductsLoadTime: null
+          featuredProductsLoadTime: null,
         },
         userBehavior: {
           timeOnPage: 0,
           scrollDepth: 0,
           maxScrollDepth: 0,
           clickPatterns: [],
-          hoverDuration: {}
-        }
-      },      // === ERROR STATE ===
+          hoverDuration: {},
+        },
+      }, // === ERROR STATE ===
       errors: {
         featuredProducts: null,
         categories: null,
         search: null,
         general: null,
         lastErrorTime: null,
-        errorHistory: []
-      },// === FEATURE FLAGS ===
+        errorHistory: [],
+      }, // === FEATURE FLAGS ===
       features: {
         enableVideoBackground: false,
         enableAutoPlayCarousel: true,
@@ -568,7 +577,7 @@ const HomePage = {  template: `
         enablePushNotifications: false,
         enableVoiceSearch: false,
         enableGeolocation: false,
-        enableOfflineMode: false
+        enableOfflineMode: false,
       },
 
       // === PERFORMANCE STATE ===
@@ -580,13 +589,13 @@ const HomePage = {  template: `
         dataFetchTimes: {
           featuredProducts: null,
           categories: null,
-          reviews: null
+          reviews: null,
         },
         renderMetrics: {
           heroSectionRender: null,
           categoriesRender: null,
-          featuredProductsRender: null
-        }
+          featuredProductsRender: null,
+        },
       },
 
       // === ACCESSIBILITY STATE ===
@@ -596,7 +605,7 @@ const HomePage = {  template: `
         isScreenReaderActive: false,
         keyboardNavigationEnabled: true,
         focusVisible: false,
-        announcements: []
+        announcements: [],
       },
 
       // === CACHE STATE ===
@@ -604,25 +613,26 @@ const HomePage = {  template: `
         featuredProducts: {
           data: null,
           timestamp: null,
-          ttl: 300000 // 5 minutes
+          ttl: 300000, // 5 minutes
         },
         categories: {
           data: null,
           timestamp: null,
-          ttl: 600000 // 10 minutes
+          ttl: 600000, // 10 minutes
         },
         userPreferences: {
           data: null,
           timestamp: null,
-          ttl: 86400000 // 24 hours
-        }
+          ttl: 86400000, // 24 hours
+        },
       },
 
       // === DEBOUNCED METHODS ===
-      debouncedMethods: {},      // Legacy compatibility (for backward compatibility)
+      debouncedMethods: {}, // Legacy compatibility (for backward compatibility)
       featuredProducts: [],
       categories: [],
-      isLoading: true,      isSearching: false,
+      isLoading: true,
+      isSearching: false,
       loadError: null,
       retryCount: 0,
 
@@ -630,9 +640,10 @@ const HomePage = {  template: `
       reviewInterval: null,
       latestNews: [],
       reviews: [],
-      userLocation: null
+      userLocation: null,
     };
-  }, computed: {
+  },
+  computed: {
     /**
      * Get current review for display
      */
@@ -649,15 +660,17 @@ const HomePage = {  template: `
         sessionId: this.analytics.sessionId,
         userInteractions: this.analytics.userInteractions.length,
         searchesPerformed: this.analytics.searchAnalytics.queriesPerformed,
-        categoriesViewed: this.analytics.searchAnalytics.categoriesViewed.length,
+        categoriesViewed:
+          this.analytics.searchAnalytics.categoriesViewed.length,
         productsViewed: this.analytics.searchAnalytics.productsViewed.length,
         scrollDepth: this.analytics.userBehavior.maxScrollDepth,
         timeOnPage: this.analytics.userBehavior.timeOnPage,
         hasVideoError: this.errors.video,
-        hasLoadError: !!this.errors.featuredProducts || !!this.errors.categories,
+        hasLoadError:
+          !!this.errors.featuredProducts || !!this.errors.categories,
         retryCount: this.componentState.retryCount,
         featureFlags: this.features,
-        performanceMetrics: this.performance.dataFetchTimes
+        performanceMetrics: this.performance.dataFetchTimes,
       };
     },
 
@@ -667,13 +680,16 @@ const HomePage = {  template: `
     componentHealth() {
       return {
         isHealthy: !this.componentState.hasError && !this.errors.general,
-        hasDataErrors: !!(this.errors.featuredProducts || this.errors.categories),
+        hasDataErrors: !!(
+          this.errors.featuredProducts || this.errors.categories
+        ),
         hasVideoFallback: this.errors.video,
-        isFullyLoaded: !this.componentState.isLoading && this.componentState.isInitialized,
+        isFullyLoaded:
+          !this.componentState.isLoading && this.componentState.isInitialized,
         errorCount: this.errors.errorHistory.length,
         retryCount: this.componentState.retryCount,
         lastLoadTime: this.componentState.lastLoadTime,
-        performanceScore: this.calculatePerformanceScore()
+        performanceScore: this.calculatePerformanceScore(),
       };
     },
 
@@ -684,11 +700,19 @@ const HomePage = {  template: `
       return {
         isMobile: this.ui.isMobile,
         screenSize: this.ui.screenSize,
-        shouldShowMobileNav: this.ui.screenSize === 'mobile',
-        cardsPerRow: this.ui.screenSize === 'mobile' ? 1 :
-          this.ui.screenSize === 'tablet' ? 2 : 4,
-        shouldUseParallax: this.ui.screenSize !== 'mobile' && !this.accessibility.isReducedMotion,
-        shouldAutoPlayCarousel: this.features.enableAutoPlayCarousel && !this.accessibility.isReducedMotion
+        shouldShowMobileNav: this.ui.screenSize === "mobile",
+        cardsPerRow:
+          this.ui.screenSize === "mobile"
+            ? 1
+            : this.ui.screenSize === "tablet"
+            ? 2
+            : 4,
+        shouldUseParallax:
+          this.ui.screenSize !== "mobile" &&
+          !this.accessibility.isReducedMotion,
+        shouldAutoPlayCarousel:
+          this.features.enableAutoPlayCarousel &&
+          !this.accessibility.isReducedMotion,
       };
     },
 
@@ -700,16 +724,19 @@ const HomePage = {  template: `
       const location = this.search.form.location.toLowerCase();
 
       return {
-        queries: this.search.suggestions.queries.filter(s =>
-          s.toLowerCase().includes(query)
-        ).slice(0, this.config.search.maxSuggestions),
-        locations: this.search.suggestions.locations.filter(s =>
-          s.toLowerCase().includes(location)
-        ).slice(0, this.config.search.maxSuggestions),
-        restaurants: this.search.suggestions.restaurants.filter(s =>
-          s.name.toLowerCase().includes(query) ||
-          s.cuisine.toLowerCase().includes(query)
-        ).slice(0, this.config.search.maxSuggestions)
+        queries: this.search.suggestions.queries
+          .filter((s) => s.toLowerCase().includes(query))
+          .slice(0, this.config.search.maxSuggestions),
+        locations: this.search.suggestions.locations
+          .filter((s) => s.toLowerCase().includes(location))
+          .slice(0, this.config.search.maxSuggestions),
+        restaurants: this.search.suggestions.restaurants
+          .filter(
+            (s) =>
+              s.name.toLowerCase().includes(query) ||
+              s.cuisine.toLowerCase().includes(query)
+          )
+          .slice(0, this.config.search.maxSuggestions),
       };
     },
 
@@ -719,23 +746,37 @@ const HomePage = {  template: `
     validationStatus() {
       return {
         search: {
-          isValid: this.validation.search.location.isValid && this.validation.search.query.isValid,
+          isValid:
+            this.validation.search.location.isValid &&
+            this.validation.search.query.isValid,
           errors: [
-            ...(!this.validation.search.location.isValid ? [this.validation.search.location.message] : []),
-            ...(!this.validation.search.query.isValid ? [this.validation.search.query.message] : [])
-          ]
+            ...(!this.validation.search.location.isValid
+              ? [this.validation.search.location.message]
+              : []),
+            ...(!this.validation.search.query.isValid
+              ? [this.validation.search.query.message]
+              : []),
+          ],
         },
         newsletter: {
           isValid: this.validation.newsletter.email.isValid,
-          errors: !this.validation.newsletter.email.isValid ? [this.validation.newsletter.email.message] : []
+          errors: !this.validation.newsletter.email.isValid
+            ? [this.validation.newsletter.email.message]
+            : [],
         },
         feedback: {
-          isValid: this.validation.feedback.rating.isValid && this.validation.feedback.comment.isValid,
+          isValid:
+            this.validation.feedback.rating.isValid &&
+            this.validation.feedback.comment.isValid,
           errors: [
-            ...(!this.validation.feedback.rating.isValid ? [this.validation.feedback.rating.message] : []),
-            ...(!this.validation.feedback.comment.isValid ? [this.validation.feedback.comment.message] : [])
-          ]
-        }
+            ...(!this.validation.feedback.rating.isValid
+              ? [this.validation.feedback.rating.message]
+              : []),
+            ...(!this.validation.feedback.comment.isValid
+              ? [this.validation.feedback.comment.message]
+              : []),
+          ],
+        },
       };
     },
 
@@ -746,34 +787,52 @@ const HomePage = {  template: `
       const now = Date.now();
       return {
         featuredProducts: {
-          isValid: this.cache.featuredProducts.timestamp &&
-            (now - this.cache.featuredProducts.timestamp) < this.cache.featuredProducts.ttl,
-          age: this.cache.featuredProducts.timestamp ? now - this.cache.featuredProducts.timestamp : 0,
-          needsRefresh: !this.cache.featuredProducts.timestamp ||
-            (now - this.cache.featuredProducts.timestamp) >= this.cache.featuredProducts.ttl
+          isValid:
+            this.cache.featuredProducts.timestamp &&
+            now - this.cache.featuredProducts.timestamp <
+              this.cache.featuredProducts.ttl,
+          age: this.cache.featuredProducts.timestamp
+            ? now - this.cache.featuredProducts.timestamp
+            : 0,
+          needsRefresh:
+            !this.cache.featuredProducts.timestamp ||
+            now - this.cache.featuredProducts.timestamp >=
+              this.cache.featuredProducts.ttl,
         },
         categories: {
-          isValid: this.cache.categories.timestamp &&
-            (now - this.cache.categories.timestamp) < this.cache.categories.ttl,
-          age: this.cache.categories.timestamp ? now - this.cache.categories.timestamp : 0,
-          needsRefresh: !this.cache.categories.timestamp ||
-            (now - this.cache.categories.timestamp) >= this.cache.categories.ttl
+          isValid:
+            this.cache.categories.timestamp &&
+            now - this.cache.categories.timestamp < this.cache.categories.ttl,
+          age: this.cache.categories.timestamp
+            ? now - this.cache.categories.timestamp
+            : 0,
+          needsRefresh:
+            !this.cache.categories.timestamp ||
+            now - this.cache.categories.timestamp >= this.cache.categories.ttl,
         },
         userPreferences: {
-          isValid: this.cache.userPreferences.timestamp &&
-            (now - this.cache.userPreferences.timestamp) < this.cache.userPreferences.ttl,
-          age: this.cache.userPreferences.timestamp ? now - this.cache.userPreferences.timestamp : 0,
-          needsRefresh: !this.cache.userPreferences.timestamp ||
-            (now - this.cache.userPreferences.timestamp) >= this.cache.userPreferences.ttl
-        }
+          isValid:
+            this.cache.userPreferences.timestamp &&
+            now - this.cache.userPreferences.timestamp <
+              this.cache.userPreferences.ttl,
+          age: this.cache.userPreferences.timestamp
+            ? now - this.cache.userPreferences.timestamp
+            : 0,
+          needsRefresh:
+            !this.cache.userPreferences.timestamp ||
+            now - this.cache.userPreferences.timestamp >=
+              this.cache.userPreferences.ttl,
+        },
       };
-    }
+    },
   },
   created() {
     // Component initialization
     this.componentState.isInitialized = true;
-  }, async mounted() {
-    this.isLoading = true; try {
+  },
+  async mounted() {
+    this.isLoading = true;
+    try {
       await this.initializeComponent();
       this.setupPageEffects();
 
@@ -785,7 +844,7 @@ const HomePage = {  template: `
       // Automatically detect location on mount
       this.detectLocation();
     } catch (error) {
-      this.handleComponentError('Error initializing HomePage', error);
+      this.handleComponentError("Error initializing HomePage", error);
     } finally {
       this.isLoading = false;
     }
@@ -808,7 +867,7 @@ const HomePage = {  template: `
           await window.ProductService.ensureInitialized();
           await this.loadProducts();
         } else {
-          throw new Error('ProductService not available');
+          throw new Error("ProductService not available");
         }
       } catch (error) {
         throw new Error(`Component initialization failed: ${error.message}`);
@@ -822,14 +881,13 @@ const HomePage = {  template: `
       try {
         const [featured, categoriesData] = await Promise.all([
           window.ProductService.getPopularProducts(4),
-          window.ProductService.getAllCategories()
+          window.ProductService.getAllCategories(),
         ]);
 
         this.featuredProducts = featured;
         this.categories = this.processCategoriesData(categoriesData);
         this.loadError = null;
         this.retryCount = 0;
-
       } catch (error) {
         this.handleLoadError(error);
       }
@@ -840,28 +898,29 @@ const HomePage = {  template: `
      */
     processCategoriesData(categoriesData) {
       const iconMap = {
-        'mains': 'fas fa-utensils',
-        'appetizers': 'fas fa-cheese',
-        'sides': 'fas fa-bread-slice',
-        'desserts': 'fas fa-ice-cream',
-        'drinks': 'fas fa-cocktail',
-        'specials': 'fas fa-star',
-        'burgers': 'fas fa-hamburger',
-        'pizza': 'fas fa-pizza-slice',
-        'salads': 'fas fa-seedling',
-        'breakfast': 'fas fa-egg',
-        'seafood': 'fas fa-fish',
-        'international': 'fas fa-globe-americas',
-        'vegetarian': 'fas fa-leaf'
+        mains: "fas fa-utensils",
+        appetizers: "fas fa-cheese",
+        sides: "fas fa-bread-slice",
+        desserts: "fas fa-ice-cream",
+        drinks: "fas fa-cocktail",
+        specials: "fas fa-star",
+        burgers: "fas fa-hamburger",
+        pizza: "fas fa-pizza-slice",
+        salads: "fas fa-seedling",
+        breakfast: "fas fa-egg",
+        seafood: "fas fa-fish",
+        international: "fas fa-globe-americas",
+        vegetarian: "fas fa-leaf",
       };
 
-      return categoriesData.map(category => ({
+      return categoriesData.map((category) => ({
         ...category,
-        icon: iconMap[category.id.toLowerCase()] || 'fas fa-utensils'
+        icon: iconMap[category.id.toLowerCase()] || "fas fa-utensils",
       }));
-    },    /**
+    }
+    /**
      * Detect user location for personalized content
-     */
+     */,
     async detectLocation() {
       try {
         if (navigator.geolocation) {
@@ -869,47 +928,49 @@ const HomePage = {  template: `
             (position) => {
               this.userLocation = {
                 latitude: position.coords.latitude,
-                longitude: position.coords.longitude
+                longitude: position.coords.longitude,
               };
-              console.log('Location detected:', this.userLocation);
+              console.log("Location detected:", this.userLocation);
             },
             (error) => {
-              console.warn('Location detection failed:', error);
+              console.warn("Location detection failed:", error);
               // Set a default location or continue without location
               this.userLocation = null;
             },
             {
               enableHighAccuracy: false,
               timeout: 5000,
-              maximumAge: 600000 // 10 minutes
+              maximumAge: 600000, // 10 minutes
             }
           );
         } else {
-          console.warn('Geolocation is not supported by this browser');
+          console.warn("Geolocation is not supported by this browser");
           this.userLocation = null;
         }
       } catch (error) {
-        console.error('Error in detectLocation:', error);
+        console.error("Error in detectLocation:", error);
         this.userLocation = null;
       }
-    },    /**
+    }
+    /**
      * Handle component errors with proper logging
-     */
+     */,
     handleComponentError(message, error) {
       console.error(message, error);
 
       if (window.ErrorHandler) {
         window.ErrorHandler.handleError(error, {
-          component: 'HomePage',
-          action: 'initialization',
-          severity: window.ErrorHandler.SEVERITY.HIGH
+          component: "HomePage",
+          action: "initialization",
+          severity: window.ErrorHandler.SEVERITY.HIGH,
         });
       }
 
       if (window.ToastService) {
         window.ToastService.show(
-          window.APP_CONSTANTS?.MESSAGES?.ERROR?.COMPONENT_LOAD || 'Failed to load page content',
-          'error'
+          window.APP_CONSTANTS?.MESSAGES?.ERROR?.COMPONENT_LOAD ||
+            "Failed to load page content",
+          "error"
         );
       }
     },
@@ -918,20 +979,25 @@ const HomePage = {  template: `
      * Handle load errors with retry logic
      */
     handleLoadError(error) {
-      console.error('Error loading product data for HomePage:', error);
+      console.error("Error loading product data for HomePage:", error);
 
       if (this.retryCount < this.config.maxRetries) {
-        this.loadError = `Loading failed. Retrying... (${this.retryCount + 1}/${this.config.maxRetries})`;
+        this.loadError = `Loading failed. Retrying... (${this.retryCount + 1}/${
+          this.config.maxRetries
+        })`;
         this.retryCount++;
 
         setTimeout(() => {
           this.loadProducts();
         }, this.config.retryDelay * this.retryCount);
       } else {
-        this.loadError = window.APP_CONSTANTS?.MESSAGES?.ERROR?.LOAD_FAILED || 'Failed to load content. Please refresh the page.';
+        this.loadError =
+          window.APP_CONSTANTS?.MESSAGES?.ERROR?.LOAD_FAILED ||
+          "Failed to load content. Please refresh the page.";
         this.featuredProducts = [];
         this.categories = [];
-      }    },
+      }
+    },
 
     /**
      * Handle product card feedback
@@ -955,11 +1021,12 @@ const HomePage = {  template: `
       } finally {
         this.isLoading = false;
       }
-    },    /**
+    }
+    /**
      * Navigate to next review with smooth transition
-     */
+     */,
     nextReview() {
-      const reviewCards = document.querySelectorAll('.testimonial-card');
+      const reviewCards = document.querySelectorAll(".testimonial-card");
       if (reviewCards.length > 0) {
         this.transitionReview(1);
       }
@@ -969,60 +1036,66 @@ const HomePage = {  template: `
      * Navigate to previous review with smooth transition
      */
     prevReview() {
-      const reviewCards = document.querySelectorAll('.testimonial-card');
+      const reviewCards = document.querySelectorAll(".testimonial-card");
       if (reviewCards.length > 0) {
         this.transitionReview(-1);
       }
-    },    /**
+    }
+    /**
      * Handle review transition with direction
-     */
+     */,
     transitionReview(direction) {
-      const reviewCards = document.querySelectorAll('.testimonial-card');
+      const reviewCards = document.querySelectorAll(".testimonial-card");
       if (reviewCards.length === 0) return;
 
       // Check if reviews array is empty to prevent errors
       if (!this.reviews || this.reviews.length === 0) {
-        console.warn('transitionReview called but no reviews available');
+        console.warn("transitionReview called but no reviews available");
         return;
       }
 
-      reviewCards[0].classList.remove('active');
+      reviewCards[0].classList.remove("active");
 
       setTimeout(() => {
         if (direction > 0) {
-          this.currentReviewIndex = (this.currentReviewIndex + 1) % this.reviews.length;
+          this.currentReviewIndex =
+            (this.currentReviewIndex + 1) % this.reviews.length;
         } else {
-          this.currentReviewIndex = (this.currentReviewIndex - 1 + this.reviews.length) % this.reviews.length;
+          this.currentReviewIndex =
+            (this.currentReviewIndex - 1 + this.reviews.length) %
+            this.reviews.length;
         }
 
         const review = this.reviews[this.currentReviewIndex];
         this.updateReviewCard(reviewCards[0], review);
-        reviewCards[0].classList.add('active');
+        reviewCards[0].classList.add("active");
       }, 300);
-    },/**
+    }
+    /**
      * Update review card content
-     */
+     */,
     updateReviewCard(card, review) {
       // Check if review is defined to prevent errors when reviews array is empty
       if (!review) {
-        console.warn('updateReviewCard called with undefined review');
+        console.warn("updateReviewCard called with undefined review");
         return;
       }
 
       const starsHTML = this.getStarsHTML(review.rating);
 
-      card.querySelector('.text-warning').innerHTML = starsHTML;
-      card.querySelector('small.text-muted').textContent = review.date;
-      card.querySelector('.testimonial-text').textContent = review.text;
-      card.querySelector('img').src = review.image;
-      card.querySelector('h6').textContent = review.name;
-      card.querySelector('small.badge').textContent = review.type;
-    },    /**
+      card.querySelector(".text-warning").innerHTML = starsHTML;
+      card.querySelector("small.text-muted").textContent = review.date;
+      card.querySelector(".testimonial-text").textContent = review.text;
+      card.querySelector("img").src = review.image;
+      card.querySelector("h6").textContent = review.name;
+      card.querySelector("small.badge").textContent = review.type;
+    },
+    /**
      * Start automatic review carousel
-     */    startReviewCarousel() {
+     */ startReviewCarousel() {
       // Check if reviews are available before starting carousel
       if (!this.reviews || this.reviews.length === 0) {
-        console.log('startReviewCarousel called but no reviews available');
+        console.log("startReviewCarousel called but no reviews available");
         return;
       }
 
@@ -1036,7 +1109,7 @@ const HomePage = {  template: `
      * Generate stars HTML for rating display
      */
     getStarsHTML(rating) {
-      let html = '';
+      let html = "";
       const fullStars = Math.floor(rating);
       const hasHalfStar = rating % 1 >= 0.5;
 
@@ -1062,32 +1135,36 @@ const HomePage = {  template: `
     setupPageEffects() {
       try {
         // Setup intersection observer for scroll animations
-        if ('IntersectionObserver' in window) {
+        if ("IntersectionObserver" in window) {
           const observerOptions = {
             threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
+            rootMargin: "0px 0px -50px 0px",
           };
 
           const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
               if (entry.isIntersecting) {
-                entry.target.classList.add('animate-in');
+                entry.target.classList.add("animate-in");
               }
             });
           }, observerOptions);
 
           // Observe elements for animation
-          document.querySelectorAll('.category-card, .process-card, .featured-product-card').forEach(el => {
-            observer.observe(el);
-          });
+          document
+            .querySelectorAll(
+              ".category-card, .process-card, .featured-product-card"
+            )
+            .forEach((el) => {
+              observer.observe(el);
+            });
         }
 
         // Setup parallax effect for promo banner
         this.setupParallaxEffect();
 
-        console.log('HomePage effects initialized successfully');
+        console.log("HomePage effects initialized successfully");
       } catch (error) {
-        console.warn('Error setting up page effects:', error);
+        console.warn("Error setting up page effects:", error);
       }
     },
 
@@ -1095,20 +1172,21 @@ const HomePage = {  template: `
      * Setup parallax scrolling effect
      */
     setupParallaxEffect() {
-      const promoBanner = document.querySelector('.promo-banner');
+      const promoBanner = document.querySelector(".promo-banner");
       if (!promoBanner) return;
 
-      const handleScroll = window.Helpers?.throttle(() => {
-        const scrolled = window.pageYOffset;
-        const parallaxElement = promoBanner.querySelector('.promo-content');
+      const handleScroll =
+        window.Helpers?.throttle(() => {
+          const scrolled = window.pageYOffset;
+          const parallaxElement = promoBanner.querySelector(".promo-content");
 
-        if (parallaxElement) {
-          const speed = scrolled * 0.5;
-          parallaxElement.style.transform = `translateY(${speed}px)`;
-        }
-      }, 16) || (() => { }); // 60fps throttling
+          if (parallaxElement) {
+            const speed = scrolled * 0.5;
+            parallaxElement.style.transform = `translateY(${speed}px)`;
+          }
+        }, 16) || (() => {}); // 60fps throttling
 
-      window.addEventListener('scroll', handleScroll, { passive: true });
+      window.addEventListener("scroll", handleScroll, { passive: true });
     },
 
     /**
@@ -1119,17 +1197,17 @@ const HomePage = {  template: `
         return this.$truncate(text, 80);
       }
       // Fallback implementation
-      return text && text.length > 80 ? text.substring(0, 80) + '...' : text;
+      return text && text.length > 80 ? text.substring(0, 80) + "..." : text;
     },
     /**
-   * Pluralize text based on count
-   */
+     * Pluralize text based on count
+     */
     pluralize(count, singular, plural) {
       if (window.Filters && window.Filters.pluralize) {
         return window.Filters.pluralize(count, singular, plural);
       }
       // Fallback implementation
-      const word = count === 1 ? singular : (plural || singular + 's');
+      const word = count === 1 ? singular : plural || singular + "s";
       return `${count} ${word}`;
     },
 
@@ -1139,7 +1217,8 @@ const HomePage = {  template: `
     calculatePerformanceScore() {
       try {
         const metrics = this.performance.dataFetchTimes;
-        const componentLoad = this.componentState.performanceMetrics.loadEndTime -
+        const componentLoad =
+          this.componentState.performanceMetrics.loadEndTime -
           this.componentState.performanceMetrics.loadStartTime;
 
         let score = 100;
@@ -1160,12 +1239,13 @@ const HomePage = {  template: `
 
         return Math.max(0, Math.min(100, score));
       } catch (error) {
-        console.warn('Error calculating performance score:', error);
+        console.warn("Error calculating performance score:", error);
         return 50; // Default score
       }
-    },    /**
+    }
+    /**
      * Track analytics events
-     */
+     */,
     trackEvent(eventName, eventData = {}) {
       try {
         // Store event in local analytics
@@ -1173,20 +1253,20 @@ const HomePage = {  template: `
           name: eventName,
           data: eventData,
           timestamp: new Date().toISOString(),
-          sessionId: this.analytics.sessionId
+          sessionId: this.analytics.sessionId,
         };
-        
+
         this.analytics.userInteractions.push(event);
-        
+
         // Send to external analytics if available
-        if (window.analytics && typeof window.analytics.track === 'function') {
+        if (window.analytics && typeof window.analytics.track === "function") {
           window.analytics.track(eventName, eventData);
         }
-        
+
         // Log for debugging
-        console.log('Analytics event tracked:', eventName, eventData);
+        console.log("Analytics event tracked:", eventName, eventData);
       } catch (error) {
-        console.warn('Error tracking analytics event:', error);
+        console.warn("Error tracking analytics event:", error);
       }
     },
 
@@ -1194,9 +1274,11 @@ const HomePage = {  template: `
      * Generate unique session ID for analytics
      */
     generateSessionId() {
-      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-    }
-  }
+      return (
+        "session_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9)
+      );
+    },
+  },
 };
 
 // Make the component globally available

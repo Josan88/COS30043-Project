@@ -3,47 +3,54 @@
  * Reusable component for displaying food item information in a card format
  * Enhanced with better validation, constants, and error handling
  */
-window.app.component('product-card', {
+window.app.component("product-card", {
   props: {
     product: {
       type: Object,
       required: true,
       validator(value) {
         // Enhanced validation for product object
-        if (!value || typeof value !== 'object') return false;
-        
-        const requiredFields = ['id', 'name', 'price', 'description'];
-        const hasRequired = requiredFields.every(field => 
-          value.hasOwnProperty(field) && value[field] !== null && value[field] !== undefined
+        if (!value || typeof value !== "object") return false;
+
+        const requiredFields = ["id", "name", "price", "description"];
+        const hasRequired = requiredFields.every(
+          (field) =>
+            value.hasOwnProperty(field) &&
+            value[field] !== null &&
+            value[field] !== undefined
         );
-        
+
         if (!hasRequired) {
-          console.warn('ProductCard: Missing required product fields', { product: value, requiredFields });
+          console.warn("ProductCard: Missing required product fields", {
+            product: value,
+            requiredFields,
+          });
           return false;
         }
-        
+
         // Validate data types
-        if (typeof value.price !== 'number' || value.price < 0) {
-          console.warn('ProductCard: Invalid price value', value.price);
+        if (typeof value.price !== "number" || value.price < 0) {
+          console.warn("ProductCard: Invalid price value", value.price);
           return false;
         }
-        
+
         return true;
-      }
+      },
     },
     showAddButton: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showFavoriteButton: {
       type: Boolean,
-      default: true
+      default: true,
     },
     compactMode: {
       type: Boolean,
-      default: false
-    }
-  },  template: `
+      default: false,
+    },
+  },
+  template: `
     <div 
       class="card h-100 product-card shadow-sm border-0 position-relative"
       :class="{ 'compact-card': compactMode, 'hover-rise': !compactMode }"
@@ -209,23 +216,27 @@ window.app.component('product-card', {
         </div>
       </div>
     </div>
-  `,  data() {
+  `,
+  data() {
     return {
       // UI State
       isFavorite: false,
       isAddingToCart: false,
       isProcessingFavorite: false,
       imageError: false,
-      
+
       // Configuration from constants
       maxStars: window.APP_CONSTANTS?.UI?.MAX_RATING_STARS || 5,
-      descriptionMaxLength: window.APP_CONSTANTS?.UI?.CARD_DESCRIPTION_LENGTH || 70,
-      
+      descriptionMaxLength:
+        window.APP_CONSTANTS?.UI?.CARD_DESCRIPTION_LENGTH || 70,
+
       // Fallback image
-      fallbackImage: window.APP_CONSTANTS?.UI?.FALLBACK_PRODUCT_IMAGE || 'assets/images/placeholder-food.jpg'
+      fallbackImage:
+        window.APP_CONSTANTS?.UI?.FALLBACK_PRODUCT_IMAGE ||
+        "assets/images/placeholder-food.jpg",
     };
   },
-  
+
   computed: {
     /**
      * Calculate effective price after discount
@@ -254,17 +265,18 @@ window.app.component('product-card', {
      * Format discount percentage
      */
     formatDiscount() {
-      return this.hasDiscount ? `${this.product.discount}%` : '';
+      return this.hasDiscount ? `${this.product.discount}%` : "";
     },
 
     /**
      * Get truncated description
      */
     truncatedDescription() {
-      if (!this.product.description) return '';
-      
-      return this.product.description.length > this.descriptionMaxLength 
-        ? this.product.description.substring(0, this.descriptionMaxLength) + '...' 
+      if (!this.product.description) return "";
+
+      return this.product.description.length > this.descriptionMaxLength
+        ? this.product.description.substring(0, this.descriptionMaxLength) +
+            "..."
         : this.product.description;
     },
 
@@ -279,7 +291,9 @@ window.app.component('product-card', {
      * Get display image with fallback
      */
     displayImage() {
-      return this.imageError ? this.fallbackImage : (this.product.image || this.fallbackImage);
+      return this.imageError
+        ? this.fallbackImage
+        : this.product.image || this.fallbackImage;
     },
 
     /**
@@ -308,33 +322,41 @@ window.app.component('product-card', {
      * Get preparation time display
      */
     preparationTime() {
-      return this.product.preparationTime ? `${this.product.preparationTime} min` : null;
+      return this.product.preparationTime
+        ? `${this.product.preparationTime} min`
+        : null;
     },
 
     /**
      * Get nutritional information
      */
     nutritionalInfo() {
-      return this.product.nutritionalInfo || (this.product.calories ? { calories: this.product.calories } : null);
+      return (
+        this.product.nutritionalInfo ||
+        (this.product.calories ? { calories: this.product.calories } : null)
+      );
     },
 
     /**
      * Process dietary options for display
      */
     displayDietaryOptions() {
-      if (!this.product.dietaryOptions || !Array.isArray(this.product.dietaryOptions)) {
+      if (
+        !this.product.dietaryOptions ||
+        !Array.isArray(this.product.dietaryOptions)
+      ) {
         return [];
       }
 
       const dietaryMap = window.APP_CONSTANTS?.DIETARY_OPTIONS || {};
-      
-      return this.product.dietaryOptions.map(option => {
+
+      return this.product.dietaryOptions.map((option) => {
         const mapping = dietaryMap[option] || {};
         return {
           name: option,
-          icon: mapping.icon || 'fas fa-check',
-          badgeClass: mapping.badgeClass || 'bg-success',
-          description: mapping.description || option
+          icon: mapping.icon || "fas fa-check",
+          badgeClass: mapping.badgeClass || "bg-success",
+          description: mapping.description || option,
         };
       });
     },
@@ -344,9 +366,9 @@ window.app.component('product-card', {
      */
     favoriteIconClass() {
       return {
-        'text-danger': this.isFavorite,
-        'text-muted': !this.isFavorite,
-        'fa-spin': this.isProcessingFavorite
+        "text-danger": this.isFavorite,
+        "text-muted": !this.isFavorite,
+        "fa-spin": this.isProcessingFavorite,
       };
     },
 
@@ -354,20 +376,26 @@ window.app.component('product-card', {
      * Add to cart button text
      */
     addToCartButtonText() {
-      return this.isAddingToCart ? 'Adding...' : 'Add';
+      return this.isAddingToCart ? "Adding..." : "Add";
     },
 
     // Accessibility computed properties
     productAriaLabel() {
-      return `${this.product.name} - ${this.formatPrice(this.effectivePrice)}${this.hasRating ? `, rated ${this.product.rating} out of ${this.maxStars} stars` : ''}`;
+      return `${this.product.name} - ${this.formatPrice(this.effectivePrice)}${
+        this.hasRating
+          ? `, rated ${this.product.rating} out of ${this.maxStars} stars`
+          : ""
+      }`;
     },
 
     favoriteAriaLabel() {
-      return this.isFavorite ? 'Remove from favorites' : 'Add to favorites';
+      return this.isFavorite ? "Remove from favorites" : "Add to favorites";
     },
 
     addToCartAriaLabel() {
-      return `Add ${this.product.name} to cart for ${this.formatPrice(this.effectivePrice)}`;
+      return `Add ${this.product.name} to cart for ${this.formatPrice(
+        this.effectivePrice
+      )}`;
     },
 
     viewDetailsAriaLabel() {
@@ -376,24 +404,25 @@ window.app.component('product-card', {
 
     ratingAriaLabel() {
       return `Rated ${this.product.rating} out of ${this.maxStars} stars with ${this.product.reviewCount} reviews`;
-    }
-  },  methods: {
+    },
+  },
+  methods: {
     /**
      * Add product to cart with enhanced error handling
      */
     async addToCart(event) {
       event?.stopPropagation();
-      
+
       if (this.isAddingToCart) return; // Prevent double-clicks
-      
+
       this.isAddingToCart = true;
-      
+
       try {
         // Validate product before adding
         if (!this.validateProductForCart()) {
-          throw new Error('Product validation failed');
+          throw new Error("Product validation failed");
         }
-        
+
         // Prepare cart item
         const cartItem = {
           id: this.product.id,
@@ -402,70 +431,77 @@ window.app.component('product-card', {
           originalPrice: this.product.price,
           image: this.displayImage,
           quantity: 1,
-          discount: this.hasDiscount ? this.product.discount : 0        };
-        
+          discount: this.hasDiscount ? this.product.discount : 0,
+        };
+
         // Add to cart using service
-        if (window.CartService && typeof window.CartService.addItem === 'function') {
+        if (
+          window.CartService &&
+          typeof window.CartService.addItem === "function"
+        ) {
           await window.CartService.addItem(cartItem);
         } else {
-          throw new Error('CartService is not available or addItem method is missing');
+          throw new Error(
+            "CartService is not available or addItem method is missing"
+          );
         }
-        
+
         // Show success feedback
-        this.showFeedback(`${this.product.name} added to cart!`, 'success');
-        
+        this.showFeedback(`${this.product.name} added to cart!`, "success");
+
         // Track analytics
         this.trackAddToCart(cartItem);
-        
       } catch (error) {
-        console.error('Error adding product to cart:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'ProductCard', 
-          method: 'addToCart',
-          productId: this.product.id 
+        console.error("Error adding product to cart:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "ProductCard",
+          method: "addToCart",
+          productId: this.product.id,
         });
-        
-        this.showFeedback('Could not add to cart. Please try again.', 'error');
+
+        this.showFeedback("Could not add to cart. Please try again.", "error");
       } finally {
         this.isAddingToCart = false;
       }
     },
-    
+
     /**
      * Toggle favorite status with persistence
      */
     async toggleFavorite(event) {
       event?.stopPropagation();
-      
+
       if (this.isProcessingFavorite) return;
-      
+
       this.isProcessingFavorite = true;
-      
+
       try {
         const previousState = this.isFavorite;
         this.isFavorite = !this.isFavorite;
-        
+
         // Persist to favorites service/storage
         await this.updateFavoriteStatus(this.isFavorite);
-        
-        const action = this.isFavorite ? 'added to' : 'removed from';
-        this.showFeedback(`${this.product.name} ${action} favorites!`, 'info');
-        
+
+        const action = this.isFavorite ? "added to" : "removed from";
+        this.showFeedback(`${this.product.name} ${action} favorites!`, "info");
+
         // Track analytics
         this.trackFavoriteToggle(this.isFavorite);
-        
       } catch (error) {
         // Revert state on error
         this.isFavorite = !this.isFavorite;
-        
-        console.error('Error updating favorite status:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'ProductCard', 
-          method: 'toggleFavorite',
-          productId: this.product.id 
+
+        console.error("Error updating favorite status:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "ProductCard",
+          method: "toggleFavorite",
+          productId: this.product.id,
         });
-        
-        this.showFeedback('Could not update favorites. Please try again.', 'error');
+
+        this.showFeedback(
+          "Could not update favorites. Please try again.",
+          "error"
+        );
       } finally {
         this.isProcessingFavorite = false;
       }
@@ -476,7 +512,9 @@ window.app.component('product-card', {
      */
     handleImageError() {
       this.imageError = true;
-      console.warn(`Failed to load image for product ${this.product.id}: ${this.product.image}`);
+      console.warn(
+        `Failed to load image for product ${this.product.id}: ${this.product.image}`
+      );
     },
 
     /**
@@ -484,13 +522,13 @@ window.app.component('product-card', {
      */
     getStarClass(starIndex) {
       const rating = this.product.rating || 0;
-      
+
       if (starIndex <= Math.floor(rating)) {
-        return 'fa-star text-warning';
+        return "fa-star text-warning";
       } else if (starIndex === Math.ceil(rating) && rating % 1 !== 0) {
-        return 'fa-star-half-alt text-warning';
+        return "fa-star-half-alt text-warning";
       } else {
-        return 'fa-star text-muted';
+        return "fa-star text-muted";
       }
     },
 
@@ -498,7 +536,7 @@ window.app.component('product-card', {
      * Format price with currency
      */
     formatPrice(price) {
-      const currency = window.APP_CONSTANTS?.CURRENCY || 'RM';
+      const currency = window.APP_CONSTANTS?.CURRENCY || "RM";
       return `${currency}${price.toFixed(2)}`;
     },
 
@@ -507,20 +545,20 @@ window.app.component('product-card', {
      */
     validateProductForCart() {
       if (!this.product.id) {
-        console.error('Product missing ID');
+        console.error("Product missing ID");
         return false;
       }
-      
-      if (!this.product.name || this.product.name.trim() === '') {
-        console.error('Product missing name');
+
+      if (!this.product.name || this.product.name.trim() === "") {
+        console.error("Product missing name");
         return false;
       }
-      
-      if (typeof this.product.price !== 'number' || this.product.price <= 0) {
-        console.error('Product has invalid price');
+
+      if (typeof this.product.price !== "number" || this.product.price <= 0) {
+        console.error("Product has invalid price");
         return false;
       }
-      
+
       return true;
     },
 
@@ -537,9 +575,10 @@ window.app.component('product-card', {
         }
       } else {
         // Fallback to localStorage
-        const storageKey = window.APP_CONSTANTS?.STORAGE_KEYS?.FAVORITES || 'favorites';
-        const favorites = JSON.parse(localStorage.getItem(storageKey) || '[]');
-        
+        const storageKey =
+          window.APP_CONSTANTS?.STORAGE_KEYS?.FAVORITES || "favorites";
+        const favorites = JSON.parse(localStorage.getItem(storageKey) || "[]");
+
         if (isFavorite) {
           if (!favorites.includes(this.product.id)) {
             favorites.push(this.product.id);
@@ -550,7 +589,7 @@ window.app.component('product-card', {
             favorites.splice(index, 1);
           }
         }
-        
+
         localStorage.setItem(storageKey, JSON.stringify(favorites));
       }
     },
@@ -561,15 +600,20 @@ window.app.component('product-card', {
     async loadFavoriteStatus() {
       try {
         if (window.FavoritesService) {
-          this.isFavorite = await window.FavoritesService.isFavorite(this.product.id);
+          this.isFavorite = await window.FavoritesService.isFavorite(
+            this.product.id
+          );
         } else {
           // Fallback to localStorage
-          const storageKey = window.APP_CONSTANTS?.STORAGE_KEYS?.FAVORITES || 'favorites';
-          const favorites = JSON.parse(localStorage.getItem(storageKey) || '[]');
+          const storageKey =
+            window.APP_CONSTANTS?.STORAGE_KEYS?.FAVORITES || "favorites";
+          const favorites = JSON.parse(
+            localStorage.getItem(storageKey) || "[]"
+          );
           this.isFavorite = favorites.includes(this.product.id);
         }
       } catch (error) {
-        console.error('Error loading favorite status:', error);
+        console.error("Error loading favorite status:", error);
         this.isFavorite = false;
       }
     },
@@ -577,31 +621,31 @@ window.app.component('product-card', {
     /**
      * Show user feedback
      */
-    showFeedback(message, type = 'info') {
+    showFeedback(message, type = "info") {
       // Try toast service first
       if (window.ToastService) {
         window.ToastService.show(message, type);
         return;
       }
-      
+
       // Emit to parent component
-      this.$emit('show-feedback', { message, type });
-      
+      this.$emit("show-feedback", { message, type });
+
       // Fallback to root event bus
-      this.$root.$emit('show-toast', { message, type });
+      this.$root.$emit("show-toast", { message, type });
     },
 
     /**
      * Track add to cart analytics
      */
     trackAddToCart(cartItem) {
-      if (window.analytics && typeof window.analytics.track === 'function') {
-        window.analytics.track('Add to Cart', {
+      if (window.analytics && typeof window.analytics.track === "function") {
+        window.analytics.track("Add to Cart", {
           productId: cartItem.id,
           productName: cartItem.name,
           price: cartItem.price,
           discount: cartItem.discount,
-          source: 'product-card'
+          source: "product-card",
         });
       }
     },
@@ -610,14 +654,17 @@ window.app.component('product-card', {
      * Track favorite toggle analytics
      */
     trackFavoriteToggle(isFavorite) {
-      if (window.analytics && typeof window.analytics.track === 'function') {
-        window.analytics.track(isFavorite ? 'Add to Favorites' : 'Remove from Favorites', {
-          productId: this.product.id,
-          productName: this.product.name,
-          source: 'product-card'
-        });
+      if (window.analytics && typeof window.analytics.track === "function") {
+        window.analytics.track(
+          isFavorite ? "Add to Favorites" : "Remove from Favorites",
+          {
+            productId: this.product.id,
+            productName: this.product.name,
+            source: "product-card",
+          }
+        );
       }
-    }
+    },
   },
 
   /**
@@ -627,7 +674,7 @@ window.app.component('product-card', {
     try {
       await this.loadFavoriteStatus();
     } catch (error) {
-      console.error('Error mounting ProductCard:', error);
+      console.error("Error mounting ProductCard:", error);
     }
-  }
+  },
 });

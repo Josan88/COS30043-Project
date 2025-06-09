@@ -1,34 +1,5 @@
-/**
- * AccountPage Component v2.0.0 - Enhanced Edition
- * 
- * FEATURES:
- * - ✅ User Profile Management: Comprehensive profile editing with validation
- * - ✅ Security Settings: Password change and security preferences
- * - ✅ Order History: Complete order tracking with filtering and search
- * - ✅ Account Preferences: Notification and privacy settings management
- * - ✅ Form Validation: Real-time validation with user-friendly feedback
- * - ✅ Error Handling: Enhanced error messages with retry mechanisms
- * - ✅ Analytics Tracking: User account interaction monitoring
- * - ✅ Accessibility: ARIA labels, focus management, and keyboard navigation
- * - ✅ Mobile Responsive: Optimized layouts for all screen sizes
- * 
- * ENHANCED FEATURES:
- * - Constants integration via window.APP_CONSTANTS for centralized configuration
- * - ValidationService integration with comprehensive form validation
- * - Enhanced error handling with ErrorHandler and retry mechanisms
- * - Toast notifications for user feedback and status updates
- * - Analytics session tracking with user behavior monitoring
- * - Performance optimizations with debouncing and efficient state management
- * - Advanced order filtering and search capabilities
- * - Profile image upload and management
- * 
- * DEPENDENCIES:
- * - AuthService: User authentication and profile management
- * - ValidationService: Form validation logic
- * - APP_CONSTANTS: Application constants and messaging
- * - ErrorHandler: Centralized error handling
- */
-const AccountPage = {template: `
+const AccountPage = {
+  template: `
     <div class="account-page">
       <div class="container py-5">
         <div class="row">
@@ -352,107 +323,108 @@ const AccountPage = {template: `
       <!-- Modal Backdrop -->
       <div v-if="showLogoutModal" class="modal-backdrop fade show"></div>
     </div>
-  `,  data() {
+  `,
+  data() {
     return {
       // Component Configuration
       config: {
         maxRetries: window.APP_CONSTANTS?.API?.MAX_RETRIES || 3,
         debounceDelay: window.APP_CONSTANTS?.UI?.DEBOUNCE_DELAY || 300,
         autoSaveDelay: window.APP_CONSTANTS?.UI?.AUTO_SAVE_DELAY || 2000,
-        validationMessages: window.APP_CONSTANTS?.VALIDATION?.MESSAGES || {}
+        validationMessages: window.APP_CONSTANTS?.VALIDATION?.MESSAGES || {},
       },
 
       // User Data
       user: {},
-      originalUserData: {},      // UI State
+      originalUserData: {}, // UI State
       uiState: {
-        activeTab: 'profile',
+        activeTab: "profile",
         isLoading: false,
         hasUnsavedChanges: false,
-        lastSaveTime: null
+        lastSaveTime: null,
       },
 
       // Tab Configuration
       tabs: [
-        { 
-          id: 'profile', 
-          name: 'Profile Information', 
-          icon: 'user',
-          description: 'Manage your personal information'
+        {
+          id: "profile",
+          name: "Profile Information",
+          icon: "user",
+          description: "Manage your personal information",
         },
-        { 
-          id: 'security', 
-          name: 'Security Settings', 
-          icon: 'lock',
-          description: 'Update your password and security settings'
+        {
+          id: "security",
+          name: "Security Settings",
+          icon: "lock",
+          description: "Update your password and security settings",
         },
-        { 
-          id: 'orders', 
-          name: 'Purchase History', 
-          icon: 'shopping-bag',
-          description: 'View your order history and track purchases'
-        }
+        {
+          id: "orders",
+          name: "Purchase History",
+          icon: "shopping-bag",
+          description: "View your order history and track purchases",
+        },
       ],
 
       // Profile Form Data
       profileForm: {
-        firstName: '',
-        lastName: '',
-        phone: '',
-        address: '',
-        email: ''
+        firstName: "",
+        lastName: "",
+        phone: "",
+        address: "",
+        email: "",
       },
 
       // Profile Form State
       profileState: {
         validation: {
           errors: {},
-          touched: {}
+          touched: {},
         },
         isSubmitting: false,
         submitted: false,
-        isDirty: false
+        isDirty: false,
       },
 
       // Password Form Data
       passwordForm: {
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
       },
 
       // Password Form State
       passwordState: {
         validation: {
           errors: {},
-          touched: {}
+          touched: {},
         },
         isSubmitting: false,
         submitted: false,
         showPasswords: {
           current: false,
           new: false,
-          confirm: false
+          confirm: false,
         },
         strength: {
           score: 0,
-          feedback: ''
-        }
+          feedback: "",
+        },
       },
 
       // Error and Success States
       feedback: {
         profile: {
           success: null,
-          error: null
+          error: null,
         },
         security: {
           success: null,
-          error: null
+          error: null,
         },
         orders: {
-          error: null
-        }
+          error: null,
+        },
       },
 
       // Orders Data and State
@@ -460,23 +432,23 @@ const AccountPage = {template: `
         orders: [],
         filteredOrders: [],
         filters: {
-          status: 'all',
-          dateRange: 'all',
-          searchQuery: ''
+          status: "all",
+          dateRange: "all",
+          searchQuery: "",
         },
         pagination: {
           currentPage: 1,
           itemsPerPage: 10,
-          totalItems: 0
+          totalItems: 0,
         },
-        isLoading: false
+        isLoading: false,
       },
 
       // Modal States
       modals: {
         logout: false,
         orderDetails: false,
-        selectedOrder: null
+        selectedOrder: null,
       },
 
       // Analytics State
@@ -485,104 +457,118 @@ const AccountPage = {template: `
         profileUpdates: 0,
         passwordUpdates: 0,
         tabSwitches: 0,
-        interactions: {}
-      },      // Component State
+        interactions: {},
+      }, // Component State
       componentState: {
         isMounted: false,
         hasInitialized: false,
         loadError: null,
-        validator: null      }
+        validator: null,
+      },
     };
   },
-  
+
   filters: {
     formatRelativeTime(date) {
       if (window.Filters && window.Filters.formatRelativeTime) {
         return window.Filters.formatRelativeTime(date);
       }
       // Fallback implementation
-      if (!date) return 'Unknown';
+      if (!date) return "Unknown";
       const now = new Date();
       const target = new Date(date);
       const diffMs = now - target;
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      
-      if (diffDays === 0) return 'Today';
-      if (diffDays === 1) return 'Yesterday';
+
+      if (diffDays === 0) return "Today";
+      if (diffDays === 1) return "Yesterday";
       if (diffDays < 7) return `${diffDays} days ago`;
       if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
       if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
       return `${Math.floor(diffDays / 365)} years ago`;
-    }
+    },
   },
-  
+
   computed: {
     // Alias for template compatibility
     activeTab: {
-      get() { return this.uiState.activeTab; },
-      set(value) { this.uiState.activeTab = value; }
+      get() {
+        return this.uiState.activeTab;
+      },
+      set(value) {
+        this.uiState.activeTab = value;
+      },
     },
-    
+
     // Alias for template compatibility
     showLogoutModal: {
-      get() { return this.modals.logout; },
-      set(value) { this.modals.logout = value; }
+      get() {
+        return this.modals.logout;
+      },
+      set(value) {
+        this.modals.logout = value;
+      },
     },
     // Get user initials for avatar
     userInitials() {
-      if (!this.user.firstName || !this.user.lastName) return '?';
+      if (!this.user.firstName || !this.user.lastName) return "?";
       return `${this.user.firstName.charAt(0)}${this.user.lastName.charAt(0)}`;
     },
 
     // Get title of active tab
     activeTabTitle() {
-      const tab = this.tabs.find(t => t.id === this.uiState.activeTab);
-      return tab ? tab.name : '';
+      const tab = this.tabs.find((t) => t.id === this.uiState.activeTab);
+      return tab ? tab.name : "";
     },
 
     // Get description of active tab
     activeTabDescription() {
-      const tab = this.tabs.find(t => t.id === this.uiState.activeTab);
-      return tab ? tab.description : '';
+      const tab = this.tabs.find((t) => t.id === this.uiState.activeTab);
+      return tab ? tab.description : "";
     },
 
     // Get formatted date for account creation
     formattedDate() {
-      if (!this.user.createdAt) return 'Unknown';
+      if (!this.user.createdAt) return "Unknown";
       const date = new Date(this.user.createdAt);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     },
 
     // Check if profile form is valid
     isProfileFormValid() {
-      return Object.keys(this.profileState.validation.errors).length === 0 &&
-             this.profileForm.firstName && 
-             this.profileForm.lastName;
+      return (
+        Object.keys(this.profileState.validation.errors).length === 0 &&
+        this.profileForm.firstName &&
+        this.profileForm.lastName
+      );
     },
 
     // Check if password form is valid
     isPasswordFormValid() {
-      return Object.keys(this.passwordState.validation.errors).length === 0 &&
-             this.passwordForm.currentPassword &&
-             this.passwordForm.newPassword &&
-             this.passwordForm.confirmPassword;
+      return (
+        Object.keys(this.passwordState.validation.errors).length === 0 &&
+        this.passwordForm.currentPassword &&
+        this.passwordForm.newPassword &&
+        this.passwordForm.confirmPassword
+      );
     },
 
     // Check if profile can be submitted
     canSubmitProfile() {
-      return this.isProfileFormValid && 
-             !this.profileState.isSubmitting &&
-             this.profileState.isDirty;
+      return (
+        this.isProfileFormValid &&
+        !this.profileState.isSubmitting &&
+        this.profileState.isDirty
+      );
     },
 
     // Check if password can be submitted
     canSubmitPassword() {
-      return this.isPasswordFormValid && 
-             !this.passwordState.isSubmitting;
+      return this.isPasswordFormValid && !this.passwordState.isSubmitting;
     },
 
     // Get filtered orders based on current filters
@@ -590,18 +576,21 @@ const AccountPage = {template: `
       let filtered = [...this.ordersData.orders];
 
       // Filter by status
-      if (this.ordersData.filters.status !== 'all') {
-        filtered = filtered.filter(order => 
-          order.status.toLowerCase() === this.ordersData.filters.status.toLowerCase()
+      if (this.ordersData.filters.status !== "all") {
+        filtered = filtered.filter(
+          (order) =>
+            order.status.toLowerCase() ===
+            this.ordersData.filters.status.toLowerCase()
         );
       }
 
       // Filter by search query
       if (this.ordersData.filters.searchQuery) {
         const query = this.ordersData.filters.searchQuery.toLowerCase();
-        filtered = filtered.filter(order =>
-          order.id.toString().includes(query) ||
-          order.items.some(item => item.name.toLowerCase().includes(query))
+        filtered = filtered.filter(
+          (order) =>
+            order.id.toString().includes(query) ||
+            order.items.some((item) => item.name.toLowerCase().includes(query))
         );
       }
 
@@ -614,34 +603,41 @@ const AccountPage = {template: `
 
     // Get paginated orders
     paginatedOrders() {
-      const start = (this.ordersData.pagination.currentPage - 1) * this.ordersData.pagination.itemsPerPage;
+      const start =
+        (this.ordersData.pagination.currentPage - 1) *
+        this.ordersData.pagination.itemsPerPage;
       const end = start + this.ordersData.pagination.itemsPerPage;
       return this.filteredOrders.slice(start, end);
     },
 
     // Get total pages for pagination
     totalPages() {
-      return Math.ceil(this.ordersData.pagination.totalItems / this.ordersData.pagination.itemsPerPage);
+      return Math.ceil(
+        this.ordersData.pagination.totalItems /
+          this.ordersData.pagination.itemsPerPage
+      );
     },
 
     // Check if component is ready
     isReady() {
-      return this.componentState.isMounted && 
-             this.componentState.hasInitialized && 
-             !this.componentState.loadError;
+      return (
+        this.componentState.isMounted &&
+        this.componentState.hasInitialized &&
+        !this.componentState.loadError
+      );
     },
 
     // Get password strength indicator
     passwordStrengthClass() {
       const score = this.passwordState.strength.score;
-      if (score < 2) return 'weak';
-      if (score < 4) return 'medium';
-      return 'strong';
-    },    // Check if there are unsaved changes
+      if (score < 2) return "weak";
+      if (score < 4) return "medium";
+      return "strong";
+    }, // Check if there are unsaved changes
     hasUnsavedChanges() {
       return this.profileState.isDirty && !this.profileState.isSubmitting;
     },
-    
+
     // Template helper for showLogoutModal
     showLogoutModal() {
       return this.modals.logout;
@@ -651,118 +647,119 @@ const AccountPage = {template: `
     profileSuccess() {
       return this.feedback.profile.success;
     },
-    
+
     profileError() {
       return this.feedback.profile.error;
     },
-    
+
     profileSubmitted() {
       return this.profileState.submitted;
     },
-    
+
     isProfileSubmitting() {
       return this.profileState.isSubmitting;
     },
-    
+
     securitySuccess() {
       return this.feedback.security.success;
     },
-    
+
     securityError() {
       return this.feedback.security.error;
     },
-    
+
     passwordSubmitted() {
       return this.passwordState.submitted;
     },
-    
+
     isPasswordSubmitting() {
       return this.passwordState.isSubmitting;
     },
-    
+
     // Template aliases for validation errors
     profileFirstNameError() {
       return this.profileState.validation.errors.firstName;
     },
-    
+
     profileLastNameError() {
       return this.profileState.validation.errors.lastName;
     },
-    
+
     profileEmailError() {
       return this.profileState.validation.errors.email;
     },
-    
+
     passwordCurrentError() {
       return this.passwordState.validation.errors.currentPassword;
     },
-    
+
     passwordNewError() {
       return this.passwordState.validation.errors.newPassword;
-    },    passwordConfirmError() {
+    },
+    passwordConfirmError() {
       return this.passwordState.validation.errors.confirmPassword;
     },
-    
+
     // Password visibility computed properties
     showCurrentPassword() {
       return this.passwordState.showPasswords.current;
     },
-    
+
     showNewPassword() {
       return this.passwordState.showPasswords.new;
     },
-      showConfirmPassword() {
+    showConfirmPassword() {
       return this.passwordState.showPasswords.confirm;
     },
-      // Password validation errors alias
+    // Password validation errors alias
     passwordValidationErrors() {
       return this.passwordState.validation.errors;
     },
-    
+
     // User orders alias
     userOrders() {
       return this.ordersData.orders || [];
-    }
+    },
   },
 
   watch: {
     // Watch for profile form changes
-    'profileForm': {
+    profileForm: {
       handler(newData, oldData) {
         if (oldData && this.componentState.hasInitialized) {
           this.profileState.isDirty = this.checkIfProfileChanged();
           this.uiState.hasUnsavedChanges = this.profileState.isDirty;
-          this.trackFieldInteraction('profile', 'change');
+          this.trackFieldInteraction("profile", "change");
         }
       },
-      deep: true
+      deep: true,
     },
 
     // Watch for password form changes
-    'passwordForm.newPassword'(newPassword) {
+    "passwordForm.newPassword"(newPassword) {
       if (newPassword) {
         this.checkPasswordStrength(newPassword);
-        this.validatePasswordField('newPassword');
+        this.validatePasswordField("newPassword");
       }
     },
 
     // Watch for password confirmation changes
-    'passwordForm.confirmPassword'() {
+    "passwordForm.confirmPassword"() {
       if (this.passwordForm.confirmPassword) {
-        this.validatePasswordField('confirmPassword');
+        this.validatePasswordField("confirmPassword");
       }
-    },    // Watch for active tab changes
-    'uiState.activeTab'(newTab, oldTab) {
+    }, // Watch for active tab changes
+    "uiState.activeTab"(newTab, oldTab) {
       if (oldTab) {
         this.analytics.tabSwitches++;
-        this.trackEvent('tab_switch', {
+        this.trackEvent("tab_switch", {
           from: oldTab,
-          to: newTab
+          to: newTab,
         });
       }
-      
+
       // Load orders when switching to orders tab
-      if (newTab === 'orders') {
+      if (newTab === "orders") {
         this.loadUserOrders();
       }
     },
@@ -770,11 +767,11 @@ const AccountPage = {template: `
     // Watch for unsaved changes
     hasUnsavedChanges(hasChanges) {
       if (hasChanges) {
-        window.addEventListener('beforeunload', this.handleBeforeUnload);
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
       } else {
-        window.removeEventListener('beforeunload', this.handleBeforeUnload);
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
       }
-    }
+    },
   },
 
   created() {
@@ -785,17 +782,22 @@ const AccountPage = {template: `
       }
 
       // Set up debounced validation methods
-      this.validateProfileField = window.helpers?.debounce(this._validateProfileField.bind(this), this.config.debounceDelay);
-      this.validatePasswordField = window.helpers?.debounce(this._validatePasswordField.bind(this), this.config.debounceDelay);
+      this.validateProfileField = window.helpers?.debounce(
+        this._validateProfileField.bind(this),
+        this.config.debounceDelay
+      );
+      this.validatePasswordField = window.helpers?.debounce(
+        this._validatePasswordField.bind(this),
+        this.config.debounceDelay
+      );
 
       // Track component creation
-      this.trackEvent('component_created', {
-        timestamp: Date.now()
+      this.trackEvent("component_created", {
+        timestamp: Date.now(),
       });
-
     } catch (error) {
-      console.error('Error in AccountPage created hook:', error);
-      this.handleComponentError(error, 'created');
+      console.error("Error in AccountPage created hook:", error);
+      this.handleComponentError(error, "created");
     }
   },
 
@@ -803,21 +805,22 @@ const AccountPage = {template: `
     try {
       this.initializeComponent();
       this.componentState.isMounted = true;
-      console.log('AccountPage component mounted successfully');
+      console.log("AccountPage component mounted successfully");
     } catch (error) {
-      console.error('Error mounting AccountPage component:', error);
-      this.handleComponentError(error, 'mount');
+      console.error("Error mounting AccountPage component:", error);
+      this.handleComponentError(error, "mount");
     }
   },
 
   beforeUnmount() {
     try {
       this.cleanupComponent();
-      window.removeEventListener('beforeunload', this.handleBeforeUnload);
+      window.removeEventListener("beforeunload", this.handleBeforeUnload);
     } catch (error) {
-      console.error('Error cleaning up AccountPage component:', error);
+      console.error("Error cleaning up AccountPage component:", error);
     }
-  },  methods: {
+  },
+  methods: {
     /**
      * Initialize component with data loading and setup
      */
@@ -826,25 +829,22 @@ const AccountPage = {template: `
         this.uiState.isLoading = true;
 
         // Load user data and orders
-        await Promise.all([
-          this.loadUserData(),
-          this.loadUserOrders()
-        ]);
+        await Promise.all([this.loadUserData(), this.loadUserOrders()]);
 
         // Track component initialization
-        this.trackEvent('component_initialized', {
+        this.trackEvent("component_initialized", {
           timestamp: Date.now(),
-          hasUserData: !!this.user.id
+          hasUserData: !!this.user.id,
         });
 
         this.componentState.hasInitialized = true;
-
       } catch (error) {
-        console.error('Error initializing AccountPage:', error);
-        this.componentState.loadError = 'Failed to load account data. Please refresh the page.';
+        console.error("Error initializing AccountPage:", error);
+        this.componentState.loadError =
+          "Failed to load account data. Please refresh the page.";
         window.ErrorHandler?.logError(error, {
-          component: 'AccountPage',
-          method: 'initializeComponent'
+          component: "AccountPage",
+          method: "initializeComponent",
         });
       } finally {
         this.uiState.isLoading = false;
@@ -860,8 +860,8 @@ const AccountPage = {template: `
 
         if (!user) {
           // Redirect to login if not logged in
-          window.ToastService?.error('Please log in to access your account');
-          this.$router?.push('/login?redirect=/account');
+          window.ToastService?.error("Please log in to access your account");
+          this.$router?.push("/login?redirect=/account");
           return;
         }
 
@@ -870,25 +870,26 @@ const AccountPage = {template: `
 
         // Initialize profile form with user data
         this.profileForm = {
-          firstName: user.firstName || '',
-          lastName: user.lastName || '',
-          phone: user.phone || '',
-          address: user.address || '',
-          email: user.email || ''
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          phone: user.phone || "",
+          address: user.address || "",
+          email: user.email || "",
         };
 
         // Mark as clean after initial load
         this.$nextTick(() => {
           this.profileState.isDirty = false;
-        });      } catch (error) {
-        console.error('Error loading user data:', error);
-        window.ToastService?.error('Failed to load user data');
+        });
+      } catch (error) {
+        console.error("Error loading user data:", error);
+        window.ToastService?.error("Failed to load user data");
         throw error;
       }
-    },    /**
+    },
+    /**
      * Load user orders with enhanced error handling and database integration
-     */
-    async loadUserOrders() {
+     */ async loadUserOrders() {
       try {
         this.ordersData.isLoading = true;
         this.feedback.orders.error = null;
@@ -896,53 +897,59 @@ const AccountPage = {template: `
         const user = window.AuthService?.getCurrentUser();
         if (user?.id) {
           let orders = [];
-          
+
           try {
             // Primary: Get orders from DatabaseService
             if (window.DatabaseService) {
               orders = await window.DatabaseService.getUserOrders(user.id);
-              console.log('Orders loaded from database:', orders.length);
+              console.log("Orders loaded from database:", orders.length);
             }
-            
+
             // Fallback: If no orders from database or service unavailable, try CartService
             if (orders.length === 0 && window.CartService) {
-              console.log('Falling back to CartService for orders');
-              orders = await window.CartService.getUserOrders(user.id) || [];
-                // If we found orders in CartService but not in database, sync them
+              console.log("Falling back to CartService for orders");
+              orders = (await window.CartService.getUserOrders(user.id)) || [];
+              // If we found orders in CartService but not in database, sync them
               if (orders.length > 0 && window.DatabaseService) {
-                console.log('Syncing orders from CartService to database');
+                console.log("Syncing orders from CartService to database");
                 for (const order of orders) {
                   try {
                     // Use addOrder to save to database
                     await window.DatabaseService.addOrder(order);
                   } catch (syncError) {
-                    console.warn('Failed to sync order to database:', syncError);
+                    console.warn(
+                      "Failed to sync order to database:",
+                      syncError
+                    );
                   }
                 }
               }
             }
           } catch (dbError) {
-            console.warn('Database service error, falling back to CartService:', dbError);
+            console.warn(
+              "Database service error, falling back to CartService:",
+              dbError
+            );
             // Final fallback to CartService
             if (window.CartService) {
-              orders = await window.CartService.getUserOrders(user.id) || [];
+              orders = (await window.CartService.getUserOrders(user.id)) || [];
             }
           }
-          
+
           this.ordersData.orders = orders;
-          
+
           // Reset pagination
           this.ordersData.pagination.currentPage = 1;
         } else {
           this.ordersData.orders = [];
         }
-
       } catch (error) {
-        console.error('Failed to load user orders:', error);
-        this.feedback.orders.error = 'Failed to load order history. Please try again.';
+        console.error("Failed to load user orders:", error);
+        this.feedback.orders.error =
+          "Failed to load order history. Please try again.";
         window.ErrorHandler?.logError(error, {
-          component: 'AccountPage',
-          method: 'loadUserOrders'
+          component: "AccountPage",
+          method: "loadUserOrders",
         });
       } finally {
         this.ordersData.isLoading = false;
@@ -953,13 +960,16 @@ const AccountPage = {template: `
      * Check if profile form has changed from original data
      */
     checkIfProfileChanged() {
-      return JSON.stringify(this.profileForm) !== JSON.stringify({
-        firstName: this.originalUserData.firstName || '',
-        lastName: this.originalUserData.lastName || '',
-        phone: this.originalUserData.phone || '',
-        address: this.originalUserData.address || '',
-        email: this.originalUserData.email || ''
-      });
+      return (
+        JSON.stringify(this.profileForm) !==
+        JSON.stringify({
+          firstName: this.originalUserData.firstName || "",
+          lastName: this.originalUserData.lastName || "",
+          phone: this.originalUserData.phone || "",
+          address: this.originalUserData.address || "",
+          email: this.originalUserData.email || "",
+        })
+      );
     },
 
     /**
@@ -967,26 +977,35 @@ const AccountPage = {template: `
      */
     _validateProfileField(fieldName, showErrors = false) {
       try {
-        if (showErrors || this.profileState.validation.touched[fieldName] || this.profileState.submitted) {
+        if (
+          showErrors ||
+          this.profileState.validation.touched[fieldName] ||
+          this.profileState.submitted
+        ) {
           this.profileState.validation.touched[fieldName] = true;
 
           const value = this.profileForm[fieldName];
           let error = null;
 
           switch (fieldName) {
-            case 'firstName':
-            case 'lastName':
+            case "firstName":
+            case "lastName":
               if (!value) {
-                error = `${fieldName === 'firstName' ? 'First' : 'Last'} name is required`;
+                error = `${
+                  fieldName === "firstName" ? "First" : "Last"
+                } name is required`;
               } else if (this.componentState.validator) {
-                const result = this.componentState.validator.validateName(value);
+                const result =
+                  this.componentState.validator.validateName(value);
                 if (!result.isValid) {
                   error = result.message;
                 }
               } else {
                 // Fallback validation
-                const minLength = window.APP_CONSTANTS?.VALIDATION?.MIN_NAME_LENGTH || 2;
-                const maxLength = window.APP_CONSTANTS?.VALIDATION?.MAX_NAME_LENGTH || 50;
+                const minLength =
+                  window.APP_CONSTANTS?.VALIDATION?.MIN_NAME_LENGTH || 2;
+                const maxLength =
+                  window.APP_CONSTANTS?.VALIDATION?.MAX_NAME_LENGTH || 50;
                 if (value.length < minLength) {
                   error = `Name must be at least ${minLength} characters`;
                 } else if (value.length > maxLength) {
@@ -995,32 +1014,38 @@ const AccountPage = {template: `
               }
               break;
 
-            case 'email':
+            case "email":
               if (value && this.componentState.validator) {
-                const result = this.componentState.validator.validateEmail(value);
+                const result =
+                  this.componentState.validator.validateEmail(value);
                 if (!result.isValid) {
                   error = result.message;
                 }
               } else if (value) {
                 // Fallback validation
-                const emailPattern = window.APP_CONSTANTS?.VALIDATION?.EMAIL_PATTERN || /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                const emailPattern =
+                  window.APP_CONSTANTS?.VALIDATION?.EMAIL_PATTERN ||
+                  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailPattern.test(value)) {
-                  error = 'Please enter a valid email address';
+                  error = "Please enter a valid email address";
                 }
               }
               break;
 
-            case 'phone':
+            case "phone":
               if (value && this.componentState.validator) {
-                const result = this.componentState.validator.validatePhone(value);
+                const result =
+                  this.componentState.validator.validatePhone(value);
                 if (!result.isValid) {
                   error = result.message;
                 }
               } else if (value) {
                 // Fallback validation
-                const phonePattern = window.APP_CONSTANTS?.VALIDATION?.PHONE_PATTERN || /^[0-9+\-\s()]{8,20}$/;
+                const phonePattern =
+                  window.APP_CONSTANTS?.VALIDATION?.PHONE_PATTERN ||
+                  /^[0-9+\-\s()]{8,20}$/;
                 if (!phonePattern.test(value)) {
-                  error = 'Please enter a valid phone number';
+                  error = "Please enter a valid phone number";
                 }
               }
               break;
@@ -1042,43 +1067,50 @@ const AccountPage = {template: `
      */
     _validatePasswordField(fieldName, showErrors = false) {
       try {
-        if (showErrors || this.passwordState.validation.touched[fieldName] || this.passwordState.submitted) {
+        if (
+          showErrors ||
+          this.passwordState.validation.touched[fieldName] ||
+          this.passwordState.submitted
+        ) {
           this.passwordState.validation.touched[fieldName] = true;
 
           const value = this.passwordForm[fieldName];
           let error = null;
 
           switch (fieldName) {
-            case 'currentPassword':
+            case "currentPassword":
               if (!value) {
-                error = 'Current password is required';
+                error = "Current password is required";
               }
               break;
 
-            case 'newPassword':
+            case "newPassword":
               if (!value) {
-                error = 'New password is required';
+                error = "New password is required";
               } else if (this.componentState.validator) {
-                const result = this.componentState.validator.validatePassword(value);
+                const result =
+                  this.componentState.validator.validatePassword(value);
                 if (!result.isValid) {
                   error = result.message;
                 }
               } else {
                 // Fallback validation
-                const minLength = window.APP_CONSTANTS?.VALIDATION?.MIN_PASSWORD_LENGTH || 8;
+                const minLength =
+                  window.APP_CONSTANTS?.VALIDATION?.MIN_PASSWORD_LENGTH || 8;
                 if (value.length < minLength) {
                   error = `Password must be at least ${minLength} characters`;
                 } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
-                  error = 'Password must include uppercase, lowercase, and numbers';
+                  error =
+                    "Password must include uppercase, lowercase, and numbers";
                 }
               }
               break;
 
-            case 'confirmPassword':
+            case "confirmPassword":
               if (!value) {
-                error = 'Please confirm your new password';
+                error = "Please confirm your new password";
               } else if (value !== this.passwordForm.newPassword) {
-                error = 'Passwords do not match';
+                error = "Passwords do not match";
               }
               break;
           }
@@ -1100,7 +1132,7 @@ const AccountPage = {template: `
     checkPasswordStrength(password) {
       try {
         let score = 0;
-        let feedback = '';
+        let feedback = "";
 
         if (password.length >= 8) score++;
         if (password.match(/[a-z]/)) score++;
@@ -1111,25 +1143,25 @@ const AccountPage = {template: `
         switch (score) {
           case 0:
           case 1:
-            feedback = 'Very weak password';
+            feedback = "Very weak password";
             break;
           case 2:
-            feedback = 'Weak password';
+            feedback = "Weak password";
             break;
           case 3:
-            feedback = 'Medium password';
+            feedback = "Medium password";
             break;
           case 4:
-            feedback = 'Strong password';
+            feedback = "Strong password";
             break;
           case 5:
-            feedback = 'Very strong password';
+            feedback = "Very strong password";
             break;
         }
 
         this.passwordState.strength = { score, feedback };
       } catch (error) {
-        console.error('Error checking password strength:', error);
+        console.error("Error checking password strength:", error);
       }
     },
 
@@ -1144,12 +1176,12 @@ const AccountPage = {template: `
 
         // Validate all fields
         this.profileState.submitted = true;
-        ['firstName', 'lastName', 'email', 'phone'].forEach(field => {
+        ["firstName", "lastName", "email", "phone"].forEach((field) => {
           this._validateProfileField(field, true);
         });
 
         if (!this.isProfileFormValid) {
-          this.focusFirstError('profile');
+          this.focusFirstError("profile");
           return;
         }
 
@@ -1157,14 +1189,16 @@ const AccountPage = {template: `
         this.analytics.profileUpdates++;
 
         // Track update attempt
-        this.trackEvent('profile_update_attempt', {
-          fields: Object.keys(this.profileForm).filter(key => 
-            this.profileForm[key] !== this.originalUserData[key]
-          )
+        this.trackEvent("profile_update_attempt", {
+          fields: Object.keys(this.profileForm).filter(
+            (key) => this.profileForm[key] !== this.originalUserData[key]
+          ),
         });
 
         // Call AuthService to update profile
-        const response = await window.AuthService?.updateProfile(this.profileForm);
+        const response = await window.AuthService?.updateProfile(
+          this.profileForm
+        );
 
         if (response?.success) {
           // Update local user data
@@ -1174,32 +1208,33 @@ const AccountPage = {template: `
           this.uiState.hasUnsavedChanges = false;
           this.uiState.lastSaveTime = Date.now();
 
-          // Show success message          this.feedback.profile.success = window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.PROFILE_UPDATED || 
-                                        'Your profile has been updated successfully.';
-          
+          // Show success message          this.feedback.profile.success = window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.PROFILE_UPDATED ||
+          ("Your profile has been updated successfully.");
+
           window.ToastService?.success(this.feedback.profile.success);
 
           // Reset form state
           this.profileState.submitted = false;
 
           // Track successful update
-          this.trackEvent('profile_update_success', {
-            updateTime: Date.now() - this.analytics.sessionStartTime
-          });        } else {
-          this.feedback.profile.error = response?.message || 'Failed to update profile. Please try again.';
+          this.trackEvent("profile_update_success", {
+            updateTime: Date.now() - this.analytics.sessionStartTime,
+          });
+        } else {
+          this.feedback.profile.error =
+            response?.message || "Failed to update profile. Please try again.";
           window.ToastService?.error(this.feedback.profile.error);
         }
-
       } catch (error) {
-        console.error('Profile update error:', error);
-        this.feedback.profile.error = 'An unexpected error occurred. Please try again.';
+        console.error("Profile update error:", error);
+        this.feedback.profile.error =
+          "An unexpected error occurred. Please try again.";
         window.ToastService?.error(this.feedback.profile.error);
-        
-        window.ErrorHandler?.logError(error, {
-          component: 'AccountPage',
-          method: 'updateProfile'
-        });
 
+        window.ErrorHandler?.logError(error, {
+          component: "AccountPage",
+          method: "updateProfile",
+        });
       } finally {
         this.profileState.isSubmitting = false;
       }
@@ -1216,12 +1251,14 @@ const AccountPage = {template: `
 
         // Validate all fields
         this.passwordState.submitted = true;
-        ['currentPassword', 'newPassword', 'confirmPassword'].forEach(field => {
-          this._validatePasswordField(field, true);
-        });
+        ["currentPassword", "newPassword", "confirmPassword"].forEach(
+          (field) => {
+            this._validatePasswordField(field, true);
+          }
+        );
 
         if (!this.isPasswordFormValid) {
-          this.focusFirstError('password');
+          this.focusFirstError("password");
           return;
         }
 
@@ -1229,8 +1266,8 @@ const AccountPage = {template: `
         this.analytics.passwordUpdates++;
 
         // Track password update attempt
-        this.trackEvent('password_update_attempt', {
-          strength: this.passwordState.strength.score
+        this.trackEvent("password_update_attempt", {
+          strength: this.passwordState.strength.score,
         });
 
         // Call AuthService to update password
@@ -1239,37 +1276,42 @@ const AccountPage = {template: `
           this.passwordForm.newPassword
         );
 
-        if (response?.success) {          this.feedback.security.success = window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.PASSWORD_UPDATED ||
-                                         'Your password has been updated successfully.';
-          
+        if (response?.success) {
+          this.feedback.security.success =
+            window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.PASSWORD_UPDATED ||
+            "Your password has been updated successfully.";
+
           window.ToastService?.success(this.feedback.security.success);
 
           // Reset form
           this.passwordForm = {
-            currentPassword: '',
-            newPassword: '',
-            confirmPassword: ''
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
           };
           this.passwordState.submitted = false;
           this.passwordState.validation.errors = {};
-          this.passwordState.strength = { score: 0, feedback: '' };
+          this.passwordState.strength = { score: 0, feedback: "" };
 
           // Track successful update
-          this.trackEvent('password_update_success', {
-            updateTime: Date.now() - this.analytics.sessionStartTime
-          });        } else {
-          this.feedback.security.error = response?.message || 'Failed to update password. Please try again.';
+          this.trackEvent("password_update_success", {
+            updateTime: Date.now() - this.analytics.sessionStartTime,
+          });
+        } else {
+          this.feedback.security.error =
+            response?.message || "Failed to update password. Please try again.";
           window.ToastService?.error(this.feedback.security.error);
-        }      } catch (error) {
-        console.error('Password update error:', error);
-        this.feedback.security.error = 'An unexpected error occurred. Please try again.';
+        }
+      } catch (error) {
+        console.error("Password update error:", error);
+        this.feedback.security.error =
+          "An unexpected error occurred. Please try again.";
         window.ToastService?.error(this.feedback.security.error);
 
         window.ErrorHandler?.logError(error, {
-          component: 'AccountPage',
-          method: 'updatePassword'
+          component: "AccountPage",
+          method: "updatePassword",
         });
-
       } finally {
         this.passwordState.isSubmitting = false;
       }
@@ -1281,22 +1323,23 @@ const AccountPage = {template: `
     switchTab(tabId) {
       try {
         if (this.hasUnsavedChanges) {
-          const confirmSwitch = confirm('You have unsaved changes. Do you want to continue without saving?');
+          const confirmSwitch = confirm(
+            "You have unsaved changes. Do you want to continue without saving?"
+          );
           if (!confirmSwitch) {
             return;
           }
         }
 
         this.uiState.activeTab = tabId;
-        
+
         // Clear any existing feedback when switching tabs
-        Object.keys(this.feedback).forEach(key => {
+        Object.keys(this.feedback).forEach((key) => {
           this.feedback[key].success = null;
           this.feedback[key].error = null;
         });
-
       } catch (error) {
-        console.error('Error switching tab:', error);
+        console.error("Error switching tab:", error);
       }
     },
 
@@ -1305,14 +1348,15 @@ const AccountPage = {template: `
      */
     togglePasswordVisibility(field) {
       try {
-        this.passwordState.showPasswords[field] = !this.passwordState.showPasswords[field];
-        
-        this.trackEvent('password_visibility_toggle', {
+        this.passwordState.showPasswords[field] =
+          !this.passwordState.showPasswords[field];
+
+        this.trackEvent("password_visibility_toggle", {
           field,
-          visible: this.passwordState.showPasswords[field]
+          visible: this.passwordState.showPasswords[field],
         });
       } catch (error) {
-        console.error('Error toggling password visibility:', error);
+        console.error("Error toggling password visibility:", error);
       }
     },
 
@@ -1321,10 +1365,11 @@ const AccountPage = {template: `
      */
     focusFirstError(formType) {
       this.$nextTick(() => {
-        const selector = formType === 'profile' ? 
-          '.profile-form .is-invalid' : 
-          '.password-form .is-invalid';
-        
+        const selector =
+          formType === "profile"
+            ? ".profile-form .is-invalid"
+            : ".password-form .is-invalid";
+
         const firstErrorField = document.querySelector(selector);
         if (firstErrorField) {
           firstErrorField.focus();
@@ -1338,7 +1383,8 @@ const AccountPage = {template: `
     handleBeforeUnload(event) {
       if (this.hasUnsavedChanges) {
         event.preventDefault();
-        event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+        event.returnValue =
+          "You have unsaved changes. Are you sure you want to leave?";
         return event.returnValue;
       }
     },
@@ -1356,18 +1402,20 @@ const AccountPage = {template: `
     async logout() {
       try {
         // Track logout
-        this.trackEvent('logout', {
+        this.trackEvent("logout", {
           sessionDuration: Date.now() - this.analytics.sessionStartTime,
           profileUpdates: this.analytics.profileUpdates,
           passwordUpdates: this.analytics.passwordUpdates,
-          tabSwitches: this.analytics.tabSwitches
-        });        window.AuthService?.logout();
+          tabSwitches: this.analytics.tabSwitches,
+        });
+        window.AuthService?.logout();
         this.modals.logout = false;
-        
-        window.ToastService?.success('You have been logged out successfully');
-        this.$router?.push('/login');      } catch (error) {
-        console.error('Error during logout:', error);
-        window.ToastService?.error('Error during logout. Please try again.');
+
+        window.ToastService?.success("You have been logged out successfully");
+        this.$router?.push("/login");
+      } catch (error) {
+        console.error("Error during logout:", error);
+        window.ToastService?.error("Error during logout. Please try again.");
       }
     },
 
@@ -1377,10 +1425,10 @@ const AccountPage = {template: `
     filterOrdersByStatus(status) {
       this.ordersData.filters.status = status;
       this.ordersData.pagination.currentPage = 1;
-      
-      this.trackEvent('orders_filter', {
-        filterType: 'status',
-        value: status
+
+      this.trackEvent("orders_filter", {
+        filterType: "status",
+        value: status,
       });
     },
 
@@ -1390,9 +1438,9 @@ const AccountPage = {template: `
     searchOrders(query) {
       this.ordersData.filters.searchQuery = query;
       this.ordersData.pagination.currentPage = 1;
-      
-      this.trackEvent('orders_search', {
-        queryLength: query.length
+
+      this.trackEvent("orders_search", {
+        queryLength: query.length,
       });
     },
 
@@ -1410,14 +1458,14 @@ const AccountPage = {template: `
      */
     getStatusBadgeClass(status) {
       const statusMap = window.APP_CONSTANTS?.ORDER_STATUS_CLASSES || {
-        'pending': 'bg-warning text-dark',
-        'completed': 'bg-success',
-        'cancelled': 'bg-danger',
-        'processing': 'bg-info',
-        'shipped': 'bg-primary'
+        pending: "bg-warning text-dark",
+        completed: "bg-success",
+        cancelled: "bg-danger",
+        processing: "bg-info",
+        shipped: "bg-primary",
       };
-      
-      return statusMap[status.toLowerCase()] || 'bg-secondary';
+
+      return statusMap[status.toLowerCase()] || "bg-secondary";
     },
 
     /**
@@ -1428,12 +1476,11 @@ const AccountPage = {template: `
         if (!this.analytics.interactions[formType]) {
           this.analytics.interactions[formType] = {};
         }
-        
-        this.analytics.interactions[formType][action] = 
+
+        this.analytics.interactions[formType][action] =
           (this.analytics.interactions[formType][action] || 0) + 1;
-        
       } catch (error) {
-        console.error('Error tracking field interaction:', error);
+        console.error("Error tracking field interaction:", error);
       }
     },
 
@@ -1445,13 +1492,13 @@ const AccountPage = {template: `
         const event = {
           event: eventName,
           timestamp: Date.now(),
-          component: 'AccountPage',
-          ...eventData
+          component: "AccountPage",
+          ...eventData,
         };
 
         // Log to console in development
         if (window.APP_CONSTANTS?.DEBUG?.ANALYTICS_LOGGING) {
-          console.log('Analytics Event:', event);
+          console.log("Analytics Event:", event);
         }
 
         // Send to analytics service if available
@@ -1461,53 +1508,55 @@ const AccountPage = {template: `
 
         // Store in session for debugging
         if (window.APP_CONSTANTS?.DEBUG?.STORE_ANALYTICS) {
-          const events = JSON.parse(sessionStorage.getItem('analyticsEvents') || '[]');
+          const events = JSON.parse(
+            sessionStorage.getItem("analyticsEvents") || "[]"
+          );
           events.push(event);
-          sessionStorage.setItem('analyticsEvents', JSON.stringify(events.slice(-100)));
+          sessionStorage.setItem(
+            "analyticsEvents",
+            JSON.stringify(events.slice(-100))
+          );
         }
-
       } catch (error) {
-        console.error('Error tracking event:', error);
+        console.error("Error tracking event:", error);
       }
     },
 
     /**
      * Handle component errors
      */
-    handleComponentError(error, context = 'unknown') {
+    handleComponentError(error, context = "unknown") {
       try {
         console.error(`AccountPage component error in ${context}:`, error);
-        
+
         // Report to error handler
         window.ErrorHandler?.logError(error, {
-          component: 'AccountPage',
+          component: "AccountPage",
           context,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
 
         // Track error event
-        this.trackEvent('component_error', {
+        this.trackEvent("component_error", {
           context,
           error: error.message,
-          stack: error.stack
+          stack: error.stack,
         });
-
       } catch (trackingError) {
-        console.error('Error handling component error:', trackingError);
+        console.error("Error handling component error:", trackingError);
       }
-    },    /**
+    },
+    /**
      * Cleanup component resources
-     */
-    cleanupComponent() {
+     */ cleanupComponent() {
       try {
         // Track component cleanup
-        this.trackEvent('component_cleanup', {
+        this.trackEvent("component_cleanup", {
           sessionDuration: Date.now() - this.analytics.sessionStartTime,
-          interactions: this.analytics.interactions
+          interactions: this.analytics.interactions,
         });
-
       } catch (error) {
-        console.error('Error cleaning up component:', error);
+        console.error("Error cleaning up component:", error);
       }
     },
 
@@ -1519,20 +1568,20 @@ const AccountPage = {template: `
         return window.Filters.formatRelativeTime(date);
       }
       // Fallback implementation
-      if (!date) return 'Unknown';
+      if (!date) return "Unknown";
       const now = new Date();
       const target = new Date(date);
       const diffMs = now - target;
       const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-      
-      if (diffDays === 0) return 'Today';
-      if (diffDays === 1) return 'Yesterday';
+
+      if (diffDays === 0) return "Today";
+      if (diffDays === 1) return "Yesterday";
       if (diffDays < 7) return `${diffDays} days ago`;
       if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
       if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
       return `${Math.floor(diffDays / 365)} years ago`;
-    }
-  }
+    },
+  },
 };
 
 // Make the component globally available

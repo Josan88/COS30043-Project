@@ -7,25 +7,25 @@ class ErrorHandler {
     this.errorLog = [];
     this.maxLogSize = 100;
     this.listeners = [];
-    
+
     // Error types
     this.ERROR_TYPES = {
-      NETWORK: 'network',
-      VALIDATION: 'validation',
-      STORAGE: 'storage',
-      AUTHENTICATION: 'authentication',
-      BUSINESS_LOGIC: 'business_logic',
-      UNKNOWN: 'unknown'
+      NETWORK: "network",
+      VALIDATION: "validation",
+      STORAGE: "storage",
+      AUTHENTICATION: "authentication",
+      BUSINESS_LOGIC: "business_logic",
+      UNKNOWN: "unknown",
     };
-    
+
     // Severity levels
     this.SEVERITY = {
-      LOW: 'low',
-      MEDIUM: 'medium',
-      HIGH: 'high',
-      CRITICAL: 'critical'
+      LOW: "low",
+      MEDIUM: "medium",
+      HIGH: "high",
+      CRITICAL: "critical",
     };
-    
+
     this.init();
   }
   /**
@@ -33,14 +33,17 @@ class ErrorHandler {
    */
   init() {
     // Set up global error handlers
-    window.addEventListener('error', this.handleGlobalError.bind(this));
-    window.addEventListener('unhandledrejection', this.handleUnhandledRejection.bind(this));
-    
+    window.addEventListener("error", this.handleGlobalError.bind(this));
+    window.addEventListener(
+      "unhandledrejection",
+      this.handleUnhandledRejection.bind(this)
+    );
+
     // Set up Vue error handler if Vue is available
     if (window.app && window.app.config) {
       window.app.config.errorHandler = this.handleVueError.bind(this);
     }
-    
+
     // Also set up global error handler reference for components
     if (!window.ErrorHandler) {
       window.ErrorHandler = this;
@@ -54,7 +57,12 @@ class ErrorHandler {
    * @param {string} type - Error type
    * @param {string} severity - Error severity
    */
-  logError(error, context = {}, type = this.ERROR_TYPES.UNKNOWN, severity = this.SEVERITY.MEDIUM) {
+  logError(
+    error,
+    context = {},
+    type = this.ERROR_TYPES.UNKNOWN,
+    severity = this.SEVERITY.MEDIUM
+  ) {
     const errorEntry = {
       id: this.generateErrorId(),
       timestamp: new Date().toISOString(),
@@ -64,15 +72,15 @@ class ErrorHandler {
       severity,
       context: this.sanitizeContext(context),
       userAgent: navigator.userAgent,
-      url: window.location.href
+      url: window.location.href,
     };
-    
+
     this.addToLog(errorEntry);
     this.notifyListeners(errorEntry);
-    
+
     // Console logging based on severity
     this.consoleLog(errorEntry);
-    
+
     // Send to external service in production
     if (this.isProduction()) {
       this.sendToExternalService(errorEntry);
@@ -89,7 +97,7 @@ class ErrorHandler {
       {
         filename: event.filename,
         lineno: event.lineno,
-        colno: event.colno
+        colno: event.colno,
       },
       this.ERROR_TYPES.UNKNOWN,
       this.SEVERITY.HIGH
@@ -119,8 +127,8 @@ class ErrorHandler {
     this.logError(
       error,
       {
-        componentName: instance?.$options?.name || 'Unknown',
-        errorInfo: info
+        componentName: instance?.$options?.name || "Unknown",
+        errorInfo: info,
       },
       this.ERROR_TYPES.UNKNOWN,
       this.SEVERITY.MEDIUM
@@ -139,7 +147,7 @@ class ErrorHandler {
         url: requestInfo.url,
         method: requestInfo.method,
         status: requestInfo.status,
-        statusText: requestInfo.statusText
+        statusText: requestInfo.statusText,
       },
       this.ERROR_TYPES.NETWORK,
       this.SEVERITY.MEDIUM
@@ -188,15 +196,17 @@ class ErrorHandler {
    * @returns {Object} Sanitized context
    */
   sanitizeContext(context) {
-    const sensitiveKeys = ['password', 'token', 'apiKey', 'secret', 'auth'];
+    const sensitiveKeys = ["password", "token", "apiKey", "secret", "auth"];
     const sanitized = { ...context };
-    
-    Object.keys(sanitized).forEach(key => {
-      if (sensitiveKeys.some(sensitive => key.toLowerCase().includes(sensitive))) {
-        sanitized[key] = '[REDACTED]';
+
+    Object.keys(sanitized).forEach((key) => {
+      if (
+        sensitiveKeys.some((sensitive) => key.toLowerCase().includes(sensitive))
+      ) {
+        sanitized[key] = "[REDACTED]";
       }
     });
-    
+
     return sanitized;
   }
 
@@ -206,7 +216,7 @@ class ErrorHandler {
    */
   addToLog(errorEntry) {
     this.errorLog.unshift(errorEntry);
-    
+
     // Keep log size manageable
     if (this.errorLog.length > this.maxLogSize) {
       this.errorLog = this.errorLog.slice(0, this.maxLogSize);
@@ -218,8 +228,10 @@ class ErrorHandler {
    * @param {Object} errorEntry - Error entry
    */
   consoleLog(errorEntry) {
-    const logMessage = `[${errorEntry.severity.toUpperCase()}] ${errorEntry.type}: ${errorEntry.message}`;
-    
+    const logMessage = `[${errorEntry.severity.toUpperCase()}] ${
+      errorEntry.type
+    }: ${errorEntry.message}`;
+
     switch (errorEntry.severity) {
       case this.SEVERITY.CRITICAL:
       case this.SEVERITY.HIGH:
@@ -241,9 +253,11 @@ class ErrorHandler {
    * @returns {boolean} Is production
    */
   isProduction() {
-    return window.location.hostname !== 'localhost' && 
-           window.location.hostname !== '127.0.0.1' &&
-           !window.location.hostname.includes('test');
+    return (
+      window.location.hostname !== "localhost" &&
+      window.location.hostname !== "127.0.0.1" &&
+      !window.location.hostname.includes("test")
+    );
   }
 
   /**
@@ -253,7 +267,7 @@ class ErrorHandler {
   sendToExternalService(errorEntry) {
     // Placeholder for external error reporting service
     // e.g., Sentry, LogRocket, etc.
-    console.log('Would send to external service:', errorEntry);
+    console.log("Would send to external service:", errorEntry);
   }
 
   /**
@@ -261,7 +275,7 @@ class ErrorHandler {
    * @param {Function} listener - Error listener function
    */
   addListener(listener) {
-    if (typeof listener === 'function') {
+    if (typeof listener === "function") {
       this.listeners.push(listener);
     }
   }
@@ -282,11 +296,11 @@ class ErrorHandler {
    * @param {Object} errorEntry - Error entry
    */
   notifyListeners(errorEntry) {
-    this.listeners.forEach(listener => {
+    this.listeners.forEach((listener) => {
       try {
         listener(errorEntry);
       } catch (listenerError) {
-        console.error('Error in error listener:', listenerError);
+        console.error("Error in error listener:", listenerError);
       }
     });
   }
@@ -299,15 +313,15 @@ class ErrorHandler {
    */
   getErrorLog(type = null, severity = null) {
     let filtered = [...this.errorLog];
-    
+
     if (type) {
-      filtered = filtered.filter(entry => entry.type === type);
+      filtered = filtered.filter((entry) => entry.type === type);
     }
-    
+
     if (severity) {
-      filtered = filtered.filter(entry => entry.severity === severity);
+      filtered = filtered.filter((entry) => entry.severity === severity);
     }
-    
+
     return filtered;
   }
 
@@ -326,17 +340,18 @@ class ErrorHandler {
     const stats = {
       total: this.errorLog.length,
       byType: {},
-      bySeverity: {}
+      bySeverity: {},
     };
-    
-    this.errorLog.forEach(entry => {
+
+    this.errorLog.forEach((entry) => {
       // Count by type
       stats.byType[entry.type] = (stats.byType[entry.type] || 0) + 1;
-      
+
       // Count by severity
-      stats.bySeverity[entry.severity] = (stats.bySeverity[entry.severity] || 0) + 1;
+      stats.bySeverity[entry.severity] =
+        (stats.bySeverity[entry.severity] || 0) + 1;
     });
-    
+
     return stats;
   }
 
@@ -346,29 +361,42 @@ class ErrorHandler {
    * @param {string} context - Error context
    * @returns {string} User-friendly message
    */
-  createUserMessage(error, context = '') {
+  createUserMessage(error, context = "") {
     const defaultMessages = {
-      [this.ERROR_TYPES.NETWORK]: 'Connection problem. Please check your internet connection and try again.',
-      [this.ERROR_TYPES.VALIDATION]: 'Please check your input and try again.',
-      [this.ERROR_TYPES.STORAGE]: 'Unable to save data. Please try again.',
-      [this.ERROR_TYPES.AUTHENTICATION]: 'Authentication error. Please log in again.',
-      [this.ERROR_TYPES.BUSINESS_LOGIC]: 'Unable to complete the operation. Please try again.',
-      [this.ERROR_TYPES.UNKNOWN]: 'Something went wrong. Please try again.'
+      [this.ERROR_TYPES.NETWORK]:
+        "Connection problem. Please check your internet connection and try again.",
+      [this.ERROR_TYPES.VALIDATION]: "Please check your input and try again.",
+      [this.ERROR_TYPES.STORAGE]: "Unable to save data. Please try again.",
+      [this.ERROR_TYPES.AUTHENTICATION]:
+        "Authentication error. Please log in again.",
+      [this.ERROR_TYPES.BUSINESS_LOGIC]:
+        "Unable to complete the operation. Please try again.",
+      [this.ERROR_TYPES.UNKNOWN]: "Something went wrong. Please try again.",
     };
-    
+
     // Try to determine error type from error message
-    let errorType = this.ERROR_TYPES.UNKNOWN;    const errorMessage = error.message || error || '';
-    
-    if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
+    let errorType = this.ERROR_TYPES.UNKNOWN;
+    const errorMessage = error.message || error || "";
+
+    if (errorMessage.includes("network") || errorMessage.includes("fetch")) {
       errorType = this.ERROR_TYPES.NETWORK;
-    } else if (errorMessage.includes('validation') || errorMessage.includes('invalid')) {
+    } else if (
+      errorMessage.includes("validation") ||
+      errorMessage.includes("invalid")
+    ) {
       errorType = this.ERROR_TYPES.VALIDATION;
-    } else if (errorMessage.includes('storage') || errorMessage.includes('localStorage')) {
+    } else if (
+      errorMessage.includes("storage") ||
+      errorMessage.includes("localStorage")
+    ) {
       errorType = this.ERROR_TYPES.STORAGE;
-    } else if (errorMessage.includes('auth') || errorMessage.includes('unauthorized')) {
+    } else if (
+      errorMessage.includes("auth") ||
+      errorMessage.includes("unauthorized")
+    ) {
       errorType = this.ERROR_TYPES.AUTHENTICATION;
     }
-    
+
     return defaultMessages[errorType];
   }
 
@@ -381,7 +409,7 @@ class ErrorHandler {
   handleError(error, context = {}) {
     const severity = context.severity || this.SEVERITY.MEDIUM;
     const type = context.type || this.ERROR_TYPES.UNKNOWN;
-    
+
     return this.logError(error, context, type, severity);
   }
 }
@@ -390,6 +418,6 @@ class ErrorHandler {
 window.ErrorHandler = new ErrorHandler();
 
 // Export for module systems
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = ErrorHandler;
 }

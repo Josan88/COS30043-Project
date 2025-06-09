@@ -3,7 +3,7 @@
  * Main navigation bar for the in-restaurant food ordering application
  * Enhanced with better structure, constants, and error handling
  */
-window.app.component('nav-bar', {
+window.app.component("nav-bar", {
   template: `
     <nav class="navbar navbar-expand-md">
       <div class="container">
@@ -75,81 +75,82 @@ window.app.component('nav-bar', {
         </div>
       </div>
     </nav>
-  `,  data() {
+  `,
+  data() {
     return {
       // UI State
       isNavOpen: false,
       isUserDropdownOpen: false,
       isInitialized: false,
-      
+
       // Authentication State
       isLoggedIn: false,
-      userDisplayName: 'My Account',
-      
+      userDisplayName: "My Account",
+
       // Cart State
       cartItemCount: 0,
-      
+
       // Configuration
-      brandName: window.APP_CONSTANTS?.UI?.BRAND_NAME || 'FoodNow',
-      
+      brandName: window.APP_CONSTANTS?.UI?.BRAND_NAME || "FoodNow",
+
       // Navigation items configuration
       navigationItems: [
         {
-          name: 'Menu',
-          path: '/product',
-          icon: 'fas fa-book-open',
-          ariaLabel: 'Browse Menu',
+          name: "Menu",
+          path: "/product",
+          icon: "fas fa-book-open",
+          ariaLabel: "Browse Menu",
           shouldShow: true,
-          badge: false
+          badge: false,
         },
         {
-          name: 'Cart',
-          path: '/cart',
-          icon: 'fas fa-shopping-cart',
-          ariaLabel: 'View Cart',
+          name: "Cart",
+          path: "/cart",
+          icon: "fas fa-shopping-cart",
+          ariaLabel: "View Cart",
           shouldShow: true,
           badge: true,
-          badgeValue: 0
+          badgeValue: 0,
         },
         {
-          name: 'Sign In',
-          path: '/login',
-          icon: 'fas fa-sign-in-alt',
-          ariaLabel: 'Sign In',
+          name: "Sign In",
+          path: "/login",
+          icon: "fas fa-sign-in-alt",
+          ariaLabel: "Sign In",
           shouldShow: true,
-          badge: false
+          badge: false,
         },
         {
-          name: 'Register',
-          path: '/register',
-          icon: 'fas fa-user-plus',
-          ariaLabel: 'Create Account',
+          name: "Register",
+          path: "/register",
+          icon: "fas fa-user-plus",
+          ariaLabel: "Create Account",
           shouldShow: true,
-          badge: false
-        }
+          badge: false,
+        },
       ],
-      
+
       // User menu configuration
       userMenuItems: [
         {
-          name: 'Profile',
-          path: '/account',
-          icon: 'fas fa-user',
-          isAction: false
+          name: "Profile",
+          path: "/account",
+          icon: "fas fa-user",
+          isAction: false,
         },
         {
-          name: 'Order History',
-          path: '/purchases',
-          icon: 'fas fa-history',
-          isAction: false
+          name: "Order History",
+          path: "/purchases",
+          icon: "fas fa-history",
+          isAction: false,
         },
         {
-          name: 'Sign Out',
-          icon: 'fas fa-sign-out-alt',
+          name: "Sign Out",
+          icon: "fas fa-sign-out-alt",
           isAction: true,
-          action: () => this.logout()
-        }
-      ]
+          action: () => this.logout(),
+        },
+      ],
     };
   },
   computed: {
@@ -157,28 +158,36 @@ window.app.component('nav-bar', {
      * Filter navigation items based on authentication state
      */
     filteredNavigationItems() {
-      return this.navigationItems.filter(item => {
-        if (!this.isLoggedIn && (item.name === 'Sign In' || item.name === 'Register')) {
+      return this.navigationItems.filter((item) => {
+        if (
+          !this.isLoggedIn &&
+          (item.name === "Sign In" || item.name === "Register")
+        ) {
           return true;
         }
-        if (this.isLoggedIn && (item.name === 'Sign In' || item.name === 'Register')) {
+        if (
+          this.isLoggedIn &&
+          (item.name === "Sign In" || item.name === "Register")
+        ) {
           return false;
         }
         return item.shouldShow;
       });
-    }
+    },
   },
   watch: {
     /**
      * Update cart badge when cart count changes
      */
     cartItemCount(newCount) {
-      const cartItem = this.navigationItems.find(item => item.name === 'Cart');
+      const cartItem = this.navigationItems.find(
+        (item) => item.name === "Cart"
+      );
       if (cartItem) {
         cartItem.badgeValue = newCount;
       }
     },
-    
+
     /**
      * Update navigation visibility when authentication state changes
      */
@@ -187,22 +196,23 @@ window.app.component('nav-bar', {
       if (newValue) {
         this.loadUserInfo();
       }
-    }  },
+    },
+  },
 
   mounted() {
     try {
       // Initialize component state
       this.initializeComponent();
-      
+
       // Set up event listeners
       this.setupEventListeners();
-      
-      console.log('NavBar component mounted successfully');
+
+      console.log("NavBar component mounted successfully");
     } catch (error) {
-      console.error('Error mounting NavBar component:', error);
-      window.ErrorHandler?.logError(error, { 
-        component: 'NavBar', 
-        method: 'mounted' 
+      console.error("Error mounting NavBar component:", error);
+      window.ErrorHandler?.logError(error, {
+        component: "NavBar",
+        method: "mounted",
       });
     }
   },
@@ -212,7 +222,7 @@ window.app.component('nav-bar', {
       // Clean up event listeners
       this.cleanupEventListeners();
     } catch (error) {
-      console.error('Error cleaning up NavBar component:', error);
+      console.error("Error cleaning up NavBar component:", error);
     }
   },
   methods: {
@@ -223,60 +233,64 @@ window.app.component('nav-bar', {
       try {
         // Load user authentication state
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        this.isLoggedIn = localStorage.getItem(storageKeys.IS_LOGGED_IN || 'isLoggedIn') === 'true';
-        
+        this.isLoggedIn =
+          localStorage.getItem(storageKeys.IS_LOGGED_IN || "isLoggedIn") ===
+          "true";
+
         // Load user info if logged in
         if (this.isLoggedIn) {
           this.loadUserInfo();
         }
-        
+
         // Initialize cart count
         this.updateCartCount();
-        
+
         // Mark component as initialized
         this.isInitialized = true;
-          console.log('NavBar component initialized successfully');
+        console.log("NavBar component initialized successfully");
       } catch (error) {
-        console.error('Error initializing NavBar component:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'initializeComponent' 
+        console.error("Error initializing NavBar component:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "initializeComponent",
         });
       }
-    },    /**
+    }
+    /**
      * Toggle mobile navigation menu
-     */
+     */,
     toggleNav() {
       this.isNavOpen = !this.isNavOpen;
-      
+
       // Close user dropdown when opening nav
       if (this.isNavOpen) {
         this.isUserDropdownOpen = false;
       }
-      
+
       // Track navigation toggle for analytics
       if (window.Analytics) {
-        window.Analytics.track('navigation_toggle', {
+        window.Analytics.track("navigation_toggle", {
           isOpen: this.isNavOpen,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
-    },    /**
+    }
+    /**
      * Toggle user dropdown menu
-     */
+     */,
     toggleUserDropdown() {
       this.isUserDropdownOpen = !this.isUserDropdownOpen;
-      
+
       // Close mobile nav when opening user dropdown
       if (this.isUserDropdownOpen) {
         this.isNavOpen = false;
       }
-      
+
       // Track dropdown toggle for analytics
       if (window.Analytics) {
-        window.Analytics.track('user_dropdown_toggle', {
+        window.Analytics.track("user_dropdown_toggle", {
           isOpen: this.isUserDropdownOpen,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
     },
@@ -288,32 +302,32 @@ window.app.component('nav-bar', {
       try {
         // Close mobile navigation after click
         this.isNavOpen = false;
-        
+
         // Close user dropdown
         this.isUserDropdownOpen = false;
-        
+
         // Track navigation click for analytics
         if (window.Analytics) {
-          window.Analytics.track('navigation_click', {
+          window.Analytics.track("navigation_click", {
             itemName: item.name,
             itemPath: item.path,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
-        
+
         // Handle special navigation items
-        if (item.name === 'Cart') {
+        if (item.name === "Cart") {
           // Update cart count before navigating to cart
           this.updateCartCount();
         }
-        
-        console.log('Navigation item clicked:', item.name);
+
+        console.log("Navigation item clicked:", item.name);
       } catch (error) {
-        console.error('Error handling navigation click:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'handleNavClick',
-          item: item.name 
+        console.error("Error handling navigation click:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "handleNavClick",
+          item: item.name,
         });
       }
     },
@@ -323,35 +337,37 @@ window.app.component('nav-bar', {
      */
     setupEventListeners() {
       // Storage events for cross-tab synchronization
-      window.addEventListener('storage', this.handleStorageEvent);
-      
+      window.addEventListener("storage", this.handleStorageEvent);
+
       // Custom cart update events
-      window.addEventListener('cart-updated', this.updateCartCount);
-      
+      window.addEventListener("cart-updated", this.updateCartCount);
+
       // Custom authentication events
-      window.addEventListener('auth-updated', () => {
+      window.addEventListener("auth-updated", () => {
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        this.isLoggedIn = localStorage.getItem(storageKeys.IS_LOGGED_IN || 'isLoggedIn') === 'true';
+        this.isLoggedIn =
+          localStorage.getItem(storageKeys.IS_LOGGED_IN || "isLoggedIn") ===
+          "true";
         if (this.isLoggedIn) {
           this.loadUserInfo();
         }
       });
-      
+
       // Global click handler for closing dropdowns
-      document.addEventListener('click', this.handleGlobalClick);
-      
+      document.addEventListener("click", this.handleGlobalClick);
+
       // Keyboard navigation
-      document.addEventListener('keydown', this.handleKeydown);
+      document.addEventListener("keydown", this.handleKeydown);
     },
 
     /**
      * Clean up event listeners
      */
     cleanupEventListeners() {
-      window.removeEventListener('storage', this.handleStorageEvent);
-      window.removeEventListener('cart-updated', this.updateCartCount);
-      document.removeEventListener('click', this.handleGlobalClick);
-      document.removeEventListener('keydown', this.handleKeydown);
+      window.removeEventListener("storage", this.handleStorageEvent);
+      window.removeEventListener("cart-updated", this.updateCartCount);
+      document.removeEventListener("click", this.handleGlobalClick);
+      document.removeEventListener("keydown", this.handleKeydown);
     },
 
     /**
@@ -359,21 +375,22 @@ window.app.component('nav-bar', {
      */
     handleGlobalClick(event) {
       // Close user dropdown if clicking outside
-      if (!event.target.closest('#userDropdown') && this.isUserDropdownOpen) {
+      if (!event.target.closest("#userDropdown") && this.isUserDropdownOpen) {
         this.isUserDropdownOpen = false;
       }
-      
+
       // Close mobile nav if clicking outside
-      if (!event.target.closest('.navbar') && this.isNavOpen) {
+      if (!event.target.closest(".navbar") && this.isNavOpen) {
         this.isNavOpen = false;
-      }    },
+      }
+    },
 
     /**
      * Handle keyboard navigation
      */
     handleKeydown(event) {
       // ESC key closes dropdowns and mobile nav
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         this.isUserDropdownOpen = false;
         this.isNavOpen = false;
       }
@@ -384,32 +401,37 @@ window.app.component('nav-bar', {
      */
     updateCartCount() {
       try {
-        const cartKey = window.APP_CONSTANTS?.STORAGE_KEYS?.CART || 'cart';
+        const cartKey = window.APP_CONSTANTS?.STORAGE_KEYS?.CART || "cart";
         const cartData = localStorage.getItem(cartKey);
-        
+
         if (cartData) {
           const cart = JSON.parse(cartData);
           // Count total items in cart
-          this.cartItemCount = Array.isArray(cart) 
+          this.cartItemCount = Array.isArray(cart)
             ? cart.reduce((total, item) => total + (item.quantity || 1), 0)
-            : Object.values(cart).reduce((total, item) => total + (item.quantity || 1), 0);
+            : Object.values(cart).reduce(
+                (total, item) => total + (item.quantity || 1),
+                0
+              );
         } else {
           this.cartItemCount = 0;
         }
-        
+
         // Update navigation badge
-        const cartItem = this.navigationItems.find(item => item.name === 'Cart');
+        const cartItem = this.navigationItems.find(
+          (item) => item.name === "Cart"
+        );
         if (cartItem) {
           cartItem.badgeValue = this.cartItemCount;
         }
-        
-        console.log('Cart count updated:', this.cartItemCount);
+
+        console.log("Cart count updated:", this.cartItemCount);
       } catch (error) {
-        console.error('Error updating cart count:', error);
+        console.error("Error updating cart count:", error);
         this.cartItemCount = 0;
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'updateCartCount' 
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "updateCartCount",
         });
       }
     },
@@ -420,28 +442,30 @@ window.app.component('nav-bar', {
     loadUserInfo() {
       try {
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        const userKey = storageKeys.USER_DATA || 'userData';
+        const userKey = storageKeys.USER_DATA || "userData";
         const userData = localStorage.getItem(userKey);
-        
+
         if (userData) {
           const user = JSON.parse(userData);
           // Set display name with fallback hierarchy
-          this.userDisplayName = user.firstName 
-            ? `${user.firstName} ${user.lastName || ''}`.trim()
-            : user.username || user.email || 'My Account';
+          this.userDisplayName = user.firstName
+            ? `${user.firstName} ${user.lastName || ""}`.trim()
+            : user.username || user.email || "My Account";
         } else {
           // Fallback to basic account info
-          const email = localStorage.getItem(storageKeys.USER_EMAIL || 'userEmail');
-          this.userDisplayName = email ? email.split('@')[0] : 'My Account';
+          const email = localStorage.getItem(
+            storageKeys.USER_EMAIL || "userEmail"
+          );
+          this.userDisplayName = email ? email.split("@")[0] : "My Account";
         }
-        
-        console.log('User info loaded:', this.userDisplayName);
+
+        console.log("User info loaded:", this.userDisplayName);
       } catch (error) {
-        console.error('Error loading user info:', error);
-        this.userDisplayName = 'My Account';
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'loadUserInfo' 
+        console.error("Error loading user info:", error);
+        this.userDisplayName = "My Account";
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "loadUserInfo",
         });
       }
     },
@@ -452,18 +476,21 @@ window.app.component('nav-bar', {
     updateNavigationVisibility() {
       try {
         // Force reactivity update by modifying navigationItems
-        this.navigationItems.forEach(item => {
-          if (item.name === 'Sign In' || item.name === 'Register') {
+        this.navigationItems.forEach((item) => {
+          if (item.name === "Sign In" || item.name === "Register") {
             item.shouldShow = !this.isLoggedIn;
           }
         });
-        
-        console.log('Navigation visibility updated for auth state:', this.isLoggedIn);
+
+        console.log(
+          "Navigation visibility updated for auth state:",
+          this.isLoggedIn
+        );
       } catch (error) {
-        console.error('Error updating navigation visibility:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'updateNavigationVisibility' 
+        console.error("Error updating navigation visibility:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "updateNavigationVisibility",
         });
       }
     },
@@ -474,33 +501,33 @@ window.app.component('nav-bar', {
     handleStorageEvent(event) {
       try {
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        
+
         // Handle authentication changes
-        if (event.key === (storageKeys.IS_LOGGED_IN || 'isLoggedIn')) {
-          this.isLoggedIn = event.newValue === 'true';
+        if (event.key === (storageKeys.IS_LOGGED_IN || "isLoggedIn")) {
+          this.isLoggedIn = event.newValue === "true";
           if (this.isLoggedIn) {
             this.loadUserInfo();
           } else {
-            this.userDisplayName = 'My Account';
+            this.userDisplayName = "My Account";
           }
         }
-        
+
         // Handle cart changes
-        if (event.key === (storageKeys.CART || 'cart')) {
+        if (event.key === (storageKeys.CART || "cart")) {
           this.updateCartCount();
         }
-        
+
         // Handle user data changes
-        if (event.key === (storageKeys.USER_DATA || 'userData')) {
+        if (event.key === (storageKeys.USER_DATA || "userData")) {
           if (this.isLoggedIn) {
             this.loadUserInfo();
           }
         }
       } catch (error) {
-        console.error('Error handling storage event:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'handleStorageEvent' 
+        console.error("Error handling storage event:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "handleStorageEvent",
         });
       }
     },
@@ -512,56 +539,58 @@ window.app.component('nav-bar', {
       try {
         // Show confirmation if ToastService is available
         if (window.ToastService) {
-          window.ToastService.info('Signing out...', { timeout: 2000 });
+          window.ToastService.info("Signing out...", { timeout: 2000 });
         }
-        
+
         // Clear authentication data
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        localStorage.removeItem(storageKeys.IS_LOGGED_IN || 'isLoggedIn');
-        localStorage.removeItem(storageKeys.USER_DATA || 'userData');
-        localStorage.removeItem(storageKeys.USER_EMAIL || 'userEmail');
-        localStorage.removeItem(storageKeys.AUTH_TOKEN || 'authToken');
-        
+        localStorage.removeItem(storageKeys.IS_LOGGED_IN || "isLoggedIn");
+        localStorage.removeItem(storageKeys.USER_DATA || "userData");
+        localStorage.removeItem(storageKeys.USER_EMAIL || "userEmail");
+        localStorage.removeItem(storageKeys.AUTH_TOKEN || "authToken");
+
         // Update component state
         this.isLoggedIn = false;
-        this.userDisplayName = 'My Account';
+        this.userDisplayName = "My Account";
         this.isUserDropdownOpen = false;
-        
+
         // Update navigation visibility
         this.updateNavigationVisibility();
-        
+
         // Emit custom event for other components
-        window.dispatchEvent(new CustomEvent('auth-updated', { 
-          detail: { isLoggedIn: false } 
-        }));
-        
+        window.dispatchEvent(
+          new CustomEvent("auth-updated", {
+            detail: { isLoggedIn: false },
+          })
+        );
+
         // Track logout for analytics
         if (window.Analytics) {
-          window.Analytics.track('user_logout', {
-            timestamp: new Date().toISOString()
+          window.Analytics.track("user_logout", {
+            timestamp: new Date().toISOString(),
           });
         }
-        
+
         // Show success message
         if (window.ToastService) {
-          window.ToastService.success('Successfully signed out');
+          window.ToastService.success("Successfully signed out");
         }
-        
+
         // Redirect to home page
-        if (this.$router && this.$route.path !== '/') {
-          this.$router.push('/');
+        if (this.$router && this.$route.path !== "/") {
+          this.$router.push("/");
         }
-        
-        console.log('User logged out successfully');
+
+        console.log("User logged out successfully");
       } catch (error) {
-        console.error('Error during logout:', error);
-        window.ErrorHandler?.logError(error, { 
-          component: 'NavBar', 
-          method: 'logout' 
+        console.error("Error during logout:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "logout",
         });
-        
+
         if (window.ToastService) {
-          window.ToastService.error('Error signing out. Please try again.');
+          window.ToastService.error("Error signing out. Please try again.");
         }
       }
     },
@@ -571,35 +600,37 @@ window.app.component('nav-bar', {
      */
     setupEventListeners() {
       // Storage events for cross-tab synchronization
-      window.addEventListener('storage', this.handleStorageEvent);
-      
+      window.addEventListener("storage", this.handleStorageEvent);
+
       // Custom cart update events
-      window.addEventListener('cart-updated', this.updateCartCount);
-      
+      window.addEventListener("cart-updated", this.updateCartCount);
+
       // Custom authentication events
-      window.addEventListener('auth-updated', () => {
+      window.addEventListener("auth-updated", () => {
         const storageKeys = window.APP_CONSTANTS?.STORAGE_KEYS || {};
-        this.isLoggedIn = localStorage.getItem(storageKeys.IS_LOGGED_IN || 'isLoggedIn') === 'true';
+        this.isLoggedIn =
+          localStorage.getItem(storageKeys.IS_LOGGED_IN || "isLoggedIn") ===
+          "true";
         if (this.isLoggedIn) {
           this.loadUserInfo();
         }
       });
-      
+
       // Global click handler for closing dropdowns
-      document.addEventListener('click', this.handleGlobalClick);
-      
+      document.addEventListener("click", this.handleGlobalClick);
+
       // Keyboard navigation
-      document.addEventListener('keydown', this.handleKeydown);
+      document.addEventListener("keydown", this.handleKeydown);
     },
 
     /**
      * Clean up event listeners
      */
     cleanupEventListeners() {
-      window.removeEventListener('storage', this.handleStorageEvent);
-      window.removeEventListener('cart-updated', this.updateCartCount);
-      document.removeEventListener('click', this.handleGlobalClick);
-      document.removeEventListener('keydown', this.handleKeydown);
+      window.removeEventListener("storage", this.handleStorageEvent);
+      window.removeEventListener("cart-updated", this.updateCartCount);
+      document.removeEventListener("click", this.handleGlobalClick);
+      document.removeEventListener("keydown", this.handleKeydown);
     },
 
     /**
@@ -607,31 +638,31 @@ window.app.component('nav-bar', {
      */
     handleGlobalClick(event) {
       // Close user dropdown if clicking outside
-      if (!event.target.closest('#userDropdown') && this.isUserDropdownOpen) {
+      if (!event.target.closest("#userDropdown") && this.isUserDropdownOpen) {
         this.isUserDropdownOpen = false;
       }
-      
+
       // Close mobile nav if clicking outside
-      if (!event.target.closest('.navbar') && this.isNavOpen) {
+      if (!event.target.closest(".navbar") && this.isNavOpen) {
         this.isNavOpen = false;
       }
-    }
+    },
   },
 
   mounted() {
     try {
       // Initialize component state
       this.initializeComponent();
-      
+
       // Set up event listeners
       this.setupEventListeners();
-      
-      console.log('NavBar component mounted successfully');
+
+      console.log("NavBar component mounted successfully");
     } catch (error) {
-      console.error('Error mounting NavBar component:', error);
-      window.ErrorHandler?.logError(error, { 
-        component: 'NavBar', 
-        method: 'mounted' 
+      console.error("Error mounting NavBar component:", error);
+      window.ErrorHandler?.logError(error, {
+        component: "NavBar",
+        method: "mounted",
       });
     }
   },
@@ -641,7 +672,7 @@ window.app.component('nav-bar', {
       // Clean up event listeners
       this.cleanupEventListeners();
     } catch (error) {
-      console.error('Error cleaning up NavBar component:', error);
+      console.error("Error cleaning up NavBar component:", error);
     }
-  }
+  },
 });

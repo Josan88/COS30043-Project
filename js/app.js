@@ -1,25 +1,27 @@
 /**
  * FoodNow Food Ordering Website - Main Application
- * 
+ *
  * This is the main entry point for the Vue 3 application.
  * It initializes the Vue app, registers components, and mounts the app to the DOM.
  */
 
 // Initialize AuthService
-AuthService.init().then(() => {
-  console.log('AuthService initialized');
-}).catch(error => {
-  console.error('Error initializing AuthService:', error);
-});
+AuthService.init()
+  .then(() => {
+    console.log("AuthService initialized");
+  })
+  .catch((error) => {
+    console.error("Error initializing AuthService:", error);
+  });
 
 // Wait for all services to be loaded
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Services Status:', {
-    AuthService: typeof window.AuthService !== 'undefined',
-    CartService: typeof window.CartService !== 'undefined',
-    ProductService: typeof window.ProductService !== 'undefined',
-    DatabaseService: typeof window.DatabaseService !== 'undefined',
-    ErrorHandler: typeof window.ErrorHandler !== 'undefined'
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Services Status:", {
+    AuthService: typeof window.AuthService !== "undefined",
+    CartService: typeof window.CartService !== "undefined",
+    ProductService: typeof window.ProductService !== "undefined",
+    DatabaseService: typeof window.DatabaseService !== "undefined",
+    ErrorHandler: typeof window.ErrorHandler !== "undefined",
   });
 });
 
@@ -28,8 +30,8 @@ window.app = Vue.createApp({
   data() {
     return {
       // Global app state can go here if needed
-      appName: 'FoodNow',
-      isLoading: false
+      appName: "FoodNow",
+      isLoading: false,
     };
   },
   // Global app methods can go here
@@ -39,15 +41,15 @@ window.app = Vue.createApp({
     },
     hideLoader() {
       this.isLoading = false;
-    }
-  }
+    },
+  },
 });
 
 // Register global custom directives
-window.app.directive('focus', {
+window.app.directive("focus", {
   mounted(el) {
     el.focus();
-  }
+  },
 });
 
 // Function to register filters as global properties
@@ -55,22 +57,29 @@ function registerFilters() {
   if (window.Filters) {
     // Register filters as global properties for Vue 3
     window.app.config.globalProperties.$filters = window.Filters;
-    
+
     // Make individual filters available directly
-    Object.keys(window.Filters).forEach(filterName => {
-      window.app.config.globalProperties[`$${filterName}`] = window.Filters[filterName];
+    Object.keys(window.Filters).forEach((filterName) => {
+      window.app.config.globalProperties[`$${filterName}`] =
+        window.Filters[filterName];
     });
-    
-    console.log('Filters registered successfully:', Object.keys(window.Filters));
-    
+
+    console.log(
+      "Filters registered successfully:",
+      Object.keys(window.Filters)
+    );
+
     // Verify the currency filter specifically
     if (window.app.config.globalProperties.$currency) {
-      console.log('Currency filter test:', window.app.config.globalProperties.$currency(25.50));
+      console.log(
+        "Currency filter test:",
+        window.app.config.globalProperties.$currency(25.5)
+      );
     }
-    
+
     return true;
   } else {
-    console.warn('Filters not loaded yet, retrying...');
+    console.warn("Filters not loaded yet, retrying...");
     return false;
   }
 }
@@ -81,7 +90,7 @@ if (window.Filters) {
 }
 
 // Wait for DOM content to be loaded before registering filters
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Try to register filters immediately, and retry if needed
   if (!registerFilters()) {
     // If filters aren't loaded yet, wait for them
@@ -91,9 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (registerFilters() || retryCount >= maxRetries) {
         clearInterval(filterCheckInterval);
         if (retryCount >= maxRetries) {
-          console.error('Failed to load filters after maximum retries');
+          console.error("Failed to load filters after maximum retries");
         } else {
-          console.log('Filters loaded successfully after', retryCount, 'retries');
+          console.log(
+            "Filters loaded successfully after",
+            retryCount,
+            "retries"
+          );
         }
       }
       retryCount++;

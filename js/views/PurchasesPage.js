@@ -1,38 +1,3 @@
-/**
- * PurchasesPage Component v2.0.0 - Enhanced Edition
- * 
- * FEATURES:
- * - ✅ Order History Management: Complete order tracking with detailed status updates
- * - ✅ Advanced Filtering: Date range, status, type, price range with real-time search
- * - ✅ Order Operations: View details, cancel orders, reorder items, rate/review orders
- * - ✅ Timeline Visualization: Interactive order status progression with visual indicators
- * - ✅ Rating System: Comprehensive rating for overall experience, food quality, and delivery
- * - ✅ Payment Information: Secure display of payment methods and transaction details
- * - ✅ Mobile Responsive: Optimized layouts for all screen sizes
- * - ✅ Analytics Integration: Order behavior tracking and conversion optimization
- * 
- * ENHANCED FEATURES:
- * - Constants integration via window.APP_CONSTANTS
- * - ValidationService integration with comprehensive form validation
- * - Enhanced error handling with ErrorHandler and retry mechanisms
- * - Analytics tracking with detailed user behavior monitoring
- * - Toast notifications for all user interactions
- * - Debounced search and filtering for optimal performance
- * - Accessibility improvements (ARIA labels, keyboard navigation)
- * - Performance optimizations with lazy loading and caching
- * - Advanced state management with component health monitoring
- * - Comprehensive logging and debugging capabilities
- * 
- * DEPENDENCIES:
- * - window.APP_CONSTANTS (configuration management)
- * - window.ValidationService (form validation)
- * - window.ErrorHandler (error management)
- * - window.Analytics (behavior tracking)
- * - window.ToastService (user notifications)
- * - window.CartService (cart integration)
- * - window.Filters (data formatting)
- * - Bootstrap 5 (UI components and modals)
- */
 const PurchasesPage = {
   template: `
     <div class="purchases-page">
@@ -645,28 +610,30 @@ const PurchasesPage = {
         </div>
       </div>
     </div>
-  `,  data() {
+  `,
+  data() {
     return {
       // === APP CONSTANTS INTEGRATION ===
       config: {
         // Get configuration from global constants with fallbacks
-        pagination: window.APP_CONSTANTS?.PAGINATION || { 
+        pagination: window.APP_CONSTANTS?.PAGINATION || {
           ordersPerPage: 10,
-          maxVisiblePages: 5 
-        },        orders: window.APP_CONSTANTS?.ORDERS || {
+          maxVisiblePages: 5,
+        },
+        orders: window.APP_CONSTANTS?.ORDERS || {
           maxCancelTime: 300000, // 5 minutes
-          ratingDeadline: 604800000 // 7 days
+          ratingDeadline: 604800000, // 7 days
         },
         validation: window.APP_CONSTANTS?.VALIDATION || {
           searchMinLength: 2,
           maxCommentLength: 500,
-          debounceDelay: 300
+          debounceDelay: 300,
         },
         ui: window.APP_CONSTANTS?.UI || {
           animationDuration: 300,
           toastDuration: 3000,
-          loadingTimeout: 10000
-        }
+          loadingTimeout: 10000,
+        },
       },
 
       // === COMPONENT STATE MANAGEMENT ===
@@ -674,16 +641,16 @@ const PurchasesPage = {
         isInitialized: false,
         isLoading: false,
         hasError: false,
-        errorMessage: '',
+        errorMessage: "",
         performanceMetrics: {
           loadStartTime: null,
           loadEndTime: null,
           renderTime: null,
-          filterTime: null
+          filterTime: null,
         },
         debugMode: window.APP_CONSTANTS?.DEBUG_MODE || false,
         retryCount: 0,
-        maxRetries: 3
+        maxRetries: 3,
       },
 
       // === ORDER DATA AND MANAGEMENT ===
@@ -692,41 +659,41 @@ const PurchasesPage = {
       expandedOrders: [],
       orderCache: new Map(), // Cache for order details
       totalOrdersCount: 0,
-      
+
       // === CURRENT OPERATIONS ===
       ratedOrder: null,
       orderToCancel: null,
       selectedOrderForDetails: null,
-      
+
       // === FILTERING AND SEARCH ===
-      searchQuery: '',
+      searchQuery: "",
       searchHistory: [],
-      statusFilter: '',
-      deliveryTypeFilter: '',
+      statusFilter: "",
+      deliveryTypeFilter: "",
       showFilterMenu: false,
       dateFilter: {
-        start: '',
-        end: ''
+        start: "",
+        end: "",
       },
       priceFilter: {
         min: null,
-        max: null
+        max: null,
       },
       advancedFilters: {
-        paymentMethod: '',
+        paymentMethod: "",
         hasPromoCode: false,
         ratingRange: { min: 1, max: 5 },
-        itemCount: { min: null, max: null }
+        itemCount: { min: null, max: null },
       },
       sortOptions: {
-        field: 'orderTime',
-        direction: 'desc',
+        field: "orderTime",
+        direction: "desc",
         available: [
-          { value: 'orderTime', label: 'Order Date' },
-          { value: 'total', label: 'Total Amount' },
-          { value: 'status', label: 'Status' },
-          { value: 'itemCount', label: 'Item Count' }
-        ]
+          { value: "orderTime", label: "Order Date" },
+          { value: "total", label: "Total Amount" },
+          { value: "status", label: "Status" },
+          { value: "itemCount", label: "Item Count" },
+        ],
       },
 
       // === PAGINATION ===
@@ -736,7 +703,7 @@ const PurchasesPage = {
         totalPages: 0,
         totalItems: 0,
         showingFrom: 0,
-        showingTo: 0
+        showingTo: 0,
       },
 
       // === RATING AND FEEDBACK ===
@@ -744,24 +711,24 @@ const PurchasesPage = {
         overall: 5,
         foodQuality: 5,
         deliverySpeed: 5,
-        comment: '',
+        comment: "",
         items: [],
         isSubmitting: false,
-        hasSubmitted: false
+        hasSubmitted: false,
       },
       ratingValidation: {
         errors: {},
         isValid: true,
-        touchedFields: new Set()
+        touchedFields: new Set(),
       },
 
       // === ORDER CANCELLATION ===
-      cancelReason: '',
-      otherCancelReason: '',
+      cancelReason: "",
+      otherCancelReason: "",
       cancellationPolicy: {
         freeWindow: 300000, // 5 minutes
         partialRefundWindow: 1800000, // 30 minutes
-        noRefundAfter: 3600000 // 1 hour
+        noRefundAfter: 3600000, // 1 hour
       },
 
       // === ANALYTICS INTEGRATION ===
@@ -777,8 +744,8 @@ const PurchasesPage = {
         conversionTracking: {
           reordersInitiated: 0,
           ratingsSubmitted: 0,
-          ordersChecked: 0
-        }
+          ordersChecked: 0,
+        },
       },
 
       // === UI STATE MANAGEMENT ===
@@ -788,18 +755,18 @@ const PurchasesPage = {
           orders: false,
           filtering: false,
           rating: false,
-          cancellation: false
+          cancellation: false,
         },
         modals: {
           rating: null,
           cancellation: null,
-          orderDetails: null
+          orderDetails: null,
         },
         notifications: [],
         errorStates: new Set(),
         isMobile: false,
-        screenSize: 'desktop',
-        orientation: 'landscape'
+        screenSize: "desktop",
+        orientation: "landscape",
       },
 
       // === PERFORMANCE TRACKING ===
@@ -811,7 +778,7 @@ const PurchasesPage = {
         renderTimes: [],
         memoryUsage: null,
         cacheHitRate: 0,
-        apiResponseTimes: []
+        apiResponseTimes: [],
       },
 
       // === VALIDATION STATES ===
@@ -820,24 +787,27 @@ const PurchasesPage = {
         dateRange: { isValid: true, errors: [] },
         priceRange: { isValid: true, errors: [] },
         rating: { isValid: true, errors: [] },
-        cancelReason: { isValid: true, errors: [] }
-      },      // === DEBOUNCED METHODS (will be initialized in created) ===
+        cancelReason: { isValid: true, errors: [] },
+      }, // === DEBOUNCED METHODS (will be initialized in created) ===
       debouncedSearch: null,
       debouncedFilter: null,
-      debouncedValidation: null
+      debouncedValidation: null,
     };
-  },  computed: {
+  },
+  computed: {
     // === ENHANCED FILTER DETECTION ===
     anyFiltersActive() {
-      return this.statusFilter || 
-             this.deliveryTypeFilter || 
-             this.dateFilter.start || 
-             this.dateFilter.end ||
-             this.priceFilter.min !== null ||
-             this.priceFilter.max !== null ||
-             this.advancedFilters.paymentMethod ||
-             this.advancedFilters.hasPromoCode ||
-             this.searchQuery.trim().length > 0;
+      return (
+        this.statusFilter ||
+        this.deliveryTypeFilter ||
+        this.dateFilter.start ||
+        this.dateFilter.end ||
+        this.priceFilter.min !== null ||
+        this.priceFilter.max !== null ||
+        this.advancedFilters.paymentMethod ||
+        this.advancedFilters.hasPromoCode ||
+        this.searchQuery.trim().length > 0
+      );
     },
 
     // === COMPREHENSIVE ORDER STATISTICS ===
@@ -845,22 +815,37 @@ const PurchasesPage = {
       try {
         const stats = {
           total: this.orders.length,
-          delivered: this.orders.filter(o => o.status === 'delivered').length,
-          pending: this.orders.filter(o => ['pending', 'preparing', 'ready', 'out-for-delivery'].includes(o.status)).length,
-          cancelled: this.orders.filter(o => o.status === 'cancelled').length,
-          totalSpent: this.orders.reduce((sum, order) => sum + (order.totals?.total || 0), 0),
+          delivered: this.orders.filter((o) => o.status === "delivered").length,
+          pending: this.orders.filter((o) =>
+            ["pending", "preparing", "ready", "out-for-delivery"].includes(
+              o.status
+            )
+          ).length,
+          cancelled: this.orders.filter((o) => o.status === "cancelled").length,
+          totalSpent: this.orders.reduce(
+            (sum, order) => sum + (order.totals?.total || 0),
+            0
+          ),
           averageOrderValue: 0,
           favoriteItems: this.calculateFavoriteItems(),
           orderFrequency: this.calculateOrderFrequency(),
-          satisfactionRating: this.calculateAverageSatisfaction()
+          satisfactionRating: this.calculateAverageSatisfaction(),
         };
-        
-        stats.averageOrderValue = stats.total > 0 ? stats.totalSpent / stats.total : 0;
-        
+
+        stats.averageOrderValue =
+          stats.total > 0 ? stats.totalSpent / stats.total : 0;
+
         return stats;
       } catch (error) {
-        this.handleError('Error calculating order statistics', error);
-        return { total: 0, delivered: 0, pending: 0, cancelled: 0, totalSpent: 0, averageOrderValue: 0 };
+        this.handleError("Error calculating order statistics", error);
+        return {
+          total: 0,
+          delivered: 0,
+          pending: 0,
+          cancelled: 0,
+          totalSpent: 0,
+          averageOrderValue: 0,
+        };
       }
     },
 
@@ -868,10 +853,16 @@ const PurchasesPage = {
     paginationInfo() {
       const totalItems = this.filteredOrders.length;
       const totalPages = Math.ceil(totalItems / this.pagination.itemsPerPage);
-      const currentPage = Math.min(this.pagination.currentPage, totalPages || 1);
+      const currentPage = Math.min(
+        this.pagination.currentPage,
+        totalPages || 1
+      );
       const startIndex = (currentPage - 1) * this.pagination.itemsPerPage;
-      const endIndex = Math.min(startIndex + this.pagination.itemsPerPage, totalItems);
-      
+      const endIndex = Math.min(
+        startIndex + this.pagination.itemsPerPage,
+        totalItems
+      );
+
       return {
         currentPage,
         totalPages,
@@ -884,7 +875,7 @@ const PurchasesPage = {
         hasNext: currentPage < totalPages,
         hasPrevious: currentPage > 1,
         pageNumbers: this.generatePageNumbers(currentPage, totalPages),
-        isEmpty: totalItems === 0
+        isEmpty: totalItems === 0,
       };
     },
 
@@ -897,15 +888,24 @@ const PurchasesPage = {
     // === ADVANCED FILTER SUMMARY ===
     activeFilterSummary() {
       const filters = [];
-      
-      if (this.statusFilter) filters.push(`Status: ${this.getStatusDisplayText(this.statusFilter)}`);
-      if (this.deliveryTypeFilter) filters.push(`Type: ${this.getDeliveryMethodText(this.deliveryTypeFilter)}`);
-      if (this.dateFilter.start) filters.push(`From: ${this.formatDate(this.dateFilter.start)}`);
-      if (this.dateFilter.end) filters.push(`To: ${this.formatDate(this.dateFilter.end)}`);
-      if (this.priceFilter.min !== null) filters.push(`Min: ${this.formatCurrency(this.priceFilter.min)}`);
-      if (this.priceFilter.max !== null) filters.push(`Max: ${this.formatCurrency(this.priceFilter.max)}`);
-      if (this.searchQuery.trim()) filters.push(`Search: "${this.searchQuery.trim()}"`);
-      
+
+      if (this.statusFilter)
+        filters.push(`Status: ${this.getStatusDisplayText(this.statusFilter)}`);
+      if (this.deliveryTypeFilter)
+        filters.push(
+          `Type: ${this.getDeliveryMethodText(this.deliveryTypeFilter)}`
+        );
+      if (this.dateFilter.start)
+        filters.push(`From: ${this.formatDate(this.dateFilter.start)}`);
+      if (this.dateFilter.end)
+        filters.push(`To: ${this.formatDate(this.dateFilter.end)}`);
+      if (this.priceFilter.min !== null)
+        filters.push(`Min: ${this.formatCurrency(this.priceFilter.min)}`);
+      if (this.priceFilter.max !== null)
+        filters.push(`Max: ${this.formatCurrency(this.priceFilter.max)}`);
+      if (this.searchQuery.trim())
+        filters.push(`Search: "${this.searchQuery.trim()}"`);
+
       return filters;
     },
 
@@ -917,15 +917,17 @@ const PurchasesPage = {
         priceRangeValid: this.validation.priceRange.isValid,
         ratingValid: this.validation.rating.isValid,
         cancelReasonValid: this.validation.cancelReason.isValid,
-        allValid: Object.values(this.validation).every(v => v.isValid)
+        allValid: Object.values(this.validation).every((v) => v.isValid),
       };
     },
 
     // === COMPONENT READINESS ===
     isComponentReady() {
-      return this.componentState.isInitialized && 
-             !this.componentState.isLoading && 
-             !this.componentState.hasError;
+      return (
+        this.componentState.isInitialized &&
+        !this.componentState.isLoading &&
+        !this.componentState.hasError
+      );
     },
 
     // === ANALYTICS DATA ===
@@ -937,7 +939,7 @@ const PurchasesPage = {
         searchQueriesCount: this.analytics.searchQueries.length,
         actionsCount: this.analytics.actionsPerformed.length,
         engagementScore: this.calculateEngagementScore(),
-        conversionRate: this.calculateConversionRate()
+        conversionRate: this.calculateConversionRate(),
       };
     },
 
@@ -951,23 +953,28 @@ const PurchasesPage = {
     },
 
     shouldShowNoResultsState() {
-      return this.isComponentReady && this.orders.length > 0 && this.filteredOrders.length === 0;
+      return (
+        this.isComponentReady &&
+        this.orders.length > 0 &&
+        this.filteredOrders.length === 0
+      );
     },
 
     // === MOBILE DETECTION ===
     isMobileView() {
-      return this.ui.isMobile || this.ui.screenSize === 'mobile';
+      return this.ui.isMobile || this.ui.screenSize === "mobile";
     },
 
     // === ORDER ACTIONS AVAILABILITY ===
     orderActions() {
       return {
-        canReorder: (order) => order.status === 'delivered',
+        canReorder: (order) => order.status === "delivered",
         canCancel: (order) => this.canCancelOrder(order),
-        canRate: (order) => order.status === 'delivered' && !order.hasRated,
-        canTrack: (order) => ['preparing', 'ready', 'out-for-delivery'].includes(order.status)
+        canRate: (order) => order.status === "delivered" && !order.hasRated,
+        canTrack: (order) =>
+          ["preparing", "ready", "out-for-delivery"].includes(order.status),
       };
-    }
+    },
   },
   watch: {
     // === ENHANCED SEARCH QUERY WATCHER ===
@@ -979,7 +986,7 @@ const PurchasesPage = {
           this.analytics.searchQueries.push({
             query: newQuery,
             timestamp: Date.now(),
-            resultsCount: 0 // Will be updated after filtering
+            resultsCount: 0, // Will be updated after filtering
           });
         }
 
@@ -991,92 +998,92 @@ const PurchasesPage = {
           this.debouncedSearch();
         }
       },
-      immediate: false
+      immediate: false,
     },
 
     // === FILTER WATCHERS WITH ANALYTICS ===
     statusFilter: {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('status', newValue);
-          this.analytics.filtersUsed.add('status');
+          this.trackFilterUsage("status", newValue);
+          this.analytics.filtersUsed.add("status");
           this.filterOrders();
         }
-      }
+      },
     },
 
     deliveryTypeFilter: {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('deliveryType', newValue);
-          this.analytics.filtersUsed.add('deliveryType');
+          this.trackFilterUsage("deliveryType", newValue);
+          this.analytics.filtersUsed.add("deliveryType");
           this.filterOrders();
         }
-      }
+      },
     },
 
-    'dateFilter.start': {
+    "dateFilter.start": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('dateStart', newValue);
-          this.analytics.filtersUsed.add('dateRange');
+          this.trackFilterUsage("dateStart", newValue);
+          this.analytics.filtersUsed.add("dateRange");
           this.validateDateRange();
           this.filterOrders();
         }
-      }
+      },
     },
 
-    'dateFilter.end': {
+    "dateFilter.end": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('dateEnd', newValue);
-          this.analytics.filtersUsed.add('dateRange');
+          this.trackFilterUsage("dateEnd", newValue);
+          this.analytics.filtersUsed.add("dateRange");
           this.validateDateRange();
           this.filterOrders();
         }
-      }
+      },
     },
 
-    'priceFilter.min': {
+    "priceFilter.min": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('priceMin', newValue);
-          this.analytics.filtersUsed.add('priceRange');
+          this.trackFilterUsage("priceMin", newValue);
+          this.analytics.filtersUsed.add("priceRange");
           this.validatePriceRange();
           this.filterOrders();
         }
-      }
+      },
     },
 
-    'priceFilter.max': {
+    "priceFilter.max": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage('priceMax', newValue);
-          this.analytics.filtersUsed.add('priceRange');
+          this.trackFilterUsage("priceMax", newValue);
+          this.analytics.filtersUsed.add("priceRange");
           this.validatePriceRange();
           this.filterOrders();
         }
-      }
+      },
     },
 
     // === PAGINATION WATCHER ===
-    'pagination.currentPage': {
+    "pagination.currentPage": {
       handler(newPage, oldPage) {
         if (newPage !== oldPage) {
           this.trackPageNavigation(newPage, oldPage);
           this.scrollToTop();
         }
-      }
+      },
     },
 
     // === COMPONENT STATE MONITORING ===
-    'componentState.hasError': {
+    "componentState.hasError": {
       handler(hasError) {
         if (hasError) {
-          this.trackError('Component Error', this.componentState.errorMessage);
+          this.trackError("Component Error", this.componentState.errorMessage);
           this.showErrorNotification(this.componentState.errorMessage);
         }
-      }
+      },
     },
 
     // === ORDER DATA WATCHER ===
@@ -1085,15 +1092,15 @@ const PurchasesPage = {
         if (newOrders.length !== oldOrders.length) {
           this.trackOrdersLoaded(newOrders.length);
           this.filterOrders();
-          
+
           // Update analytics
           this.analytics.pageViews++;
-          
+
           // Cache management
           this.updateOrderCache(newOrders);
         }
       },
-      deep: true
+      deep: true,
     },
 
     // === FILTERED ORDERS WATCHER ===
@@ -1101,84 +1108,90 @@ const PurchasesPage = {
       handler(newFiltered) {
         // Update pagination
         this.updatePaginationMetadata(newFiltered.length);
-        
+
         // Update search results count in analytics
         if (this.analytics.searchQueries.length > 0) {
-          const lastSearch = this.analytics.searchQueries[this.analytics.searchQueries.length - 1];
+          const lastSearch =
+            this.analytics.searchQueries[
+              this.analytics.searchQueries.length - 1
+            ];
           lastSearch.resultsCount = newFiltered.length;
         }
-        
+
         // Track filter performance
         this.trackFilterPerformance(newFiltered.length);
-      }
+      },
     },
 
     // === UI STATE WATCHERS ===
-    'ui.isMobile': {
+    "ui.isMobile": {
       handler(isMobile) {
-        this.trackDeviceChange(isMobile ? 'mobile' : 'desktop');
+        this.trackDeviceChange(isMobile ? "mobile" : "desktop");
         this.adjustUIForDevice(isMobile);
-      }
+      },
     },
 
     // === RATING VALIDATION WATCHER ===
-    'rating.comment': {
+    "rating.comment": {
       handler(newComment) {
         this.validateRatingComment(newComment);
-      }
-    },    'rating.overall': {
+      },
+    },
+    "rating.overall": {
       handler(newRating) {
-        this.validateRatingValue(newRating, 'overall');
-      }
-    }
+        this.validateRatingValue(newRating, "overall");
+      },
+    },
   },
 
   // === ENHANCED LIFECYCLE HOOKS ===
   created() {
     // Performance tracking
     this.componentState.performanceMetrics.loadStartTime = Date.now();
-    
+
     // Initialize debounced methods
     this.initializeDebouncedMethods();
-    
+
     // Initialize component
     this.initializeComponent();
-    
+
     // Load orders
     this.loadOrders();
-    
+
     // Track analytics
     this.trackComponentCreated();
-  },  mounted() {
+  },
+  mounted() {
     // Performance tracking
-    this.componentState.performanceMetrics.renderTime = Date.now() - this.componentState.performanceMetrics.loadStartTime;
+    this.componentState.performanceMetrics.renderTime =
+      Date.now() - this.componentState.performanceMetrics.loadStartTime;
     this.performance.componentMountTime = Date.now();
-    
+
     // Apply custom styles for timeline and rating
     this.applyCustomStyles();
-    
+
     // Setup event listeners
     this.setupEventListeners();
-    
+
     // Initialize UI state
     this.initializeUIState();
-    
+
     // Setup auto-refresh if enabled
     this.setupAutoRefresh();
-    
+
     // Track component mounted
     this.trackComponentMounted();
-    
+
     // Mark component as initialized
     this.componentState.isInitialized = true;
     this.componentState.performanceMetrics.loadEndTime = Date.now();
-    
+
     // Debug logging
     if (this.componentState.debugMode) {
-      console.log('PurchasesPage mounted', {
+      console.log("PurchasesPage mounted", {
         renderTime: this.componentState.performanceMetrics.renderTime,
         ordersCount: this.orders.length,
-        performance: this.performance
+        performance: this.performance,
       });
     }
   },
@@ -1186,21 +1199,21 @@ const PurchasesPage = {
   beforeUnmount() {
     // Cleanup event listeners
     this.cleanupEventListeners();
-    
+
     // Clear intervals
     this.clearAutoRefresh();
-    
+
     // Track session end
     this.trackSessionEnd();
-    
+
     // Cleanup performance monitoring
     this.cleanupPerformanceMonitoring();
-    
+
     // Debug logging
     if (this.componentState.debugMode) {
-      console.log('PurchasesPage unmounted', {
+      console.log("PurchasesPage unmounted", {
         sessionDuration: this.analytics.sessionDuration,
-        analyticsData: this.analyticsData
+        analyticsData: this.analyticsData,
       });
     }
   },
@@ -1225,20 +1238,20 @@ const PurchasesPage = {
     initializeComponent() {
       // Initialize performance tracking
       this.performance.initialLoadTime = Date.now();
-      
+
       // Set initial UI state
       this.ui.isLoading = true;
       this.componentState.isLoading = true;
-      
+
       // Initialize pagination
       this.pagination.itemsPerPage = this.config.pagination.ordersPerPage;
-      
+
       // Initialize analytics
       this.analytics.sessionStartTime = Date.now();
     },
 
     applyCustomStyles() {
-      const style = document.createElement('style');
+      const style = document.createElement("style");
       style.textContent = `
       .order-timeline {
         position: relative;
@@ -1310,7 +1323,7 @@ const PurchasesPage = {
       .rating-small input:checked ~ label {
         color: #f8ce0b;
       }    `;
-    document.head.appendChild(style);
+      document.head.appendChild(style);
     },
 
     setupEventListeners() {
@@ -1318,25 +1331,25 @@ const PurchasesPage = {
       this.resizeHandler = this.debounce(() => {
         this.handleWindowResize();
       }, 250);
-      window.addEventListener('resize', this.resizeHandler);
+      window.addEventListener("resize", this.resizeHandler);
 
       // Scroll handler for infinite scroll (if needed)
       this.scrollHandler = this.debounce(() => {
         this.handleScroll();
       }, 100);
-      window.addEventListener('scroll', this.scrollHandler);
+      window.addEventListener("scroll", this.scrollHandler);
 
       // Visibility change handler
       this.visibilityHandler = () => {
         this.handleVisibilityChange();
       };
-      document.addEventListener('visibilitychange', this.visibilityHandler);
+      document.addEventListener("visibilitychange", this.visibilityHandler);
 
       // Keyboard navigation
       this.keydownHandler = (event) => {
         this.handleKeyboardNavigation(event);
       };
-      document.addEventListener('keydown', this.keydownHandler);
+      document.addEventListener("keydown", this.keydownHandler);
     },
 
     initializeUIState() {
@@ -1344,7 +1357,8 @@ const PurchasesPage = {
       this.updateScreenSize();
       this.ui.isLoading = false;
       this.componentState.isLoading = false;
-    },    setupAutoRefresh() {
+    },
+    setupAutoRefresh() {
       // Auto-refresh mechanism has been removed
       // Orders will only be loaded manually or on component mount
     },
@@ -1352,18 +1366,22 @@ const PurchasesPage = {
     // === CLEANUP METHODS ===
     cleanupEventListeners() {
       if (this.resizeHandler) {
-        window.removeEventListener('resize', this.resizeHandler);
+        window.removeEventListener("resize", this.resizeHandler);
       }
       if (this.scrollHandler) {
-        window.removeEventListener('scroll', this.scrollHandler);
+        window.removeEventListener("scroll", this.scrollHandler);
       }
       if (this.visibilityHandler) {
-        document.removeEventListener('visibilitychange', this.visibilityHandler);
+        document.removeEventListener(
+          "visibilitychange",
+          this.visibilityHandler
+        );
       }
       if (this.keydownHandler) {
-        document.removeEventListener('keydown', this.keydownHandler);
+        document.removeEventListener("keydown", this.keydownHandler);
       }
-    },    clearAutoRefresh() {
+    },
+    clearAutoRefresh() {
       // Auto-refresh mechanism has been removed
       // This method is kept for compatibility but does nothing
     },
@@ -1377,16 +1395,16 @@ const PurchasesPage = {
     validateSearchQuery(query) {
       const errors = [];
       const minLength = this.config.validation.searchMinLength;
-      
+
       if (query && query.length > 0 && query.length < minLength) {
         errors.push(`Search query must be at least ${minLength} characters`);
       }
-      
+
       this.validation.searchQuery = {
         isValid: errors.length === 0,
-        errors
+        errors,
       };
-      
+
       return this.validation.searchQuery.isValid;
     },
 
@@ -1394,25 +1412,25 @@ const PurchasesPage = {
       const errors = [];
       const start = this.dateFilter.start;
       const end = this.dateFilter.end;
-      
+
       if (start && end) {
         const startDate = new Date(start);
         const endDate = new Date(end);
-        
+
         if (startDate > endDate) {
-          errors.push('Start date must be before end date');
+          errors.push("Start date must be before end date");
         }
-        
+
         if (startDate > new Date()) {
-          errors.push('Start date cannot be in the future');
+          errors.push("Start date cannot be in the future");
         }
       }
-      
+
       this.validation.dateRange = {
         isValid: errors.length === 0,
-        errors
+        errors,
       };
-      
+
       return this.validation.dateRange.isValid;
     },
 
@@ -1420,46 +1438,48 @@ const PurchasesPage = {
       const errors = [];
       const min = this.priceFilter.min;
       const max = this.priceFilter.max;
-      
+
       if (min !== null && min < 0) {
-        errors.push('Minimum price cannot be negative');
+        errors.push("Minimum price cannot be negative");
       }
-      
+
       if (max !== null && max < 0) {
-        errors.push('Maximum price cannot be negative');
+        errors.push("Maximum price cannot be negative");
       }
-      
+
       if (min !== null && max !== null && min > max) {
-        errors.push('Minimum price must be less than maximum price');
+        errors.push("Minimum price must be less than maximum price");
       }
-      
+
       this.validation.priceRange = {
         isValid: errors.length === 0,
-        errors
+        errors,
       };
-      
+
       return this.validation.priceRange.isValid;
     },
 
     validateRatingComment(comment) {
       const errors = [];
       const maxLength = this.config.validation.maxCommentLength;
-      
+
       if (comment && comment.length > maxLength) {
         errors.push(`Comment must be less than ${maxLength} characters`);
       }
-      
+
       this.validation.rating = {
         isValid: errors.length === 0,
-        errors
+        errors,
       };
-      
+
       return this.validation.rating.isValid;
     },
 
     validateRatingValue(rating, field) {
       if (rating < 1 || rating > 5) {
-        this.showErrorNotification(`${field} rating must be between 1 and 5 stars`);
+        this.showErrorNotification(
+          `${field} rating must be between 1 and 5 stars`
+        );
         return false;
       }
       return true;
@@ -1468,117 +1488,121 @@ const PurchasesPage = {
     // === ANALYTICS METHODS ===
     trackComponentCreated() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_page_created', {
+        window.Analytics.track("purchases_page_created", {
           timestamp: Date.now(),
           userId: this.getCurrentUserId(),
-          sessionId: this.analytics.sessionStartTime
+          sessionId: this.analytics.sessionStartTime,
         });
       }
     },
 
     trackComponentMounted() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_page_mounted', {
+        window.Analytics.track("purchases_page_mounted", {
           timestamp: Date.now(),
           renderTime: this.componentState.performanceMetrics.renderTime,
-          ordersCount: this.orders.length
+          ordersCount: this.orders.length,
         });
       }
     },
 
     trackSearchQuery(query) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_search', {
+        window.Analytics.track("purchases_search", {
           query,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackFilterUsage(filterType, filterValue) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_filter_used', {
+        window.Analytics.track("purchases_filter_used", {
           filterType,
           filterValue,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackOrdersLoaded(count) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_orders_loaded', {
+        window.Analytics.track("purchases_orders_loaded", {
           count,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackPageNavigation(newPage, oldPage) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_page_navigation', {
+        window.Analytics.track("purchases_page_navigation", {
           newPage,
           oldPage,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackError(errorType, errorMessage) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_error', {
+        window.Analytics.track("purchases_error", {
           errorType,
           errorMessage,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
-    },    trackSessionEnd() {
+    },
+    trackSessionEnd() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_session_end', {
+        window.Analytics.track("purchases_session_end", {
           sessionDuration: Date.now() - this.analytics.sessionStartTime,
           ordersViewed: this.analytics.ordersViewed.size,
           filtersUsed: this.analytics.filtersUsed.size,
           searchQueries: this.analytics.searchQueries.length,
           actionsPerformed: this.analytics.actionsPerformed.length,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
-        });
-      }    },    trackDeviceChange(deviceType) {
-      if (window.Analytics) {
-        window.Analytics.track('purchases_device_change', {
-          deviceType,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
-    },    trackPageVisible() {
+    },
+    trackDeviceChange(deviceType) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_page_visible', {
+        window.Analytics.track("purchases_device_change", {
+          deviceType,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
+        });
+      }
+    },
+    trackPageVisible() {
+      if (window.Analytics) {
+        window.Analytics.track("purchases_page_visible", {
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackComponentCreated() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_component_created', {
+        window.Analytics.track("purchases_component_created", {
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackComponentMounted() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_component_mounted', {
+        window.Analytics.track("purchases_component_mounted", {
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
@@ -1589,27 +1613,27 @@ const PurchasesPage = {
         // Load more orders if pagination allows
         this.loadMoreOrders();
       }
-      
+
       // Track scroll behavior
       if (window.Analytics) {
-        window.Analytics.track('purchases_scroll_near_bottom', {
+        window.Analytics.track("purchases_scroll_near_bottom", {
           currentPage: this.pagination.currentPage,
           totalOrders: this.orders.length,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
 
     trackPageHidden() {
       if (window.Analytics) {
-        window.Analytics.track('purchases_page_hidden', {
+        window.Analytics.track("purchases_page_hidden", {
           timeOnPage: Date.now() - this.analytics.sessionStartTime,
           ordersViewed: this.analytics.ordersViewed.size,
           filtersUsed: this.analytics.filtersUsed.size,
           searchQueries: this.analytics.searchQueries.length,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
@@ -1622,8 +1646,8 @@ const PurchasesPage = {
           // The watcher on currentPage will trigger data refresh
         }
       } catch (error) {
-        console.error('Error loading more orders:', error);
-        this.handleError(error, 'Failed to load more orders');
+        console.error("Error loading more orders:", error);
+        this.handleError(error, "Failed to load more orders");
       }
     },
 
@@ -1636,15 +1660,17 @@ const PurchasesPage = {
 
     handleScroll() {
       // Implement infinite scroll if needed
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
+
       // Near bottom of page
       if (scrollTop + windowHeight >= documentHeight - 100) {
         this.handleNearBottomScroll();
       }
-    },    handleVisibilityChange() {
+    },
+    handleVisibilityChange() {
       if (document.hidden) {
         this.trackPageHidden();
       } else {
@@ -1657,13 +1683,13 @@ const PurchasesPage = {
       // Implement keyboard shortcuts for accessibility
       if (event.ctrlKey || event.metaKey) {
         switch (event.key) {
-          case 'f':
-          case 'F':
+          case "f":
+          case "F":
             event.preventDefault();
             this.focusSearchInput();
             break;
-          case 'r':
-          case 'R':
+          case "r":
+          case "R":
             event.preventDefault();
             this.refreshData();
             break;
@@ -1675,21 +1701,28 @@ const PurchasesPage = {
     updateScreenSize() {
       const width = window.innerWidth;
       if (width < 768) {
-        this.ui.screenSize = 'mobile';
+        this.ui.screenSize = "mobile";
       } else if (width < 992) {
-        this.ui.screenSize = 'tablet';
+        this.ui.screenSize = "tablet";
       } else {
-        this.ui.screenSize = 'desktop';
+        this.ui.screenSize = "desktop";
       }
     },
 
     detectMobileDevice() {
-      this.ui.isMobile = window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      this.ui.isMobile =
+        window.innerWidth < 768 ||
+        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
     },
 
     adjustUIForDevice(isMobile) {
       if (isMobile) {
-        this.pagination.itemsPerPage = Math.max(5, this.config.pagination.ordersPerPage / 2);
+        this.pagination.itemsPerPage = Math.max(
+          5,
+          this.config.pagination.ordersPerPage / 2
+        );
       } else {
         this.pagination.itemsPerPage = this.config.pagination.ordersPerPage;
       }
@@ -1697,11 +1730,13 @@ const PurchasesPage = {
     },
 
     scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
 
     focusSearchInput() {
-      const searchInput = document.querySelector('input[placeholder="Search orders..."]');
+      const searchInput = document.querySelector(
+        'input[placeholder="Search orders..."]'
+      );
       if (searchInput) {
         searchInput.focus();
       }
@@ -1718,13 +1753,13 @@ const PurchasesPage = {
 
     getCurrentUserId() {
       const user = window.AuthService?.getCurrentUser();
-      return user?.id || 'anonymous';
+      return user?.id || "anonymous";
     },
 
     generatePageNumbers(currentPage, totalPages) {
       const maxVisible = this.config.pagination.maxVisiblePages;
       const pages = [];
-      
+
       if (totalPages <= maxVisible) {
         for (let i = 1; i <= totalPages; i++) {
           pages.push(i);
@@ -1733,54 +1768,69 @@ const PurchasesPage = {
         const half = Math.floor(maxVisible / 2);
         let start = Math.max(1, currentPage - half);
         let end = Math.min(totalPages, start + maxVisible - 1);
-        
+
         if (end - start + 1 < maxVisible) {
           start = Math.max(1, end - maxVisible + 1);
         }
-        
+
         for (let i = start; i <= end; i++) {
           pages.push(i);
         }
       }
-      
+
       return pages;
     },
 
     updatePaginationMetadata(totalItems) {
       this.pagination.totalItems = totalItems;
-      this.pagination.totalPages = Math.ceil(totalItems / this.pagination.itemsPerPage);
-      this.pagination.currentPage = Math.min(this.pagination.currentPage, this.pagination.totalPages || 1);
+      this.pagination.totalPages = Math.ceil(
+        totalItems / this.pagination.itemsPerPage
+      );
+      this.pagination.currentPage = Math.min(
+        this.pagination.currentPage,
+        this.pagination.totalPages || 1
+      );
     },
 
     calculateFavoriteItems() {
       const itemCounts = {};
-      this.orders.forEach(order => {
-        order.items.forEach(item => {
+      this.orders.forEach((order) => {
+        order.items.forEach((item) => {
           itemCounts[item.name] = (itemCounts[item.name] || 0) + item.quantity;
         });
       });
-      
+
       return Object.entries(itemCounts)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
     },
 
     calculateOrderFrequency() {
       if (this.orders.length === 0) return 0;
-      
-      const firstOrder = new Date(Math.min(...this.orders.map(o => new Date(o.orderTime))));
-      const lastOrder = new Date(Math.max(...this.orders.map(o => new Date(o.orderTime))));
-      const daysDiff = Math.max(1, (lastOrder - firstOrder) / (1000 * 60 * 60 * 24));
-      
+
+      const firstOrder = new Date(
+        Math.min(...this.orders.map((o) => new Date(o.orderTime)))
+      );
+      const lastOrder = new Date(
+        Math.max(...this.orders.map((o) => new Date(o.orderTime)))
+      );
+      const daysDiff = Math.max(
+        1,
+        (lastOrder - firstOrder) / (1000 * 60 * 60 * 24)
+      );
+
       return this.orders.length / daysDiff;
     },
 
     calculateAverageSatisfaction() {
-      const ratedOrders = this.orders.filter(o => o.rating);
+      const ratedOrders = this.orders.filter((o) => o.rating);
       if (ratedOrders.length === 0) return 0;
-      
-      const totalRating = ratedOrders.reduce((sum, order) => sum + order.rating.overall, 0);
+
+      const totalRating = ratedOrders.reduce(
+        (sum, order) => sum + order.rating.overall,
+        0
+      );
       return totalRating / ratedOrders.length;
     },
 
@@ -1789,36 +1839,40 @@ const PurchasesPage = {
         ordersViewed: 1,
         filtersUsed: 2,
         searchQueries: 1.5,
-        actionsPerformed: 3
+        actionsPerformed: 3,
       };
-      
-      return (this.analytics.ordersViewed.size * weights.ordersViewed) +
-             (this.analytics.filtersUsed.size * weights.filtersUsed) +
-             (this.analytics.searchQueries.length * weights.searchQueries) +
-             (this.analytics.actionsPerformed.length * weights.actionsPerformed);
+
+      return (
+        this.analytics.ordersViewed.size * weights.ordersViewed +
+        this.analytics.filtersUsed.size * weights.filtersUsed +
+        this.analytics.searchQueries.length * weights.searchQueries +
+        this.analytics.actionsPerformed.length * weights.actionsPerformed
+      );
     },
 
     calculateConversionRate() {
       if (this.orders.length === 0) return 0;
-      return this.analytics.conversionTracking.reordersInitiated / this.orders.length;
+      return (
+        this.analytics.conversionTracking.reordersInitiated / this.orders.length
+      );
     },
 
     // === ERROR HANDLING METHODS ===
     handleError(message, error = null) {
-      console.error('PurchasesPage Error:', message, error);
-      
+      console.error("PurchasesPage Error:", message, error);
+
       this.componentState.hasError = true;
       this.componentState.errorMessage = message;
-      
+
       if (window.ErrorHandler) {
         window.ErrorHandler.handle(error || new Error(message), {
-          component: 'PurchasesPage',
-          action: 'handleError',
-          timestamp: Date.now()
+          component: "PurchasesPage",
+          action: "handleError",
+          timestamp: Date.now(),
         });
       }
-      
-      this.trackError('General Error', message);
+
+      this.trackError("General Error", message);
     },
 
     showErrorNotification(message) {
@@ -1843,85 +1897,93 @@ const PurchasesPage = {
       } else {
         alert(message);
       }
-    },    // === ENHANCED EXISTING METHODS ===
+    }, // === ENHANCED EXISTING METHODS ===
     async loadOrders() {
       try {
         // Start performance tracking
         const startTime = Date.now();
         this.ui.loadingStates.orders = true;
-        
+
         const currentUser = window.AuthService.getCurrentUser();
         if (currentUser && currentUser.id) {
           let orders = [];
-          
+
           try {
             // Primary: Get orders from DatabaseService
             if (window.DatabaseService) {
-              orders = await window.DatabaseService.getUserOrders(currentUser.id);
-              console.log('Orders loaded from database:', orders.length);
+              orders = await window.DatabaseService.getUserOrders(
+                currentUser.id
+              );
+              console.log("Orders loaded from database:", orders.length);
             }
-            
+
             // Fallback: If no orders from database or service unavailable, try CartService
             if (orders.length === 0 && window.CartService) {
-              console.log('Falling back to CartService for orders');
+              console.log("Falling back to CartService for orders");
               orders = window.CartService.getUserOrders(currentUser.id) || [];
-                // If we found orders in CartService but not in database, sync them
+              // If we found orders in CartService but not in database, sync them
               if (orders.length > 0 && window.DatabaseService) {
-                console.log('Syncing orders from CartService to database');
+                console.log("Syncing orders from CartService to database");
                 for (const order of orders) {
                   try {
                     // Use addOrder to save to database
                     await window.DatabaseService.addOrder(order);
                   } catch (syncError) {
-                    console.warn('Failed to sync order to database:', syncError);
+                    console.warn(
+                      "Failed to sync order to database:",
+                      syncError
+                    );
                   }
                 }
               }
             }
           } catch (dbError) {
-            console.warn('Database service error, falling back to CartService:', dbError);
+            console.warn(
+              "Database service error, falling back to CartService:",
+              dbError
+            );
             // Final fallback to CartService
             if (window.CartService) {
               orders = window.CartService.getUserOrders(currentUser.id) || [];
             }
           }
-          
+
           // Normalize order data to ensure all required fields exist
-          this.orders = orders.map(order => this.normalizeOrder(order));
-          
+          this.orders = orders.map((order) => this.normalizeOrder(order));
+
           // Cache orders
           this.updateOrderCache(this.orders);
-          
+
           // Track performance
           this.performance.apiResponseTimes.push({
-            operation: 'loadOrders',
+            operation: "loadOrders",
             duration: Date.now() - startTime,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
-          
+
           // Track analytics
           this.trackOrdersLoaded(this.orders.length);
-          
         } else {
           this.orders = [];
-          console.warn('User not logged in or missing user ID');
-          this.handleError('User authentication required');
+          console.warn("User not logged in or missing user ID");
+          this.handleError("User authentication required");
         }
-        
+
         // Filter orders and update UI
         this.filterOrders();
         this.ui.loadingStates.orders = false;
-        
+
         // Show success notification if orders loaded
         if (this.orders.length > 0) {
           this.showInfoNotification(`Loaded ${this.orders.length} orders`);
         }
-        
       } catch (error) {
         this.ui.loadingStates.orders = false;
-        this.handleError('Failed to load orders', error);
-        this.showErrorNotification('Failed to load your order history. Please try refreshing the page.');
-        
+        this.handleError("Failed to load orders", error);
+        this.showErrorNotification(
+          "Failed to load your order history. Please try refreshing the page."
+        );
+
         // Retry mechanism
         if (this.componentState.retryCount < this.componentState.maxRetries) {
           this.componentState.retryCount++;
@@ -1938,212 +2000,248 @@ const PurchasesPage = {
         id: order.id || Date.now(),
         userId: order.userId || this.getCurrentUserId(),
         orderTime: order.orderTime || new Date().toISOString(),
-        status: order.status || 'pending',
+        status: order.status || "pending",
         items: order.items || [],
         totals: {
           subtotal: order.totals?.subtotal || 0,
           tax: order.totals?.tax || 0,
           deliveryFee: order.totals?.deliveryFee || 0,
           total: order.totals?.total || 0,
-          ...order.totals
+          ...order.totals,
         },
         delivery: {
-          method: order.delivery?.method || 'delivery',
+          method: order.delivery?.method || "delivery",
           details: order.delivery?.details || {},
-          ...order.delivery
+          ...order.delivery,
         },
         payment: {
-          method: order.payment?.method || 'card',
+          method: order.payment?.method || "card",
           details: order.payment?.details || {},
-          ...order.payment
+          ...order.payment,
         },
         promoCode: order.promoCode || null,
         bulkDiscount: order.bulkDiscount || null,
-        specialInstructions: order.specialInstructions || '',
+        specialInstructions: order.specialInstructions || "",
         statusUpdates: order.statusUpdates || {},
         hasRated: order.hasRated || false,
         rating: order.rating || null,
         cancellationReason: order.cancellationReason || null,
-        estimatedDeliveryTime: order.estimatedDeliveryTime || null
+        estimatedDeliveryTime: order.estimatedDeliveryTime || null,
       };
     },
 
     updateOrderCache(orders) {
-      orders.forEach(order => {
+      orders.forEach((order) => {
         this.orderCache.set(order.id, order);
       });
-      
+
       // Calculate cache hit rate
       const totalRequests = this.performance.apiResponseTimes.length;
       const cacheHits = this.orderCache.size;
-      this.performance.cacheHitRate = totalRequests > 0 ? cacheHits / totalRequests : 0;
-    },    refreshData() {
-      this.showInfoNotification('Refreshing order data...');
+      this.performance.cacheHitRate =
+        totalRequests > 0 ? cacheHits / totalRequests : 0;
+    },
+    refreshData() {
+      this.showInfoNotification("Refreshing order data...");
       this.loadOrders();
     },
-    
+
     // New method to ensure all orders have the required structure
     normalizeOrder(order) {
       // Create a copy to avoid modifying the original
       const normalizedOrder = { ...order };
-      
+
       // Ensure order has the required properties
-      normalizedOrder.totals = normalizedOrder.totals || { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
+      normalizedOrder.totals = normalizedOrder.totals || {
+        subtotal: 0,
+        tax: 0,
+        deliveryFee: 0,
+        total: 0,
+      };
       normalizedOrder.items = normalizedOrder.items || [];
-      normalizedOrder.status = normalizedOrder.status || 'pending';
-      normalizedOrder.orderTime = normalizedOrder.orderTime || order.orderDate || new Date().toISOString();
-      
+      normalizedOrder.status = normalizedOrder.status || "pending";
+      normalizedOrder.orderTime =
+        normalizedOrder.orderTime ||
+        order.orderDate ||
+        new Date().toISOString();
+
       // Ensure order has delivery info
       normalizedOrder.delivery = normalizedOrder.delivery || {
-        method: order.serviceMethod || 'delivery',
-        details: {}
+        method: order.serviceMethod || "delivery",
+        details: {},
       };
-      
+
       // Convert older format orders to new format
       if (!normalizedOrder.delivery.method && normalizedOrder.serviceMethod) {
         normalizedOrder.delivery = {
           method: normalizedOrder.serviceMethod,
           details: {
-            line1: normalizedOrder.deliveryAddress || '',
-            notes: normalizedOrder.specialRequests || ''
-          }
+            line1: normalizedOrder.deliveryAddress || "",
+            notes: normalizedOrder.specialRequests || "",
+          },
         };
       }
-      
+
       return normalizedOrder;
-    },    
+    },
     filterOrders() {
       try {
         // Start performance tracking
         const startTime = Date.now();
         this.ui.loadingStates.filtering = true;
-        
+
         let filtered = [...this.orders];
-        
+
         // Apply status filter if selected
         if (this.statusFilter) {
-          filtered = filtered.filter(order => order.status === this.statusFilter);
+          filtered = filtered.filter(
+            (order) => order.status === this.statusFilter
+          );
         }
-        
+
         // Apply delivery type filter if selected
         if (this.deliveryTypeFilter) {
-          filtered = filtered.filter(order => order.delivery.method === this.deliveryTypeFilter);
+          filtered = filtered.filter(
+            (order) => order.delivery.method === this.deliveryTypeFilter
+          );
         }
-        
+
         // Apply date range filter
         if (this.dateFilter.start) {
           const startDate = new Date(this.dateFilter.start);
-          filtered = filtered.filter(order => new Date(order.orderTime) >= startDate);
+          filtered = filtered.filter(
+            (order) => new Date(order.orderTime) >= startDate
+          );
         }
-        
+
         if (this.dateFilter.end) {
           const endDate = new Date(this.dateFilter.end);
           // Set time to end of day
           endDate.setHours(23, 59, 59, 999);
-          filtered = filtered.filter(order => new Date(order.orderTime) <= endDate);
+          filtered = filtered.filter(
+            (order) => new Date(order.orderTime) <= endDate
+          );
         }
-        
+
         // Apply price filter
         if (this.priceFilter.min !== null) {
-          filtered = filtered.filter(order => order.totals.total >= this.priceFilter.min);
+          filtered = filtered.filter(
+            (order) => order.totals.total >= this.priceFilter.min
+          );
         }
-        
+
         if (this.priceFilter.max !== null) {
-          filtered = filtered.filter(order => order.totals.total <= this.priceFilter.max);
+          filtered = filtered.filter(
+            (order) => order.totals.total <= this.priceFilter.max
+          );
         }
-        
+
         // Apply advanced filters
         if (this.advancedFilters.paymentMethod) {
-          filtered = filtered.filter(order => order.payment.method === this.advancedFilters.paymentMethod);
+          filtered = filtered.filter(
+            (order) =>
+              order.payment.method === this.advancedFilters.paymentMethod
+          );
         }
-        
+
         if (this.advancedFilters.hasPromoCode) {
-          filtered = filtered.filter(order => !!order.promoCode);
+          filtered = filtered.filter((order) => !!order.promoCode);
         }
-        
+
         if (this.advancedFilters.itemCount.min !== null) {
-          filtered = filtered.filter(order => order.items.length >= this.advancedFilters.itemCount.min);
+          filtered = filtered.filter(
+            (order) => order.items.length >= this.advancedFilters.itemCount.min
+          );
         }
-        
+
         if (this.advancedFilters.itemCount.max !== null) {
-          filtered = filtered.filter(order => order.items.length <= this.advancedFilters.itemCount.max);
+          filtered = filtered.filter(
+            (order) => order.items.length <= this.advancedFilters.itemCount.max
+          );
         }
-        
+
         // Apply search query if entered
         if (this.searchQuery.trim()) {
           const query = this.searchQuery.toLowerCase();
-          filtered = filtered.filter(order => {
+          filtered = filtered.filter((order) => {
             // Search by order ID
             if (order.id.toString().includes(query)) return true;
-            
+
             // Search by food item names
-            if (order.items.some(item => item.name.toLowerCase().includes(query))) return true;
-            
+            if (
+              order.items.some((item) =>
+                item.name.toLowerCase().includes(query)
+              )
+            )
+              return true;
+
             // Search by delivery address if it exists
-            if (order.delivery.method !== 'pickup' && 
-                order.delivery.details.line1 && 
-                order.delivery.details.line1.toLowerCase().includes(query)) return true;
-            
+            if (
+              order.delivery.method !== "pickup" &&
+              order.delivery.details.line1 &&
+              order.delivery.details.line1.toLowerCase().includes(query)
+            )
+              return true;
+
             // Search by status
             if (order.status.toLowerCase().includes(query)) return true;
-            
+
             // Search by payment method
             if (order.payment.method.toLowerCase().includes(query)) return true;
-            
+
             return false;
           });
         }
-        
+
         // Apply sorting
         this.applySorting(filtered);
-        
+
         // Update filtered results
         this.filteredOrders = filtered;
-        
+
         // Track performance
         const filterTime = Date.now() - startTime;
         this.performance.filterPerformance.push({
           timestamp: Date.now(),
           duration: filterTime,
           resultsCount: filtered.length,
-          filtersApplied: this.getActiveFiltersCount()
+          filtersApplied: this.getActiveFiltersCount(),
         });
-        
+
         // Update pagination
         this.updatePaginationMetadata(filtered.length);
         this.resetToFirstPage();
-        
+
         // Track analytics
         this.trackFilterPerformance(filtered.length);
-        
+
         this.ui.loadingStates.filtering = false;
-        
       } catch (error) {
         this.ui.loadingStates.filtering = false;
-        this.handleError('Failed to filter orders', error);
+        this.handleError("Failed to filter orders", error);
       }
     },
 
     applySorting(orders) {
       const { field, direction } = this.sortOptions;
-      
+
       orders.sort((a, b) => {
         let aValue, bValue;
-        
+
         switch (field) {
-          case 'orderTime':
+          case "orderTime":
             aValue = new Date(a.orderTime);
             bValue = new Date(b.orderTime);
             break;
-          case 'total':
+          case "total":
             aValue = a.totals.total;
             bValue = b.totals.total;
             break;
-          case 'status':
+          case "status":
             aValue = a.status;
             bValue = b.status;
             break;
-          case 'itemCount':
+          case "itemCount":
             aValue = a.items.length;
             bValue = b.items.length;
             break;
@@ -2151,8 +2249,8 @@ const PurchasesPage = {
             aValue = a.orderTime;
             bValue = b.orderTime;
         }
-        
-        if (direction === 'asc') {
+
+        if (direction === "asc") {
           return aValue > bValue ? 1 : -1;
         } else {
           return aValue < bValue ? 1 : -1;
@@ -2180,151 +2278,154 @@ const PurchasesPage = {
 
     trackFilterPerformance(resultsCount) {
       if (window.Analytics) {
-        window.Analytics.track('purchases_filter_performance', {
+        window.Analytics.track("purchases_filter_performance", {
           resultsCount,
           filtersCount: this.getActiveFiltersCount(),
           hasSearch: !!this.searchQuery.trim(),
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
-        });
-      }
-    },    
-    toggleFilterMenu() {
-      this.showFilterMenu = !this.showFilterMenu;
-      
-      // Track analytics
-      if (window.Analytics) {
-        window.Analytics.track('purchases_filter_menu_toggled', {
-          isOpen: this.showFilterMenu,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
-    
+    toggleFilterMenu() {
+      this.showFilterMenu = !this.showFilterMenu;
+
+      // Track analytics
+      if (window.Analytics) {
+        window.Analytics.track("purchases_filter_menu_toggled", {
+          isOpen: this.showFilterMenu,
+          timestamp: Date.now(),
+          userId: this.getCurrentUserId(),
+        });
+      }
+    },
+
     clearFilters() {
       // Store previous state for analytics
       const previousFiltersCount = this.getActiveFiltersCount();
-      
+
       // Clear all filters
-      this.statusFilter = '';
-      this.deliveryTypeFilter = '';
-      this.dateFilter.start = '';
-      this.dateFilter.end = '';
+      this.statusFilter = "";
+      this.deliveryTypeFilter = "";
+      this.dateFilter.start = "";
+      this.dateFilter.end = "";
       this.priceFilter.min = null;
       this.priceFilter.max = null;
-      this.searchQuery = '';
+      this.searchQuery = "";
       this.advancedFilters = {
-        paymentMethod: '',
+        paymentMethod: "",
         hasPromoCode: false,
         ratingRange: { min: 1, max: 5 },
-        itemCount: { min: null, max: null }
+        itemCount: { min: null, max: null },
       };
-      
+
       // Reset sorting to default
-      this.sortOptions.field = 'orderTime';
-      this.sortOptions.direction = 'desc';
-      
+      this.sortOptions.field = "orderTime";
+      this.sortOptions.direction = "desc";
+
       // Apply filtering
       this.filterOrders();
-      
+
       // Track analytics
       if (window.Analytics) {
-        window.Analytics.track('purchases_filters_cleared', {
+        window.Analytics.track("purchases_filters_cleared", {
           previousFiltersCount,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
-      
+
       // Show notification
-      this.showInfoNotification('All filters cleared');
+      this.showInfoNotification("All filters cleared");
     },
-    
+
     toggleOrderDetails(orderId) {
       if (this.expandedOrders.includes(orderId)) {
-        this.expandedOrders = this.expandedOrders.filter(id => id !== orderId);
+        this.expandedOrders = this.expandedOrders.filter(
+          (id) => id !== orderId
+        );
       } else {
         this.expandedOrders.push(orderId);
-        
+
         // Track order viewed for analytics
         this.analytics.ordersViewed.add(orderId);
         this.analytics.actionsPerformed.push({
-          action: 'order_details_viewed',
+          action: "order_details_viewed",
           orderId,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
       }
-      
+
       // Track analytics
       if (window.Analytics) {
-        window.Analytics.track('purchases_order_details_toggled', {
+        window.Analytics.track("purchases_order_details_toggled", {
           orderId,
           isExpanded: this.expandedOrders.includes(orderId),
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
     },
-    
+
     rateOrder(order) {
       try {
         this.ratedOrder = JSON.parse(JSON.stringify(order)); // Deep copy
-        
+
         // Initialize rating for each item
         this.rating = {
           overall: 5,
           foodQuality: 5,
-          deliverySpeed: order.delivery.method !== 'pickup' ? 5 : 0,
-          comment: '',
-          items: order.items.map(() => ({ rating: 5, comment: '' })),
+          deliverySpeed: order.delivery.method !== "pickup" ? 5 : 0,
+          comment: "",
+          items: order.items.map(() => ({ rating: 5, comment: "" })),
           isSubmitting: false,
-          hasSubmitted: false
+          hasSubmitted: false,
         };
-        
+
         // Reset validation
         this.ratingValidation = {
           errors: {},
           isValid: true,
-          touchedFields: new Set()
+          touchedFields: new Set(),
         };
-        
+
         // Track analytics
         this.analytics.actionsPerformed.push({
-          action: 'rating_modal_opened',
+          action: "rating_modal_opened",
           orderId: order.id,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
-        
+
         if (window.Analytics) {
-          window.Analytics.track('purchases_rating_started', {
+          window.Analytics.track("purchases_rating_started", {
             orderId: order.id,
             orderTotal: order.totals.total,
             itemCount: order.items.length,
             timestamp: Date.now(),
-            userId: this.getCurrentUserId()
+            userId: this.getCurrentUserId(),
           });
         }
-        
+
         // Open modal
-        new bootstrap.Modal(document.getElementById('rateOrderModal')).show();
-        
+        new bootstrap.Modal(document.getElementById("rateOrderModal")).show();
       } catch (error) {
-        this.handleError('Failed to open rating modal', error);
-        this.showErrorNotification('Failed to open rating form. Please try again.');
+        this.handleError("Failed to open rating modal", error);
+        this.showErrorNotification(
+          "Failed to open rating form. Please try again."
+        );
       }
-    },    
+    },
     submitRating() {
       try {
         // Validate rating before submission
         if (!this.validateRatingSubmission()) {
           return;
         }
-        
+
         // Set submitting state
         this.rating.isSubmitting = true;
         this.ui.loadingStates.rating = true;
-        
+
         // Prepare review data
         const reviewData = {
           orderId: this.ratedOrder.id,
@@ -2332,103 +2433,114 @@ const PurchasesPage = {
           ratings: {
             overall: this.rating.overall,
             foodQuality: this.rating.foodQuality,
-            deliverySpeed: this.rating.deliverySpeed
+            deliverySpeed: this.rating.deliverySpeed,
           },
           comment: this.rating.comment.trim(),
           itemRatings: this.ratedOrder.items.map((item, index) => ({
             foodItemId: item.id,
             name: item.name,
             rating: this.rating.items[index].rating,
-            comment: this.rating.items[index].comment || ''
+            comment: this.rating.items[index].comment || "",
           })),
           reviewDate: new Date().toISOString(),
           metadata: {
-            deviceType: this.ui.isMobile ? 'mobile' : 'desktop',
+            deviceType: this.ui.isMobile ? "mobile" : "desktop",
             sessionId: this.analytics.sessionStartTime,
-            submissionAttempt: 1
-          }
+            submissionAttempt: 1,
+          },
         };
-        
+
         // Track submission attempt
         this.analytics.actionsPerformed.push({
-          action: 'rating_submission_attempted',
+          action: "rating_submission_attempted",
           orderId: this.ratedOrder.id,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         });
-        
+
         // Save the review with retry mechanism
         this.saveReviewWithRetry(reviewData)
           .then(() => {
             this.handleRatingSuccess(reviewData);
           })
-          .catch(error => {
+          .catch((error) => {
             this.handleRatingError(error, reviewData);
           });
-          
       } catch (error) {
         this.rating.isSubmitting = false;
         this.ui.loadingStates.rating = false;
-        this.handleError('Failed to submit rating', error);
-        this.showErrorNotification('Failed to submit your rating. Please try again.');
+        this.handleError("Failed to submit rating", error);
+        this.showErrorNotification(
+          "Failed to submit your rating. Please try again."
+        );
       }
     },
 
     validateRatingSubmission() {
       const errors = [];
-      
+
       // Validate overall rating
       if (this.rating.overall < 1 || this.rating.overall > 5) {
-        errors.push('Overall rating must be between 1 and 5 stars');
+        errors.push("Overall rating must be between 1 and 5 stars");
       }
-      
+
       // Validate food quality rating
       if (this.rating.foodQuality < 1 || this.rating.foodQuality > 5) {
-        errors.push('Food quality rating must be between 1 and 5 stars');
+        errors.push("Food quality rating must be between 1 and 5 stars");
       }
-      
+
       // Validate delivery speed rating (if applicable)
-      if (this.ratedOrder.delivery.method !== 'pickup' && 
-          (this.rating.deliverySpeed < 1 || this.rating.deliverySpeed > 5)) {
-        errors.push('Delivery speed rating must be between 1 and 5 stars');
+      if (
+        this.ratedOrder.delivery.method !== "pickup" &&
+        (this.rating.deliverySpeed < 1 || this.rating.deliverySpeed > 5)
+      ) {
+        errors.push("Delivery speed rating must be between 1 and 5 stars");
       }
-      
+
       // Validate comment length
-      if (this.rating.comment && this.rating.comment.length > this.config.validation.maxCommentLength) {
-        errors.push(`Comment must be less than ${this.config.validation.maxCommentLength} characters`);
+      if (
+        this.rating.comment &&
+        this.rating.comment.length > this.config.validation.maxCommentLength
+      ) {
+        errors.push(
+          `Comment must be less than ${this.config.validation.maxCommentLength} characters`
+        );
       }
-      
+
       // Validate item ratings
       for (let i = 0; i < this.rating.items.length; i++) {
-        if (this.rating.items[i].rating < 1 || this.rating.items[i].rating > 5) {
+        if (
+          this.rating.items[i].rating < 1 ||
+          this.rating.items[i].rating > 5
+        ) {
           errors.push(`Item ${i + 1} rating must be between 1 and 5 stars`);
         }
       }
-      
+
       if (errors.length > 0) {
         this.ratingValidation.errors = { general: errors };
         this.ratingValidation.isValid = false;
-        this.showErrorNotification(errors.join(', '));
+        this.showErrorNotification(errors.join(", "));
         return false;
       }
-      
+
       this.ratingValidation.isValid = true;
       return true;
     },
 
     async saveReviewWithRetry(reviewData, attempt = 1) {
       const maxAttempts = 3;
-      
+
       try {
         if (window.DatabaseService) {
           await window.DatabaseService.addReview(reviewData);
         } else {
-          throw new Error('DatabaseService not available');
+          throw new Error("DatabaseService not available");
         }
       } catch (error) {
         if (attempt < maxAttempts) {
           // Retry with exponential backoff
           const delay = Math.pow(2, attempt) * 1000;
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise((resolve) => setTimeout(resolve, delay));
           return this.saveReviewWithRetry(reviewData, attempt + 1);
         } else {
           // Fallback to localStorage after all retries failed
@@ -2439,22 +2551,26 @@ const PurchasesPage = {
 
     saveReviewToLocalStorage(reviewData) {
       try {
-        const existingReviews = JSON.parse(localStorage.getItem('reviews') || '[]');
+        const existingReviews = JSON.parse(
+          localStorage.getItem("reviews") || "[]"
+        );
         existingReviews.push(reviewData);
-        localStorage.setItem('reviews', JSON.stringify(existingReviews));
-        
+        localStorage.setItem("reviews", JSON.stringify(existingReviews));
+
         // Mark as local storage fallback
         reviewData.isLocalStorageFallback = true;
-        
+
         return Promise.resolve();
       } catch (error) {
-        return Promise.reject(new Error('Failed to save to local storage'));
+        return Promise.reject(new Error("Failed to save to local storage"));
       }
     },
 
     handleRatingSuccess(reviewData) {
       // Update order as rated
-      const orderIndex = this.orders.findIndex(o => o.id === this.ratedOrder.id);
+      const orderIndex = this.orders.findIndex(
+        (o) => o.id === this.ratedOrder.id
+      );
       if (orderIndex >= 0) {
         this.orders[orderIndex].hasRated = true;
         this.orders[orderIndex].rating = {
@@ -2462,22 +2578,22 @@ const PurchasesPage = {
           foodQuality: this.rating.foodQuality,
           deliverySpeed: this.rating.deliverySpeed,
           comment: this.rating.comment,
-          date: reviewData.reviewDate
+          date: reviewData.reviewDate,
         };
       }
-      
+
       // Update analytics
       this.analytics.conversionTracking.ratingsSubmitted++;
       this.analytics.actionsPerformed.push({
-        action: 'rating_submitted_successfully',
+        action: "rating_submitted_successfully",
         orderId: this.ratedOrder.id,
         rating: this.rating.overall,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
-      
+
       // Track success analytics
       if (window.Analytics) {
-        window.Analytics.track('purchases_rating_submitted', {
+        window.Analytics.track("purchases_rating_submitted", {
           orderId: this.ratedOrder.id,
           overallRating: this.rating.overall,
           foodQualityRating: this.rating.foodQuality,
@@ -2486,250 +2602,303 @@ const PurchasesPage = {
           commentLength: this.rating.comment.length,
           itemRatingsCount: this.rating.items.length,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
-      
+
       // Close modal
-      const modalElement = document.getElementById('rateOrderModal');
+      const modalElement = document.getElementById("rateOrderModal");
       const modal = bootstrap.Modal.getInstance(modalElement);
       if (modal) {
         modal.hide();
       }
-      
+
       // Reset states
       this.rating.isSubmitting = false;
       this.rating.hasSubmitted = true;
       this.ui.loadingStates.rating = false;
-      
+
       // Show success notification
-      this.showSuccessNotification('Thank you for your review! Your feedback helps us improve.');
-      
+      this.showSuccessNotification(
+        "Thank you for your review! Your feedback helps us improve."
+      );
+
       // Refresh filtered orders to reflect changes
       this.filterOrders();
-    },    handleRatingError(error, reviewData) {
-      console.error('Error saving review:', error);
-      
+    },
+    handleRatingError(error, reviewData) {
+      console.error("Error saving review:", error);
+
       // Reset states
       this.rating.isSubmitting = false;
       this.ui.loadingStates.rating = false;
-      
+
       // Track error analytics
       if (window.Analytics) {
-        window.Analytics.track('purchases_rating_error', {
+        window.Analytics.track("purchases_rating_error", {
           orderId: this.ratedOrder.id,
           error: error.message,
           isLocalStorageFallback: reviewData.isLocalStorageFallback,
           timestamp: Date.now(),
-          userId: this.getCurrentUserId()
+          userId: this.getCurrentUserId(),
         });
       }
-      
+
       // Show appropriate error message
       if (reviewData.isLocalStorageFallback) {
-        this.showErrorNotification('Your review was saved locally but could not be synced. It will be uploaded when connection is restored.');
+        this.showErrorNotification(
+          "Your review was saved locally but could not be synced. It will be uploaded when connection is restored."
+        );
       } else {
-        this.showErrorNotification('Failed to save your review. Please try again or check your connection.');
+        this.showErrorNotification(
+          "Failed to save your review. Please try again or check your connection."
+        );
       }
     },
-    
+
     cancelOrder(orderId) {
-      const order = this.orders.find(o => o.id === orderId);
+      const order = this.orders.find((o) => o.id === orderId);
       if (!order) return;
-      
+
       this.orderToCancel = order;
-      this.cancelReason = '';
-      this.otherCancelReason = '';
-      
+      this.cancelReason = "";
+      this.otherCancelReason = "";
+
       // Open modal
-      new bootstrap.Modal(document.getElementById('cancelOrderModal')).show();
+      new bootstrap.Modal(document.getElementById("cancelOrderModal")).show();
     },
-    
+
     confirmCancelOrder() {
       if (!this.orderToCancel) return;
-      
+
       // Get cancel reason
-      const reason = this.cancelReason === 'other' ? this.otherCancelReason : this.cancelReason;
-      
+      const reason =
+        this.cancelReason === "other"
+          ? this.otherCancelReason
+          : this.cancelReason;
+
       // Update order status
       try {
         // First try using DatabaseService
-        window.DatabaseService.updateOrderStatus(this.orderToCancel.id, 'cancelled')
+        window.DatabaseService.updateOrderStatus(
+          this.orderToCancel.id,
+          "cancelled"
+        )
           .then(() => {
             // Update the order in local copy
-            const orderIndex = this.orders.findIndex(o => o.id === this.orderToCancel.id);
+            const orderIndex = this.orders.findIndex(
+              (o) => o.id === this.orderToCancel.id
+            );
             if (orderIndex >= 0) {
-              this.orders[orderIndex].status = 'cancelled';
+              this.orders[orderIndex].status = "cancelled";
               this.orders[orderIndex].statusUpdates = {
                 ...(this.orders[orderIndex].statusUpdates || {}),
-                cancelled: new Date().toISOString()
+                cancelled: new Date().toISOString(),
               };
               this.orders[orderIndex].cancellationReason = reason;
-              
+
               // Update orders in localStorage
               window.CartService.updateUserOrder(this.orders[orderIndex]);
             }
-            
+
             // Close modal
-            const modalElement = document.getElementById('cancelOrderModal');
+            const modalElement = document.getElementById("cancelOrderModal");
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
-            
+
             // Show success message
-            alert('Your order has been cancelled.');
-            
+            alert("Your order has been cancelled.");
+
             // Reset
             this.orderToCancel = null;
-            this.cancelReason = '';
-            this.otherCancelReason = '';
-            
+            this.cancelReason = "";
+            this.otherCancelReason = "";
+
             // Refresh filtered orders
             this.filterOrders();
           })
-          .catch(error => {
-            console.error('Error cancelling order with DatabaseService:', error);
+          .catch((error) => {
+            console.error(
+              "Error cancelling order with DatabaseService:",
+              error
+            );
             this.fallbackCancelOrder(reason);
           });
       } catch (error) {
-        console.error('Error cancelling order:', error);
+        console.error("Error cancelling order:", error);
         this.fallbackCancelOrder(reason);
       }
     },
-    
+
     fallbackCancelOrder(reason) {
       // Fallback to localStorage if the database service fails
-      const orderIndex = this.orders.findIndex(o => o.id === this.orderToCancel.id);
+      const orderIndex = this.orders.findIndex(
+        (o) => o.id === this.orderToCancel.id
+      );
       if (orderIndex >= 0) {
-        this.orders[orderIndex].status = 'cancelled';
+        this.orders[orderIndex].status = "cancelled";
         this.orders[orderIndex].statusUpdates = {
           ...(this.orders[orderIndex].statusUpdates || {}),
-          cancelled: new Date().toISOString()
+          cancelled: new Date().toISOString(),
         };
         this.orders[orderIndex].cancellationReason = reason;
-        
+
         // Update orders in localStorage
-        localStorage.setItem('orders', JSON.stringify(this.orders));
-        
+        localStorage.setItem("orders", JSON.stringify(this.orders));
+
         // Close modal
-        const modalElement = document.getElementById('cancelOrderModal');
+        const modalElement = document.getElementById("cancelOrderModal");
         const modal = bootstrap.Modal.getInstance(modalElement);
         modal.hide();
-        
+
         // Show success message
-        alert('Your order has been cancelled.');
-        
+        alert("Your order has been cancelled.");
+
         // Reset
         this.orderToCancel = null;
-        this.cancelReason = '';
-        this.otherCancelReason = '';
-        
+        this.cancelReason = "";
+        this.otherCancelReason = "";
+
         // Refresh filtered orders
         this.filterOrders();
       }
     },
-    
+
     reorderItems(order) {
       // First clear the cart
       window.CartService.clearCart();
-      
+
       // Add all items from the order to the cart
-      order.items.forEach(item => {
+      order.items.forEach((item) => {
         window.CartService.addToCart({
           id: item.id,
           quantity: item.quantity,
-          specialInstructions: item.specialInstructions || ''
+          specialInstructions: item.specialInstructions || "",
         });
       });
-      
+
       // Redirect to cart page
-      this.$router.push('/cart');
-      
+      this.$router.push("/cart");
+
       // Show success message
-      alert('Items have been added to your cart!');
+      alert("Items have been added to your cart!");
     },
-    
+
     getStatusBadgeClass(status) {
       switch (status) {
-        case 'pending': return 'bg-secondary';
-        case 'preparing': return 'bg-warning text-dark';
-        case 'ready': return 'bg-info';
-        case 'out-for-delivery': return 'bg-primary';
-        case 'delivered': return 'bg-success';
-        case 'cancelled': return 'bg-danger';
-        default: return 'bg-secondary';
+        case "pending":
+          return "bg-secondary";
+        case "preparing":
+          return "bg-warning text-dark";
+        case "ready":
+          return "bg-info";
+        case "out-for-delivery":
+          return "bg-primary";
+        case "delivered":
+          return "bg-success";
+        case "cancelled":
+          return "bg-danger";
+        default:
+          return "bg-secondary";
       }
     },
-    
+
     getDeliveryBadgeClass(method) {
       switch (method) {
-        case 'delivery': return 'bg-info text-dark';
-        case 'express': return 'bg-primary';
-        case 'pickup': return 'bg-success';
-        default: return 'bg-secondary';
+        case "delivery":
+          return "bg-info text-dark";
+        case "express":
+          return "bg-primary";
+        case "pickup":
+          return "bg-success";
+        default:
+          return "bg-secondary";
       }
     },
-    
+
     getStatusDisplayText(status) {
       switch (status) {
-        case 'pending': return 'Pending';
-        case 'preparing': return 'Preparing';
-        case 'ready': return 'Ready for Pickup';
-        case 'out-for-delivery': return 'Out for Delivery';
-        case 'delivered': return 'Delivered';
-        case 'cancelled': return 'Cancelled';
-        default: return status.charAt(0).toUpperCase() + status.slice(1);
+        case "pending":
+          return "Pending";
+        case "preparing":
+          return "Preparing";
+        case "ready":
+          return "Ready for Pickup";
+        case "out-for-delivery":
+          return "Out for Delivery";
+        case "delivered":
+          return "Delivered";
+        case "cancelled":
+          return "Cancelled";
+        default:
+          return status.charAt(0).toUpperCase() + status.slice(1);
       }
     },
-    
+
     getDeliveryMethodText(method) {
       switch (method) {
-        case 'delivery': return 'Standard Delivery';
-        case 'express': return 'Express Delivery';
-        case 'pickup': return 'Self Pickup';
-        default: return method;
+        case "delivery":
+          return "Standard Delivery";
+        case "express":
+          return "Express Delivery";
+        case "pickup":
+          return "Self Pickup";
+        default:
+          return method;
       }
     },
-    
+
     getDeliveryLabel(order) {
       const method = order.delivery?.method || order.serviceMethod;
-      return method === 'pickup' ? 'Pickup Fee' : 'Delivery Fee';
+      return method === "pickup" ? "Pickup Fee" : "Delivery Fee";
     },
-    
+
     isStatusReached(currentStatus, checkStatus) {
-      const statusOrder = ['pending', 'preparing', 'ready', 'out-for-delivery', 'delivered'];
-      
-      if (currentStatus === 'cancelled') {
+      const statusOrder = [
+        "pending",
+        "preparing",
+        "ready",
+        "out-for-delivery",
+        "delivered",
+      ];
+
+      if (currentStatus === "cancelled") {
         return false;
       }
-      
+
       const currentIndex = statusOrder.indexOf(currentStatus);
       const checkIndex = statusOrder.indexOf(checkStatus);
-      
+
       return currentIndex >= checkIndex;
     },
-    
+
     canCancelOrder(order) {
       // Can only cancel if status is pending or just moved to preparing
-      return ['pending', 'preparing'].includes(order.status);
+      return ["pending", "preparing"].includes(order.status);
     },
-    
+
     formatDateTime(dateTimeString) {
       const date = new Date(dateTimeString);
-      return date.toLocaleString('en-US', { 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
       });
     },
-      getCardIcon(brand) {
+    getCardIcon(brand) {
       switch (brand.toLowerCase()) {
-        case 'visa': return 'fa-cc-visa';
-        case 'mastercard': return 'fa-cc-mastercard';
-        case 'amex': return 'fa-cc-amex';
-        case 'discover': return 'fa-cc-discover';
-        default: return 'fa-credit-card';
+        case "visa":
+          return "fa-cc-visa";
+        case "mastercard":
+          return "fa-cc-mastercard";
+        case "amex":
+          return "fa-cc-amex";
+        case "discover":
+          return "fa-cc-discover";
+        default:
+          return "fa-credit-card";
       }
     },
 
@@ -2738,7 +2907,7 @@ const PurchasesPage = {
       if (window.Filters && window.Filters.formatCurrency) {
         return window.Filters.formatCurrency(value);
       }
-      return 'RM ' + (value || 0).toFixed(2);
+      return "RM " + (value || 0).toFixed(2);
     },
 
     formatNumber(value) {
@@ -2752,7 +2921,7 @@ const PurchasesPage = {
       if (window.Filters && window.Filters.pluralize) {
         return window.Filters.pluralize(count, singular, plural);
       }
-      return count === 1 ? singular : (plural || singular + 's');
+      return count === 1 ? singular : plural || singular + "s";
     },
 
     formatRelativeTime(date) {
@@ -2762,13 +2931,15 @@ const PurchasesPage = {
       const now = new Date();
       const inputDate = new Date(date);
       const diffInSeconds = Math.floor((now - inputDate) / 1000);
-      
-      if (diffInSeconds < 60) return 'just now';
-      if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-      if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+
+      if (diffInSeconds < 60) return "just now";
+      if (diffInSeconds < 3600)
+        return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      if (diffInSeconds < 86400)
+        return `${Math.floor(diffInSeconds / 3600)} hours ago`;
       return `${Math.floor(diffInSeconds / 86400)} days ago`;
-    }
-  }
+    },
+  },
 };
 
 // Make the component globally available
