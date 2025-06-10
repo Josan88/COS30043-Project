@@ -50,10 +50,13 @@ window.app.component("product-card", {
       default: false,
     },
   },
-  template: `
-    <div 
+  template: `    <div 
       class="card h-100 product-card shadow-sm border-0 position-relative"
-      :class="{ 'compact-card': compactMode, 'hover-rise': !compactMode }"
+      :class="{ 
+        'compact-card': compactMode, 
+        'hover-rise': !compactMode,
+        'out-of-stock': isOutOfStock
+      }"
       role="article"
       :aria-label="productAriaLabel"
     >
@@ -77,12 +80,19 @@ window.app.component("product-card", {
             @load="handleImageLoad"
             @error="handleImageError"
           >
-          
-          <!-- Discount Ribbon -->
+            <!-- Discount Ribbon -->
           <div v-if="hasDiscount" class="ribbon">
             <span class="bg-danger text-white px-2 py-1 small fw-bold">
               {{ formatDiscount }} OFF
             </span>
+          </div>
+          
+          <!-- Stock Status Overlay -->
+          <div v-if="isOutOfStock" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center stock-overlay">
+            <div class="bg-dark bg-opacity-75 text-white px-3 py-2 rounded">
+              <i class="fas fa-times-circle me-2"></i>
+              <strong>OUT OF STOCK</strong>
+            </div>
           </div>
         </router-link>
         
@@ -168,9 +178,25 @@ window.app.component("product-card", {
               :class="{ 'text-danger': hasDiscount, 'text-dark': !hasDiscount }"
             >
               {{ formatPrice(effectivePrice) }}
-            </span>
-            <span v-if="hasDiscount" class="badge bg-success ms-2 small">
+            </span>            <span v-if="hasDiscount" class="badge bg-success ms-2 small">
               Save {{ formatPrice(savingsAmount) }}
+            </span>
+          </div>
+          
+          <!-- Stock Status Indicator -->
+          <div v-if="stockStatusText" class="mb-2">
+            <span 
+              class="badge small"
+              :class="{
+                'bg-danger': isOutOfStock,
+                'bg-warning text-dark': isLowStock
+              }"
+            >
+              <i class="fas" :class="{
+                'fa-times-circle': isOutOfStock,
+                'fa-exclamation-triangle': isLowStock
+              }"></i>
+              {{ stockStatusText }}
             </span>
           </div>
         </div>
@@ -204,16 +230,21 @@ window.app.component("product-card", {
             >
               <i class="fas fa-info-circle me-1"></i>Details
             </router-link>
-            
-            <button 
+              <button 
               v-if="showAddButton" 
               @click.stop.prevent="addToCart" 
-              class="btn btn-sm btn-primary"
-              :class="{ 'btn-xs': compactMode }"
-              :disabled="isAddingToCart"
+              class="btn btn-sm"
+              :class="{
+                'btn-xs': compactMode,
+                'btn-primary': !isOutOfStock && !isLowStock,
+                'btn-warning': isLowStock && !isOutOfStock,
+                'btn-secondary': isOutOfStock
+              }"
+              :disabled="isAddingToCart || isOutOfStock"
               :aria-label="addToCartAriaLabel"
             >
-              <i v-if="!isAddingToCart" class="fas fa-cart-plus me-1"></i>
+              <i v-if="!isAddingToCart && !isOutOfStock" class="fas fa-cart-plus me-1"></i>
+              <i v-else-if="!isAddingToCart && isOutOfStock" class="fas fa-ban me-1"></i>
               <i v-else class="fas fa-spinner fa-spin me-1"></i>
               {{ addToCartButtonText }}
             </button>
@@ -265,13 +296,39 @@ window.app.component("product-card", {
      */
     savingsAmount() {
       return this.hasDiscount ? this.product.price - this.effectivePrice : 0;
+    }
+    /**
+     * Format discount percentage
+     */,
+    formatDiscount() {
+      return this.hasDiscount ? `${this.product.discount}%` : "";
     },
 
     /**
-     * Format discount percentage
+     * Check if product is out of stock
      */
-    formatDiscount() {
-      return this.hasDiscount ? `${this.product.discount}%` : "";
+    isOutOfStock() {
+      return this.product.stock !== undefined && this.product.stock === 0;
+    },
+
+    /**
+     * Check if product has low stock (less than 5 items)
+     */
+    isLowStock() {
+      return (
+        this.product.stock !== undefined &&
+        this.product.stock > 0 &&
+        this.product.stock < 5
+      );
+    },
+
+    /**
+     * Get stock status text
+     */
+    stockStatusText() {
+      if (this.isOutOfStock) return "OUT OF STOCK";
+      if (this.isLowStock) return `Only ${this.product.stock} left`;
+      return "";
     },
 
     /**
@@ -386,13 +443,15 @@ window.app.component("product-card", {
         "text-muted": !this.isFavorite,
         "fa-spin": this.isProcessingFavorite,
       };
-    },
-
+    }
     /**
      * Add to cart button text
-     */
+     */,
     addToCartButtonText() {
-      return this.isAddingToCart ? "Adding..." : "Add";
+      if (this.isAddingToCart) return "Adding...";
+      if (this.isOutOfStock) return "Out of Stock";
+      if (this.isLowStock) return `Add (${this.product.stock} left)`;
+      return "Add";
     },
 
     // Accessibility computed properties
@@ -469,13 +528,34 @@ window.app.component("product-card", {
         this.trackAddToCart(cartItem);
       } catch (error) {
         console.error("Error adding product to cart:", error);
+
+        // Handle specific stock validation errors
+        if (error.code === "INSUFFICIENT_STOCK") {
+          if (error.available === 0) {
+            this.showFeedback(
+              `${this.product.name} is currently out of stock.`,
+              "error"
+            );
+          } else {
+            const inCartText =
+              error.inCart > 0 ? ` (${error.inCart} already in cart)` : "";
+            this.showFeedback(
+              `Only ${error.available} ${this.product.name} available${inCartText}.`,
+              "error"
+            );
+          }
+        } else {
+          this.showFeedback(
+            "Could not add to cart. Please try again.",
+            "error"
+          );
+        }
+
         window.ErrorHandler?.logError(error, {
           component: "ProductCard",
           method: "addToCart",
           productId: this.product.id,
         });
-
-        this.showFeedback("Could not add to cart. Please try again.", "error");
       } finally {
         this.isAddingToCart = false;
       }

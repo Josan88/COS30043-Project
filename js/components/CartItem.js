@@ -341,6 +341,21 @@ window.app.component("cart-item", {
       }
     },
     increaseQuantity() {
+      // Check if we have stock information
+      if (
+        this.item.stock !== undefined &&
+        this.item.quantity >= this.item.stock
+      ) {
+        // Show toast message if ToastService is available
+        if (window.ToastService) {
+          window.ToastService.show(
+            `Only ${this.item.stock} ${this.item.name} available`,
+            "warning"
+          );
+        }
+        return;
+      }
+
       this.item.quantity++;
       this.updateCart();
     },
@@ -367,7 +382,23 @@ window.app.component("cart-item", {
     },
     updateQuantity() {
       // Ensure quantity is at least 1 and is a number
-      this.item.quantity = Math.max(1, parseInt(this.item.quantity) || 1);
+      let newQuantity = Math.max(1, parseInt(this.item.quantity) || 1);
+
+      // Check stock availability if stock info is available
+      if (this.item.stock !== undefined && newQuantity > this.item.stock) {
+        // Reset to maximum available stock
+        newQuantity = this.item.stock;
+
+        // Show warning message
+        if (window.ToastService) {
+          window.ToastService.show(
+            `Only ${this.item.stock} ${this.item.name} available. Quantity adjusted.`,
+            "warning"
+          );
+        }
+      }
+
+      this.item.quantity = newQuantity;
       this.updateCart();
     },
     confirmRemove() {

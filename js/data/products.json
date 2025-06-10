@@ -370,7 +370,7 @@
         { "name": "Chili flakes", "price": 0.5 }
       ],
       "dietaryOptions": ["vegetarian"],
-      "stock": 35,
+      "stock": 0,
       "preparationTime": 8,
       "calories": 320
     }

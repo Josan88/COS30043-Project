@@ -93,7 +93,16 @@ const FeaturedProductsSection = {
      * Add product to cart
      */
     async addToCart(product) {
-      if (!product.available) return;
+      if (!product.available) {
+        // Show specific message for out-of-stock items
+        if (window.ToastService) {
+          window.ToastService.show(
+            `${product.name} is currently out of stock`,
+            "warning"
+          );
+        }
+        return;
+      }
 
       try {
         // Use CartService to add product
@@ -118,9 +127,22 @@ const FeaturedProductsSection = {
       } catch (error) {
         console.error("Failed to add product to cart:", error);
 
+        let errorMessage = "Failed to add item to cart";
+
+        // Handle stock validation errors specifically
+        if (error.code === "INSUFFICIENT_STOCK") {
+          if (error.available === 0) {
+            errorMessage = `${product.name} is currently out of stock`;
+          } else if (error.inCart) {
+            errorMessage = `Cannot add more ${product.name}. Only ${error.available} available (${error.inCart} already in cart)`;
+          } else {
+            errorMessage = `Only ${error.available} ${product.name} available`;
+          }
+        }
+
         // Show error feedback
         if (window.ToastService) {
-          window.ToastService.show("Failed to add item to cart", "error");
+          window.ToastService.show(errorMessage, "error");
         }
 
         // Emit feedback event

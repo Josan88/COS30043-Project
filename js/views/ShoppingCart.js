@@ -815,16 +815,18 @@ const ShoppingCart = {
     handleShowToast(toastData) {
       const { message, type } = toastData;
       this.showToast(type, message);
-    },
-
+    }
     /**
      * Handle cart update (quantity, special instructions)
-     */
+     */,
     async handleCartUpdate(data) {
       try {
         this.trackInteraction();
 
-        window.CartService.updateQuantity(data.id, data.quantity);
+        // Handle quantity updates with stock validation
+        if (data.quantity !== undefined) {
+          await window.CartService.updateQuantity(data.id, data.quantity);
+        }
 
         if (data.specialInstructions !== undefined) {
           const itemIndex = this.cartItems.findIndex(
@@ -846,7 +848,23 @@ const ShoppingCart = {
 
         this.showToast("success", "Cart updated successfully");
       } catch (error) {
-        this.handleError(error, "Failed to update cart");
+        console.error("Cart update error:", error);
+
+        let errorMessage = "Failed to update cart";
+
+        // Handle stock validation errors specifically
+        if (error.code === "INSUFFICIENT_STOCK") {
+          if (error.available === 0) {
+            errorMessage = "This item is currently out of stock";
+          } else {
+            errorMessage = `Only ${error.available} items available. Quantity reset to ${error.currentQuantity}`;
+          }
+
+          // Reload cart to reset quantities to valid values
+          await this.loadCart();
+        }
+
+        this.handleError(error, errorMessage);
       }
     },
 
@@ -1526,11 +1544,10 @@ const ShoppingCart = {
       });
 
       this.showToast("error", this.errorState.errorMessage);
-    }
+    },
     /**
      * Clear error state
-     */,
-    clearErrorState() {
+     */ clearErrorState() {
       this.errorState = this.createErrorState();
     },
 

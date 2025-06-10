@@ -99,10 +99,46 @@ class CartService {
    * @param {Number} quantity - Quantity to add (default: 1)
    * @param {Object} options - Special instructions and customization options
    */
+  /**
+   * Validate stock availability for an item
+   * @param {Object} item - The product item
+   * @param {Number} quantity - Requested quantity
+   * @returns {Boolean} - True if stock is sufficient
+   */
+  validateStock(item, quantity) {
+    // Check if item has stock property
+    if (typeof item.stock !== "number") {
+      console.warn(
+        `Product ${item.name} (ID: ${item.id}) missing stock information`
+      );
+      return true; // Allow if stock info is missing (backward compatibility)
+    }
+
+    // Check if stock is sufficient
+    return item.stock >= quantity;
+  }
+
+  /**
+   * Get product details with stock information
+   * @param {Number} productId - The product ID
+   * @returns {Object|null} - Product with stock info or null if not found
+   */
+  async getProductWithStock(productId) {
+    try {
+      if (window.ProductService) {
+        const product = await window.ProductService.getProductById(productId);
+        return product;
+      }
+      return null;
+    } catch (error) {
+      console.error(`Error fetching product ${productId}:`, error);
+      return null;
+    }
+  }
+
   addItem(item, quantity = 1, options = {}) {
     return this.addToCart(item, quantity, options);
   }
-
   /**
    * Add a food item to the cart
    * @param {Object} item - The food item to add
@@ -110,12 +146,41 @@ class CartService {
    * @param {Object} options - Special instructions and customization options
    */
   addToCart(item, quantity = 1, options = {}) {
+    // Check stock availability
+    if (!this.validateStock(item, quantity)) {
+      const error = new Error(
+        `Insufficient stock for ${item.name}. Available: ${item.stock || 0}`
+      );
+      error.code = "INSUFFICIENT_STOCK";
+      error.available = item.stock || 0;
+      error.requested = quantity;
+      throw error;
+    }
+
     // Check if item already exists in cart with same options
     const existingItemIndex = this.findItemInCart(item.id, options);
 
     if (existingItemIndex !== -1) {
+      // Check if total quantity (existing + new) exceeds stock
+      const totalQuantity = this.cart[existingItemIndex].quantity + quantity;
+      if (!this.validateStock(item, totalQuantity)) {
+        const error = new Error(
+          `Cannot add ${quantity} items. Available: ${
+            item.stock || 0
+          }, In cart: ${this.cart[existingItemIndex].quantity}`
+        );
+        error.code = "INSUFFICIENT_STOCK";
+        error.available = item.stock || 0;
+        error.inCart = this.cart[existingItemIndex].quantity;
+        error.requested = quantity;
+        throw error;
+      }
+
       // Update quantity if item already exists
       this.cart[existingItemIndex].quantity += quantity;
+      this.cart[existingItemIndex].subTotal =
+        this.cart[existingItemIndex].price *
+        this.cart[existingItemIndex].quantity;
     } else {
       // Add new item to cart
       this.cart.push({
@@ -136,13 +201,34 @@ class CartService {
 
     return this.cart;
   }
-
   /**
    * Update quantity of an item in the cart
    */
-  updateCartItemQuantity(index, quantity) {
+  async updateCartItemQuantity(index, quantity) {
     if (index >= 0 && index < this.cart.length) {
       if (quantity > 0) {
+        // Get current cart item
+        const cartItem = this.cart[index];
+
+        // Get fresh product data with stock info
+        const productWithStock = await this.getProductWithStock(cartItem.id);
+
+        if (productWithStock) {
+          // Validate stock availability
+          if (!this.validateStock(productWithStock, quantity)) {
+            const error = new Error(
+              `Cannot update quantity to ${quantity}. Available: ${
+                productWithStock.stock || 0
+              }`
+            );
+            error.code = "INSUFFICIENT_STOCK";
+            error.available = productWithStock.stock || 0;
+            error.requested = quantity;
+            error.currentQuantity = cartItem.quantity;
+            throw error;
+          }
+        }
+
         this.cart[index].quantity = quantity;
         this.cart[index].subTotal = this.cart[index].price * quantity;
       } else {
@@ -160,11 +246,11 @@ class CartService {
   /**
    * Update quantity of an item in the cart by ID
    */
-  updateQuantity(itemId, quantity) {
+  async updateQuantity(itemId, quantity) {
     const itemIndex = this.cart.findIndex((item) => item.id === itemId);
 
     if (itemIndex !== -1) {
-      return this.updateCartItemQuantity(itemIndex, quantity);
+      return await this.updateCartItemQuantity(itemIndex, quantity);
     }
 
     return this.cart;

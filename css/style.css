@@ -510,6 +510,29 @@ body {
   background-color: #229954;
 }
 
+/* Stock Status Styles */
+.stock-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 10;
+}
+
+.product-card .card-image-container {
+  position: relative;
+}
+
+.product-card.out-of-stock {
+  opacity: 0.7;
+}
+
+.product-card.out-of-stock .card-img-top {
+  filter: grayscale(0.5);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* ===========================================
      CATEGORY GRID - MOBILE FIRST
      =========================================== */

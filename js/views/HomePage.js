@@ -347,11 +347,10 @@ const HomePage = {
       } finally {
         this.isLoading = false;
       }
-    },
-
+    }
     /**
      * Load all required data
-     */
+     */,
     async loadData() {
       if (!window.ProductService) {
         throw new Error("ProductService not available");
@@ -364,7 +363,11 @@ const HomePage = {
         window.ProductService.getAllCategories(),
       ]);
 
-      this.featuredProducts = featured;
+      // Set the available property based on stock levels
+      this.featuredProducts = featured.map((product) => ({
+        ...product,
+        available: product.stock > 0,
+      }));
       this.categories = this.processCategoriesData(categoriesData);
       this.loadError = null;
       this.retryCount = 0;

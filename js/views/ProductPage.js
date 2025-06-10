@@ -1904,11 +1904,11 @@ const ProductPage = {
 
       // Update special instructions field
       this.specialInstructions = customization.specialInstructions;
-    },
+    }
     /**
      * Enhanced add to cart with validation and feedback
-     */
-    addToCart() {
+     */,
+    async addToCart() {
       if (!this.currentProduct) {
         console.error("No product selected");
         return;
@@ -1945,11 +1945,9 @@ const ProductPage = {
         const cartItem = {
           ...productToAdd,
           finalPrice,
-        };
-
-        // Add to cart
+        }; // Add to cart
         if (window.CartService) {
-          window.CartService.addToCart(cartItem, this.quantity);
+          await window.CartService.addToCart(cartItem, this.quantity);
           this.showAddToCartSuccess();
           this.trackAddToCart(cartItem);
         } else {
@@ -1957,6 +1955,19 @@ const ProductPage = {
         }
       } catch (error) {
         console.error("Error adding to cart:", error);
+
+        let errorMessage = "Failed to add item to cart";
+
+        // Handle stock validation errors specifically
+        if (error.code === "INSUFFICIENT_STOCK") {
+          if (error.available === 0) {
+            errorMessage = "This item is currently out of stock";
+          } else if (error.inCart) {
+            errorMessage = `Cannot add ${error.requested} items. Only ${error.available} available (${error.inCart} already in cart)`;
+          } else {
+            errorMessage = `Only ${error.available} items available`;
+          }
+        }
 
         if (window.ErrorHandler) {
           window.ErrorHandler.handleError(error, {
@@ -1967,7 +1978,7 @@ const ProductPage = {
         }
 
         if (window.ToastService) {
-          window.ToastService.show("Failed to add item to cart", "error");
+          window.ToastService.show(errorMessage, "error");
         }
       }
     },
