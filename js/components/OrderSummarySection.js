@@ -303,24 +303,10 @@ const OrderSummarySection = {
                       <i class="fas fa-utensils me-2"></i>
                       {{ isSubmitting ? 'Placing Order...' : 'Place Order' }}
                     </div>
-                    <div class="checkout-subtext">
-                      {{ cartSummary.itemCount }} items
-                    </div>
-                  </div>
-                  <div class="col-4 text-end">
-                    <div class="checkout-total">
-                      {{ formatCurrency(cartSummary.total) }}
-                    </div>
                   </div>
                 </div>
               </div>
             </button>
-            
-            <!-- Security Notice -->
-            <div class="security-notice">
-              <i class="fas fa-shield-alt me-1"></i>
-              <small>Secure checkout with SSL encryption</small>
-            </div>
           </div>
         </div>
       </div>

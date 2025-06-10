@@ -157,6 +157,28 @@ class CartService {
 
     return this.cart;
   }
+  /**
+   * Update quantity of an item in the cart by ID
+   */
+  updateQuantity(itemId, quantity) {
+    const itemIndex = this.cart.findIndex((item) => item.id === itemId);
+
+    if (itemIndex !== -1) {
+      return this.updateCartItemQuantity(itemIndex, quantity);
+    }
+
+    return this.cart;
+  }
+
+  /**
+   * Update the entire cart with new cart items
+   */
+  updateCart(cartItems) {
+    this.cart = Array.isArray(cartItems) ? cartItems : [];
+    this.updateCartTotals();
+    this.saveCart();
+    return this.cart;
+  }
 
   /**
    * Remove an item from the cart

@@ -158,30 +158,7 @@ const HomePage = {
                   <router-link to="/product" class="btn-primary-custom">
                     <i class="fas fa-utensils"></i> Order Now
                   </router-link>
-                  <router-link to="/product" class="btn-outline-custom">
-                    <i class="fas fa-info-circle"></i> Learn More
-                  </router-link>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Search Section - Mobile First -->
-      <section class="content-section bg-light">
-        <div class="container">
-          <div class="row">
-            <div class="col-12">
-              <div class="search-container">
-                <input 
-                  type="search" 
-                  class="search-bar" 
-                  placeholder="Search for delicious food..."
-                  v-model="searchQuery"
-                  @input="handleSearch"
-                  aria-label="Search for food items"
-                >
               </div>
             </div>
           </div>

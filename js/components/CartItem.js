@@ -65,23 +65,14 @@ window.app.component("cart-item", {
     };
   },
   template: `
-    <div class="cart-item" :class="{ 'fade-out': isRemoving }">
-      <div class="row align-items-center g-3">
-        <!-- Item Image -->
-        <div class="col-3 col-md-2">
-          <div class="position-relative">
-            <img :src="item.image" :alt="item.name" class="thumbnail-image rounded shadow-sm">
-            <span v-if="item.quantity > 1" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
-              {{ item.quantity }}
-            </span>
-          </div>
-        </div>
-        
-        <!-- Item Details -->
-        <div class="col-9 col-md-4">
+    <div class="cart-item" :class="{ 'fade-out': isRemoving }">      <div class="row align-items-center g-3">        <!-- Item Details -->
+        <div class="col-12 col-md-6">
           <div class="d-flex flex-column">
             <div class="d-flex align-items-center">
               <h5 class="mb-1">{{ item.name }}</h5>
+              <span v-if="item.quantity > 1" class="ms-2 badge bg-primary">
+                {{ item.quantity }}x
+              </span>
               <span v-if="hasCustomization" class="ms-2 badge bg-info">Customized</span>
             </div>
             
@@ -171,8 +162,7 @@ window.app.component("cart-item", {
             </div>
           </div>
         </div>
-        
-        <!-- Quantity Controls -->
+          <!-- Quantity Controls -->
         <div class="col-6 col-md-3 mt-3 mt-md-0">
           <div class="quantity-controls d-flex align-items-center">
             <button 
@@ -203,8 +193,7 @@ window.app.component("cart-item", {
               <i class="fas fa-plus"></i>
             </button>
           </div>
-        </div>
-          <!-- Item Price -->
+        </div>          <!-- Item Price -->
         <div class="col-4 col-md-2 mt-3 mt-md-0 text-end">
           <p class="price fw-bold mb-0">{{ $currency(totalPrice) }}</p>
           <small v-if="item.quantity > 1" class="text-muted d-block">
@@ -464,13 +453,12 @@ window.app.component("cart-item", {
       this.showOptions = false;
       // In a real app, open customization modal with current customizations
       this.$root.$emit("open-customization-modal", this.item);
-    }
+    },
     /**
      * Get CSS class for dietary option badge
      * @param {string} option - Dietary option
      * @returns {string} CSS class
-     */,
-    getDietaryBadgeClass(option) {
+     */ getDietaryBadgeClass(option) {
       return this.DIETARY_BADGE_CLASSES[option] || "bg-secondary";
     },
 

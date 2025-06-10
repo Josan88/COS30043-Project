@@ -105,6 +105,7 @@ class ToastService {
         console.warn(
           `ToastService: Unknown toast type '${type}', using 'info' instead`
         );
+        message = type;
         type = "info";
       }
 

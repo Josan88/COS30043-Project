@@ -589,11 +589,10 @@ const ShoppingCart = {
       } finally {
         this.isLoading = false;
       }
-    }
+    },
     /**
      * Recalculate cart totals
-     */,
-    recalculateCart() {
+     */ recalculateCart() {
       try {
         // Validate cart items before calculation
         const validCartItems = this.cartItems.filter(
@@ -1163,11 +1162,10 @@ const ShoppingCart = {
         retryCount: 0,
         canRetry: true,
       };
-    }
+    },
     /**
      * Format currency value
-     */,
-    formatCurrency(amount) {
+     */ formatCurrency(amount) {
       // Handle invalid amounts
       if (typeof amount !== "number" || isNaN(amount) || !isFinite(amount)) {
         amount = 0;
@@ -1177,11 +1175,10 @@ const ShoppingCart = {
         return this.$currency(amount);
       }
       return `RM ${amount.toFixed(2)}`;
-    }
+    },
     /**
      * Round number to two decimal places
-     */,
-    roundToTwoDecimals(num) {
+     */ roundToTwoDecimals(num) {
       if (typeof num !== "number" || isNaN(num) || !isFinite(num)) {
         return 0;
       }
@@ -1447,15 +1444,14 @@ const ShoppingCart = {
      */
     clearErrorState() {
       this.errorState = this.createErrorState();
-    },
-
+    }
     /**
      * Show toast notification
-     */
+     */,
     showToast(type, message, duration = UI_CONFIG.TOAST_DURATION) {
       try {
         if (window.ToastService) {
-          window.ToastService.show(type, message, duration);
+          window.ToastService.show(message, type, { duration });
         } else if (type === "error") {
           alert(`Error: ${message}`);
         }
