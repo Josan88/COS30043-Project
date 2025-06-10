@@ -944,3 +944,277 @@ button:focus,
     border: 1px solid #ccc;
   }
 }
+
+/* ===========================================
+   IMAGE OPTIMIZATION - MOBILE PORTRAIT
+   =========================================== */
+
+/* Base image styles - mobile first */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Responsive images with aspect ratio preservation */
+.responsive-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Card images optimization for mobile portrait */
+.card-img-top,
+.food-image {
+  width: 100%;
+  height: 180px; /* Optimized for mobile portrait */
+  object-fit: cover;
+  object-position: center;
+  background-color: var(--light-bg);
+  transition: transform 0.3s ease;
+}
+
+/* Loading state for images */
+.image-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Image placeholder for failed loads */
+.image-placeholder {
+  width: 100%;
+  height: 180px;
+  background-color: var(--light-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: var(--light-text);
+  font-size: var(--font-size-sm);
+  border: 1px dashed var(--border-color);
+}
+
+.image-placeholder i {
+  font-size: var(--font-size-xxl);
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.5;
+}
+
+/* Product card image container */
+.card-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  background-color: var(--light-bg);
+}
+
+/* Image hover effects (disabled on touch devices) */
+@media (hover: hover) {
+  .card:hover .food-image {
+    transform: scale(1.05);
+  }
+}
+
+/* Mobile Portrait Image Optimizations */
+@media (max-width: 575.98px) and (orientation: portrait) {
+  /* Optimize image sizes for mobile portrait */
+  .card-img-top,
+  .food-image {
+    height: 160px; /* Smaller height for mobile portrait */
+  }
+  
+  /* Hero section images */
+  .hero-image {
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Category images */
+  .category-image {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  /* Compact card images */
+  .compact-image {
+    height: 120px !important;
+  }
+  
+  /* Product thumbnail images */
+  .product-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  
+  /* Profile/avatar images */
+  .avatar-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  /* Logo optimization for mobile */
+  .navbar-brand img,
+  .logo-image {
+    max-height: 32px;
+    width: auto;
+    object-fit: contain;
+  }
+  
+  /* Disable image hover effects on mobile */
+  .card:hover .food-image {
+    transform: none;
+  }
+  
+  /* Lazy loading indicator for mobile */
+  .lazy-loading {
+    background: linear-gradient(90deg, #f8f9fa 25%, #e9ecef 50%, #f8f9fa 75%);
+    background-size: 200% 100%;
+    animation: loading-shimmer 2s infinite;
+  }
+}
+
+/* Mobile Landscape Adjustments */
+@media (min-width: 576px) and (max-width: 767.98px) and (orientation: landscape) {
+  .card-img-top,
+  .food-image {
+    height: 140px; /* Shorter height for landscape */
+  }
+  
+  .hero-image {
+    height: 120px;
+  }
+}
+
+/* Tablet and Desktop Enhancements */
+@media (min-width: 768px) {
+  .card-img-top,
+  .food-image {
+    height: 200px; /* Standard height for larger screens */
+  }
+  
+  .hero-image {
+    height: 180px;
+  }
+  
+  /* Re-enable hover effects for non-touch devices */
+  .card:hover .food-image {
+    transform: scale(1.05);
+  }
+}
+
+/* High-DPI/Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .food-image,
+  .card-img-top {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Dark mode image adjustments */
+@media (prefers-color-scheme: dark) {
+  .image-placeholder {
+    background-color: #2c3e50;
+    color: #95a5a6;
+    border-color: #34495e;
+  }
+  
+  .image-loading {
+    background: linear-gradient(90deg, #2c3e50 25%, #34495e 50%, #2c3e50 75%);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-image,
+  .card-img-top,
+  .food-image {
+    transition: none;
+  }
+  
+  .loading-shimmer {
+    animation: none;
+  }
+  
+  .card:hover .food-image {
+    transform: none;
+  }
+}
+
+/* WebP format support detection */
+@supports (background-image: url('data:image/webp;base64,UklGRh4AAABXRUJQVlA4TBEAAAAvAAAAAAfQ//73v/+BiOh/AAA=')) {
+  .webp-supported .food-image {
+    /* WebP images load faster on supported browsers */
+    background-size: cover;
+  }
+}
+
+/* Image gallery grid for mobile portrait */
+@media (max-width: 575.98px) and (orientation: portrait) {
+  .image-gallery {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-sm);
+  }
+  
+  .image-gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 16/9;
+  }
+  
+  .image-gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+/* Touch-friendly image interaction */
+@media (pointer: coarse) {
+  .image-interactive {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  
+  .image-interactive:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+/* Performance optimizations for mobile */
+@media (max-width: 575.98px) {
+  /* Optimize image rendering on mobile */
+  .hero-image,
+  .featured-image {
+    image-rendering: optimizeSpeed;
+  }
+  
+  /* Reduce image quality for faster loading on slower connections */
+  .product-grid .food-image,
+  .category-grid .category-image {
+    image-rendering: optimizeSpeed;
+  }
+}
+
+/* ===========================================
+   END IMAGE OPTIMIZATION
+   =========================================== */

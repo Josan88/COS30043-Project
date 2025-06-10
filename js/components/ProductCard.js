@@ -63,13 +63,18 @@ window.app.component("product-card", {
           :to="productDetailPath" 
           :aria-label="viewDetailsAriaLabel"
           class="d-block"
-        >
-          <img 
+        >          <img 
             :src="displayImage" 
             :alt="imageAltText" 
-            class="card-img-top food-image"
-            :class="{ 'compact-image': compactMode }"
+            class="card-img-top food-image responsive-image"
+            :class="{ 
+              'compact-image': compactMode, 
+              'lazy-loading': isImageLoading,
+              'image-error': imageError 
+            }"
             loading="lazy"
+            decoding="async"
+            @load="handleImageLoad"
             @error="handleImageError"
           >
           
@@ -224,6 +229,7 @@ window.app.component("product-card", {
       isAddingToCart: false,
       isProcessingFavorite: false,
       imageError: false,
+      isImageLoading: true,
 
       // Configuration from constants
       maxStars: window.APP_CONSTANTS?.UI?.MAX_RATING_STARS || 5,
@@ -285,15 +291,26 @@ window.app.component("product-card", {
      */
     productDetailPath() {
       return `/product/${this.product.id}`;
-    },
-
+    }
     /**
-     * Get display image with fallback
-     */
+     * Get display image with fallback and optimization
+     */,
     displayImage() {
-      return this.imageError
+      const baseImage = this.imageError
         ? this.fallbackImage
         : this.product.image || this.fallbackImage;
+
+      // Use image optimization service if available
+      if (window.ImageOptimizationService) {
+        return window.ImageOptimizationService.optimizeImageUrl(baseImage, {
+          width: this.compactMode ? 300 : 400,
+          height: this.compactMode ? 200 : 300,
+          quality: "auto",
+          format: "auto",
+        });
+      }
+
+      return baseImage;
     },
 
     /**
@@ -530,13 +547,12 @@ window.app.component("product-card", {
       } else {
         return "fa-star text-muted";
       }
-    },
-
+    }
     /**
      * Format price with currency
-     */
+     */,
     formatPrice(price) {
-      const currency = window.APP_CONSTANTS?.CURRENCY || "RM";
+      const currency = window.APP_CONSTANTS?.PRICING?.CURRENCY || "RM";
       return `${currency}${price.toFixed(2)}`;
     },
 
@@ -648,11 +664,10 @@ window.app.component("product-card", {
           source: "product-card",
         });
       }
-    },
-
+    }
     /**
      * Track favorite toggle analytics
-     */
+     */,
     trackFavoriteToggle(isFavorite) {
       if (window.analytics && typeof window.analytics.track === "function") {
         window.analytics.track(
@@ -665,14 +680,95 @@ window.app.component("product-card", {
         );
       }
     },
-  },
 
+    /**
+     * Handle successful image load
+     */
+    handleImageLoad() {
+      this.isImageLoading = false;
+      this.imageError = false;
+    },
+
+    /**
+     * Handle image load error - Enhanced for mobile optimization
+     */
+    handleImageError() {
+      this.imageError = true;
+      this.isImageLoading = false;
+
+      // Try to load a lower quality fallback image for mobile
+      if (window.innerWidth <= 575) {
+        const fallbackUrl = this.generateMobileFallback();
+        if (fallbackUrl !== this.displayImage) {
+          // Attempt to load mobile-optimized fallback
+          this.$nextTick(() => {
+            const img = this.$el.querySelector(".food-image");
+            if (img && fallbackUrl) {
+              img.src = fallbackUrl;
+            }
+          });
+        }
+      }
+
+      console.warn(`Image failed to load for product: ${this.product.name}`, {
+        originalUrl: this.product.image,
+        fallbackUrl: this.fallbackImage,
+        isMobile: window.innerWidth <= 575,
+      });
+    }
+    /**
+     * Generate mobile-optimized fallback image URL
+     */,
+    generateMobileFallback() {
+      // Check if original image has different resolutions available
+      const originalUrl = this.product.image;
+      if (originalUrl && typeof originalUrl === "string") {
+        // Try to find mobile-optimized version
+        const mobileUrl = originalUrl
+          .replace(/\.(jpg|jpeg|png)$/i, "_mobile.$1")
+          .replace(/large/gi, "small")
+          .replace(/high/gi, "low");
+
+        if (mobileUrl !== originalUrl) {
+          return mobileUrl;
+        }
+      }
+
+      return this.fallbackImage;
+    },
+
+    /**
+     * Check if image is below the fold for lazy loading
+     */
+    isImageBelowFold(imgElement) {
+      const rect = imgElement.getBoundingClientRect();
+      const viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      return rect.top > viewportHeight + 100; // 100px buffer
+    },
+  }
   /**
-   * Component lifecycle - load favorite status
-   */
+   * Component lifecycle - load favorite status and setup image optimization
+   */,
   async mounted() {
     try {
       await this.loadFavoriteStatus();
+
+      // Setup image optimization and lazy loading
+      this.$nextTick(() => {
+        const imgElement = this.$el.querySelector(".food-image");
+        if (imgElement && window.ImageOptimizationService) {
+          // Store original source for optimization service
+          imgElement.dataset.originalSrc = this.product.image;
+          imgElement.dataset.width = this.compactMode ? "300" : "400";
+          imgElement.dataset.height = this.compactMode ? "200" : "300";
+
+          // Enable lazy loading if image is below the fold
+          if (this.isImageBelowFold(imgElement)) {
+            window.ImageOptimizationService.enableLazyLoading(imgElement);
+          }
+        }
+      });
     } catch (error) {
       console.error("Error mounting ProductCard:", error);
     }

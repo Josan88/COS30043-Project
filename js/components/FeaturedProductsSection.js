@@ -67,12 +67,11 @@ const FeaturedProductsSection = {
               </span>
               <span>({{ product.rating }})</span>
             </div>
-            
-            <p class="card-text" v-if="product.description">
+              <p class="card-text" v-if="product.description">
               {{ product.description }}
             </p>
             
-            <div class="card-price">\${{ product.price?.toFixed(2) || '0.00' }}</div>
+            <div class="card-price">RM{{ product.price?.toFixed(2) || '0.00' }}</div>
             
             <div class="card-actions">
               <button 

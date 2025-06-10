@@ -904,10 +904,10 @@ class ProductService {
           break;
         case "price-range":
           const price = this.getEffectivePrice(product);
-          if (price < 10) key = "Under $10";
-          else if (price < 20) key = "$10 - $20";
-          else if (price < 30) key = "$20 - $30";
-          else key = "Over $30";
+          if (price < 10) key = "Under RM10";
+          else if (price < 20) key = "RM10 - RM20";
+          else if (price < 30) key = "RM20 - RM30";
+          else key = "Over RM30";
           break;
         case "rating":
           const rating = Math.floor(product.rating);

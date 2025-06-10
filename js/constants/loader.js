@@ -20,13 +20,14 @@ window.APP_CONSTANTS = {
     RETRY_DELAY: 1000,
     ANIMATION_DELAY: 150,
   },
-
   // Pricing Configuration
   PRICING: {
     TAX_RATE: 0.1,
     FREE_DELIVERY_THRESHOLD: 15,
     DELIVERY_FEE: 2.99,
     EXPRESS_DELIVERY_FEE: 4.99,
+    CURRENCY: "RM",
+    CURRENCY_CODE: "MYR",
   },
 
   // Delivery Configuration

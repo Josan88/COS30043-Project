@@ -124,10 +124,10 @@ window.Helpers.isValidPhone = function (phone) {
  */
 window.Helpers.formatPrice = function (
   price,
-  currency = "MYR",
+  currency = window.APP_CONSTANTS?.PRICING?.CURRENCY_CODE || "MYR",
   locale = "en-MY"
 ) {
-  if (typeof price !== "number" || isNaN(price)) return "0.00";
+  if (typeof price !== "number" || isNaN(price)) return "RM0.00";
 
   return new Intl.NumberFormat(locale, {
     style: "currency",
