@@ -168,19 +168,20 @@ const PurchasesPage = {
                       <th scope="col" width="100">Total</th>
                     </tr>
                   </thead>
-                  <tbody>
-                    <tr v-for="item in order.items" :key="item.id">
+                  <tbody>                    <tr v-for="item in order.items" :key="item.id">
                       <td>
-                        <img 
-                          :src="item.image" 
-                          :alt="item.name + ' - Order item'"
-                          class="thumbnail-image"
-                          v-accessible-image="{ 
-                            src: item.image, 
-                            alt: item.name + ' - Order item',
-                            fallback: '/images/placeholder-food.jpg'
-                          }"
-                        >
+                        <div class="product-thumbnail-container">
+                          <img 
+                            :src="item.image" 
+                            :alt="item.name + ' - Order item'"
+                            class="product-thumbnail"
+                            v-accessible-image="{ 
+                              src: item.image, 
+                              alt: item.name + ' - Order item',
+                              fallback: '/images/placeholder-food.jpg'
+                            }"
+                          >
+                        </div>
                       </td>
                       <td>
                         <strong>{{ item.name }}</strong>
@@ -229,11 +230,12 @@ const PurchasesPage = {
               </div>
               
               <!-- Mobile view for items -->
-              <div class="d-md-none">
-                <div v-for="item in order.items" :key="item.id" class="card mb-2">
+              <div class="d-md-none">                <div v-for="item in order.items" :key="item.id" class="card mb-2">
                   <div class="card-body p-3">
                     <div class="d-flex">
-                      <img :src="item.image" :alt="item.name" class="img-thumbnail me-3" style="max-height: 70px; max-width: 70px;">
+                      <div class="product-thumbnail-container me-3">
+                        <img :src="item.image" :alt="item.name" class="product-thumbnail">
+                      </div>
                       <div class="flex-grow-1">
                         <h6 class="mb-1">{{ item.name }}</h6>
                         <div v-if="item.specialInstructions" class="small text-muted mb-2">

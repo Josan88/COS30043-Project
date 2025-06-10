@@ -41,18 +41,21 @@ const FeaturedProductsSection = {
           v-for="(product, index) in products" 
           :key="product.id" 
           class="card"
-          v-scroll-reveal="{ delay: index * 150, threshold: 0.2 }"
-        >
-          <div class="card-image">
+          v-scroll-reveal="{ delay: index * 150, threshold: 0.2 }"        >
+          <div class="card-image-container">
             <img 
               v-if="product.image" 
               :src="product.image" 
               :alt="product.name"
+              class="food-image responsive-image"
               loading="lazy"
             />
-            <div v-else class="placeholder-image">
+            <div v-else class="image-placeholder">
               <i class="fas fa-utensils"></i>
               <span>{{ product.name }}</span>
+            </div>
+            <div class="image-overlay">
+              <span>View Details</span>
             </div>
           </div>
           

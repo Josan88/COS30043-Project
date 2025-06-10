@@ -104,17 +104,9 @@ const ProductPage = {
                 <button class="btn-close btn-close-white ms-2" @click="removeDietaryFilter(diet)" aria-label="Clear dietary filter"></button>
               </span>
             </div>
-          </div>
-            <!-- Enhanced Category Title & Statistics -->
-          <div v-if="filteredProducts.length > 0" class="mb-4 d-flex justify-content-between align-items-center">
-            <h2 v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</h2>
+          </div>            <!-- Enhanced Category Title & Statistics -->
+          <div v-if="filteredProducts.length > 0" class="mb-4 d-flex justify-content-between align-items-center">            <h2 v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</h2>
             <h2 v-else>All Menu Items</h2>
-            <div class="text-muted mb-0">              {{ pluralize(filteredProducts.length, 'item') }} found
-              <span v-if="productStats" class="ms-2">
-                • Avg Price: RM{{ formatCurrency(productStats.averagePrice) }}
-                • Avg Rating: <span v-html="formatStars(productStats.averageRating)"></span>
-              </span>
-            </div>
           </div>
           
           <!-- Additional Filters Section -->
@@ -1091,7 +1083,7 @@ const ProductPage = {
     $route: {
       immediate: true,
       handler(to, from) {
-        if (to.path === "/products") {
+        if (to.path === "") {
           this.analytics.pageViews++;
           this.loadData();
           this.updateRouteAnalytics(to, from);
@@ -1904,11 +1896,10 @@ const ProductPage = {
 
       // Update special instructions field
       this.specialInstructions = customization.specialInstructions;
-    }
+    },
     /**
      * Enhanced add to cart with validation and feedback
-     */,
-    async addToCart() {
+     */ async addToCart() {
       if (!this.currentProduct) {
         console.error("No product selected");
         return;
@@ -2599,8 +2590,14 @@ const ProductPage = {
 
     /**
      * Enhanced product sorting with multiple criteria
-     */
-    sortProducts(a, b) {
+     */ sortProducts(a, b) {
+      // Safety check for undefined objects
+      if (!a || !b) {
+        if (!a && !b) return 0;
+        if (!a) return 1;
+        if (!b) return -1;
+      }
+
       switch (this.sortOption) {
         case "price-asc":
           return this.getEffectivePrice(a) - this.getEffectivePrice(b);
@@ -2609,9 +2606,9 @@ const ProductPage = {
         case "rating-desc":
           return (b.rating || 0) - (a.rating || 0);
         case "name-asc":
-          return a.name.localeCompare(b.name);
+          return (a.name || "").localeCompare(b.name || "");
         case "name-desc":
-          return b.name.localeCompare(a.name);
+          return (b.name || "").localeCompare(a.name || "");
         case "prep-time-asc":
           return (a.preparationTime || 0) - (b.preparationTime || 0);
         case "calories-asc":
@@ -2623,11 +2620,12 @@ const ProductPage = {
           return bScore - aScore;
       }
     },
-
     /**
      * Calculate featured score for default sorting
-     */
-    calculateFeaturedScore(product) {
+     */ calculateFeaturedScore(product) {
+      // Safety check for undefined product
+      if (!product) return 0;
+
       let score = 0;
 
       // Rating contribution (0-50 points)
@@ -2667,7 +2665,7 @@ const ProductPage = {
       if (hasChanges) {
         this.$router
           .push({
-            path: "/products",
+            path: "/product",
             query: params,
           })
           .catch(() => {}); // Ignore navigation errors

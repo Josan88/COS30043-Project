@@ -59,12 +59,18 @@ Breakpoints: 576px (Mobile Landscape), 768px (Tablet), 992px (Desktop)
   --container-lg: 768px;
   --container-xl: 992px;
   --container-xxl: 1200px;
-
   /* Layout Variables */
   --navbar-height-mobile: 60px;
   --navbar-height-desktop: 80px;
   --hero-height-mobile: 200px;
   --hero-height-desktop: 300px;
+  
+  /* Border Radius Variables */
+  --border-radius: 8px;
+  --border-radius-sm: 4px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-round: 50%;
 }
 
 /* Global Reset & Base Styles */
@@ -1222,16 +1228,28 @@ img {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
+/* Consistent image aspect ratio container */
+.image-aspect-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3; /* Consistent aspect ratio across all image types */
+  overflow: hidden;
+  background-color: var(--light-bg);
+  border-radius: var(--border-radius);
+}
+
 /* Card images optimization for mobile portrait */
 .card-img-top,
 .food-image {
   width: 100%;
-  height: 180px;
-  /* Optimized for mobile portrait */
+  height: 100%;
   object-fit: cover;
   object-position: center;
   background-color: var(--light-bg);
   transition: transform 0.3s ease;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* Loading state for images */
@@ -1251,10 +1269,13 @@ img {
   }
 }
 
-/* Image placeholder for failed loads */
+/* Enhanced image placeholder for failed loads */
 .image-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 180px;
+  height: 100%;
   background-color: var(--light-bg);
   display: flex;
   align-items: center;
@@ -1271,12 +1292,41 @@ img {
   opacity: 0.5;
 }
 
-/* Product card image container */
+/* Product card image container with consistent positioning */
 .card-image-container {
   position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
   overflow: hidden;
-  border-radius: 12px 12px 0 0;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
   background-color: var(--light-bg);
+}
+
+/* Ensure consistent image positioning in all card types */
+.product-card .card-image-container,
+.category-card .image-container,
+.recommendation-card .image-container {
+  aspect-ratio: 4/3;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--light-bg);
+}
+
+/* Image overlay for interactive states */
+.image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
 }
 
 /* Image hover effects (disabled on touch devices) */
@@ -1284,68 +1334,123 @@ img {
   .card:hover .food-image {
     transform: scale(1.05);
   }
+  
+  .card:hover .image-overlay {
+    opacity: 1;
+  }
 }
 
 /* Mobile Portrait Image Optimizations */
 @media (max-width: 575.98px) and (orientation: portrait) {
 
-  /* Optimize image sizes for mobile portrait */
-  .card-img-top,
-  .food-image {
-    height: 160px;
-    /* Smaller height for mobile portrait */
+  /* Maintain consistent aspect ratio on mobile portrait */
+  .card-image-container,
+  .image-aspect-container {
+    aspect-ratio: 3/2; /* Slightly wider for mobile */
   }
 
-  /* Hero section images */
-  .hero-image {
-    height: 140px;
-    object-fit: cover;
+  /* Hero section images - maintain aspect ratio */
+  .hero-image-container {
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
     border-radius: 8px;
   }
+  
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 
-  /* Category images */
+  /* Category images - square aspect ratio for consistency */
+  .category-image-container {
+    aspect-ratio: 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  
   .category-image {
     width: 100%;
-    height: 80px;
+    height: 100%;
     object-fit: cover;
-    border-radius: 8px;
+    object-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   /* Compact card images */
-  .compact-image {
-    height: 120px !important;
+  .compact-image-container {
+    aspect-ratio: 2/1 !important;
   }
 
-  /* Product thumbnail images */
-  .product-thumbnail {
+  /* Product thumbnail images - circular for profile/user images */
+  .product-thumbnail-container {
     width: 60px;
     height: 60px;
-    object-fit: cover;
+    position: relative;
+    overflow: hidden;
     border-radius: 8px;
     flex-shrink: 0;
+    background-color: var(--light-bg);
+  }
+  
+  .product-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   /* Profile/avatar images */
-  .avatar-image {
+  .avatar-image-container {
     width: 40px;
     height: 40px;
+    position: relative;
+    overflow: hidden;
     border-radius: 50%;
+    flex-shrink: 0;
+    background-color: var(--light-bg);
+  }
+  
+  .avatar-image {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    object-position: center;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
   /* Logo optimization for mobile */
+  .navbar-brand-container {
+    height: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  
   .navbar-brand img,
   .logo-image {
-    max-height: 32px;
+    max-height: 100%;
     width: auto;
     object-fit: contain;
+    object-position: center;
   }
 
   /* Disable image hover effects on mobile */
   .card:hover .food-image {
     transform: none;
   }
-
   /* Lazy loading indicator for mobile */
   .lazy-loading {
     background: linear-gradient(90deg, #f8f9fa 25%, #e9ecef 50%, #f8f9fa 75%);
@@ -1357,33 +1462,90 @@ img {
 /* Mobile Landscape Adjustments */
 @media (min-width: 576px) and (max-width: 767.98px) and (orientation: landscape) {
 
-  .card-img-top,
-  .food-image {
-    height: 140px;
-    /* Shorter height for landscape */
+  /* Maintain 4:3 aspect ratio for landscape */
+  .card-image-container,
+  .image-aspect-container {
+    aspect-ratio: 4/3;
   }
 
-  .hero-image {
-    height: 120px;
+  /* Hero images - 16:9 for landscape */
+  .hero-image-container {
+    aspect-ratio: 16/9;
+  }
+  
+  /* Category images - maintain square */
+  .category-image-container {
+    aspect-ratio: 1;
   }
 }
 
 /* Tablet and Desktop Enhancements */
 @media (min-width: 768px) {
 
-  .card-img-top,
-  .food-image {
-    height: 200px;
-    /* Standard height for larger screens */
+  /* Standard aspect ratios for larger screens */
+  .card-image-container,
+  .image-aspect-container {
+    aspect-ratio: 4/3;
   }
 
-  .hero-image {
-    height: 180px;
+  /* Enhanced hero image dimensions */
+  .hero-image-container {
+    aspect-ratio: 21/9; /* Wider cinematic ratio for desktop */
   }
 
   /* Re-enable hover effects for non-touch devices */
   .card:hover .food-image {
     transform: scale(1.05);
+  }
+  
+  /* Enhanced hover overlay */
+  .card:hover .image-overlay {
+    opacity: 1;
+  }
+}
+
+/* Mobile Landscape Adjustments */
+@media (min-width: 576px) and (max-width: 767.98px) and (orientation: landscape) {
+
+  /* Maintain 4:3 aspect ratio for landscape */
+  .card-image-container,
+  .image-aspect-container {
+    aspect-ratio: 4/3;
+  }
+
+  /* Hero images - 16:9 for landscape */
+  .hero-image-container {
+    aspect-ratio: 16/9;
+  }
+  
+  /* Category images - maintain square */
+  .category-image-container {
+    aspect-ratio: 1;
+  }
+}
+
+/* Tablet and Desktop Enhancements */
+@media (min-width: 768px) {
+
+  /* Standard aspect ratios for larger screens */
+  .card-image-container,
+  .image-aspect-container {
+    aspect-ratio: 4/3;
+  }
+
+  /* Enhanced hero image dimensions */
+  .hero-image-container {
+    aspect-ratio: 21/9; /* Wider cinematic ratio for desktop */
+  }
+
+  /* Re-enable hover effects for non-touch devices */
+  .card:hover .food-image {
+    transform: scale(1.05);
+  }
+  
+  /* Enhanced hover overlay */
+  .card:hover .image-overlay {
+    opacity: 1;
   }
 }
 
@@ -1491,6 +1653,70 @@ img {
 /* ===========================================
      END IMAGE OPTIMIZATION
      =========================================== */
+
+/* Image Positioning Utilities */
+.image-center {
+  object-position: center;
+}
+
+.image-top {
+  object-position: top;
+}
+
+.image-bottom {
+  object-position: bottom;
+}
+
+.image-left {
+  object-position: left;
+}
+
+.image-right {
+  object-position: right;
+}
+
+/* Image fit utilities */
+.image-cover {
+  object-fit: cover;
+}
+
+.image-contain {
+  object-fit: contain;
+}
+
+.image-fill {
+  object-fit: fill;
+}
+
+/* Aspect ratio utilities */
+.aspect-square {
+  aspect-ratio: 1;
+}
+
+.aspect-video {
+  aspect-ratio: 16/9;
+}
+
+.aspect-photo {
+  aspect-ratio: 4/3;
+}
+
+.aspect-wide {
+  aspect-ratio: 21/9;
+}
+
+/* Image border radius utilities */
+.image-rounded {
+  border-radius: var(--border-radius);
+}
+
+.image-rounded-lg {
+  border-radius: var(--border-radius-lg);
+}
+
+.image-circle {
+  border-radius: var(--border-radius-round);
+}
 
 /* ===========================================
      SHOPPING CART - MOBILE FIRST RESPONSIVE DESIGN

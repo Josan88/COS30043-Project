@@ -23,7 +23,6 @@ class ImageOptimizationService {
 
     this.init();
   }
-
   /**
    * Initialize the service
    */
@@ -40,6 +39,9 @@ class ImageOptimizationService {
 
     // Preload critical images
     this.preloadCriticalImages();
+
+    // Apply consistent image containers
+    this.applyImageContainers();
 
     console.log("ImageOptimizationService initialized", {
       webpSupported: this.webpSupported,
@@ -271,22 +273,40 @@ class ImageOptimizationService {
 
     return "/assets/images/placeholder-default.jpg";
   }
-
   /**
    * Show image placeholder
    */
   showImagePlaceholder(imgElement) {
-    // Create placeholder content
-    const placeholder = document.createElement("div");
-    placeholder.className = "image-placeholder";
-    placeholder.innerHTML = `
-      <i class="fas fa-image"></i>
-      <span>Image unavailable</span>
-    `;
+    const container = imgElement.closest(
+      ".card-image-container, .image-aspect-container, .hero-image-container, .category-image-container"
+    );
 
-    // Replace image with placeholder
-    imgElement.style.display = "none";
-    imgElement.parentNode.insertBefore(placeholder, imgElement);
+    if (container) {
+      // Create placeholder content for container-based layout
+      const placeholder = document.createElement("div");
+      placeholder.className = "image-placeholder";
+      placeholder.innerHTML = `
+        <i class="fas fa-image"></i>
+        <span>Image unavailable</span>
+      `;
+
+      // Hide the image and add placeholder
+      imgElement.style.opacity = "0";
+      container.appendChild(placeholder);
+    } else {
+      // Fallback for non-container images
+      const placeholder = document.createElement("div");
+      placeholder.className = "image-placeholder";
+      placeholder.style.width = imgElement.offsetWidth + "px";
+      placeholder.style.height = imgElement.offsetHeight + "px";
+      placeholder.innerHTML = `
+        <i class="fas fa-image"></i>
+        <span>Image unavailable</span>
+      `;
+
+      imgElement.style.display = "none";
+      imgElement.parentNode.insertBefore(placeholder, imgElement);
+    }
   }
 
   /**
@@ -388,7 +408,6 @@ class ImageOptimizationService {
     const images = document.querySelectorAll("img[data-src]");
     images.forEach((img) => this.loadImage(img));
   }
-
   /**
    * Get optimization statistics
    */
@@ -400,6 +419,62 @@ class ImageOptimizationService {
       isLowBandwidth: this.isLowBandwidth,
       isMobilePortrait: this.isMobilePortrait(),
     };
+  }
+
+  /**
+   * Apply consistent image containers to improve positioning
+   */
+  applyImageContainers() {
+    const images = document.querySelectorAll("img");
+
+    images.forEach((img) => {
+      const parent = img.parentElement;
+
+      // Skip if already in a proper container
+      if (
+        parent.classList.contains("card-image-container") ||
+        parent.classList.contains("image-aspect-container") ||
+        parent.classList.contains("hero-image-container") ||
+        parent.classList.contains("category-image-container")
+      ) {
+        return;
+      }
+
+      // Determine container type based on image class or context
+      let containerClass = "image-aspect-container";
+
+      if (img.classList.contains("hero-image")) {
+        containerClass = "hero-image-container";
+      } else if (img.classList.contains("category-image")) {
+        containerClass = "category-image-container";
+      } else if (
+        img.classList.contains("food-image") ||
+        img.classList.contains("card-img-top")
+      ) {
+        containerClass = "card-image-container";
+      } else if (img.classList.contains("product-thumbnail")) {
+        containerClass = "product-thumbnail-container";
+      } else if (img.classList.contains("avatar-image")) {
+        containerClass = "avatar-image-container";
+      }
+
+      // Create container wrapper
+      const container = document.createElement("div");
+      container.className = containerClass;
+
+      // Wrap the image
+      parent.insertBefore(container, img);
+      container.appendChild(img);
+
+      // Ensure image has proper positioning classes
+      img.style.position = "absolute";
+      img.style.top = "0";
+      img.style.left = "0";
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.objectFit = "cover";
+      img.style.objectPosition = "center";
+    });
   }
 }
 

@@ -59,14 +59,14 @@ window.app.component("product-card", {
       }"
       role="article"
       :aria-label="productAriaLabel"
-    >
-      <!-- Product Image Section -->
+    >      <!-- Product Image Section -->
       <div class="position-relative card-image-container">
         <router-link 
           :to="productDetailPath" 
           :aria-label="viewDetailsAriaLabel"
           class="d-block"
-        >          <img 
+        >
+          <img 
             :src="displayImage" 
             :alt="imageAltText" 
             class="card-img-top food-image responsive-image"
@@ -80,6 +80,11 @@ window.app.component("product-card", {
             @load="handleImageLoad"
             @error="handleImageError"
           >
+          
+          <!-- Image overlay for hover effects -->
+          <div class="image-overlay">
+            <span>View Details</span>
+          </div>
             <!-- Discount Ribbon -->
           <div v-if="hasDiscount" class="ribbon">
             <span class="bg-danger text-white px-2 py-1 small fw-bold">
@@ -296,11 +301,10 @@ window.app.component("product-card", {
      */
     savingsAmount() {
       return this.hasDiscount ? this.product.price - this.effectivePrice : 0;
-    }
+    },
     /**
      * Format discount percentage
-     */,
-    formatDiscount() {
+     */ formatDiscount() {
       return this.hasDiscount ? `${this.product.discount}%` : "";
     },
 
@@ -443,11 +447,10 @@ window.app.component("product-card", {
         "text-muted": !this.isFavorite,
         "fa-spin": this.isProcessingFavorite,
       };
-    }
+    },
     /**
      * Add to cart button text
-     */,
-    addToCartButtonText() {
+     */ addToCartButtonText() {
       if (this.isAddingToCart) return "Adding...";
       if (this.isOutOfStock) return "Out of Stock";
       if (this.isLowStock) return `Add (${this.product.stock} left)`;

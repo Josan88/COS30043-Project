@@ -143,3 +143,11 @@ window.router = router;
 // Use the router and mount the app
 window.app.use(router);
 window.app.mount("#app");
+
+// Initialize Image Optimization Service after app is mounted
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.ImageOptimizationService) {
+    window.ImageOptimizationService.init();
+    console.log("Image Optimization Service initialized");
+  }
+});

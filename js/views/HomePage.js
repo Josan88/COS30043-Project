@@ -23,8 +23,7 @@ const createHomePageConfig = () => ({
     sessionTimeout: 1800000,
   },
   content: window.APP_CONSTANTS?.CONTENT || {
-    featuredProductsCount: 8,
-    maxCategoriesDisplay: 12,
+    featuredProductsCount: 3,
     reviewsPerPage: 4,
   },
   // UI Text Configuration
@@ -123,23 +122,6 @@ const createReviewsData = () => [
   },
 ];
 
-// Category icon mapping
-const getCategoryIconMap = () => ({
-  mains: "fas fa-utensils",
-  appetizers: "fas fa-cheese",
-  sides: "fas fa-bread-slice",
-  desserts: "fas fa-ice-cream",
-  drinks: "fas fa-cocktail",
-  specials: "fas fa-star",
-  burgers: "fas fa-hamburger",
-  pizza: "fas fa-pizza-slice",
-  salads: "fas fa-seedling",
-  breakfast: "fas fa-egg",
-  seafood: "fas fa-fish",
-  international: "fas fa-globe-americas",
-  vegetarian: "fas fa-leaf",
-});
-
 // =====================================================
 // Main Component Definition
 // =====================================================
@@ -160,23 +142,6 @@ const HomePage = {
                   </router-link>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Categories Section -->
-      <section class="content-section">
-        <div class="container">
-          <div class="section-header">
-            <h2 class="section-title">Popular Categories</h2>
-            <p class="section-subtitle">Choose from our variety of food categories</p>
-          </div>
-          <div class="row">
-            <div class="col-12">
-              <categories-section 
-                :categories="categories"
-              />
             </div>
           </div>
         </div>
@@ -245,12 +210,12 @@ const HomePage = {
         </div>
       </section>
     </div>
-  `, // =====================================================
+  `,
+  // =====================================================
   // Component Registration
   // =====================================================
   components: {
     "featured-products-section": window.FeaturedProductsSection,
-    "categories-section": window.CategoriesSection,
     "how-it-works-section": window.HowItWorksSection,
     "news-reviews-section": window.NewsReviewsSection,
   },
@@ -266,14 +231,15 @@ const HomePage = {
       retryCount: 0,
 
       // Configuration
-      config: createHomePageConfig(), // Search functionality
+      config: createHomePageConfig(),
+
+      // Search functionality
       searchQuery: "",
       searchResults: [],
       searchTimeout: null,
 
       // Content data
       featuredProducts: [],
-      categories: [],
       currentReviewIndex: 0,
       reviewInterval: null,
       userLocation: null,
@@ -308,7 +274,6 @@ const HomePage = {
     loadingStates() {
       return {
         hasProducts: this.featuredProducts.length > 0,
-        hasCategories: this.categories.length > 0,
         isFullyLoaded: !this.isLoading && this.isHealthy,
       };
     },
@@ -347,42 +312,26 @@ const HomePage = {
       } finally {
         this.isLoading = false;
       }
-    }
+    },
+
     /**
      * Load all required data
-     */,
+     */
     async loadData() {
       if (!window.ProductService) {
         throw new Error("ProductService not available");
       }
-
       await window.ProductService.ensureInitialized();
 
-      const [featured, categoriesData] = await Promise.all([
-        window.ProductService.getPopularProducts(4),
-        window.ProductService.getAllCategories(),
-      ]);
+      const featured = await window.ProductService.getPopularProducts(3);
 
       // Set the available property based on stock levels
       this.featuredProducts = featured.map((product) => ({
         ...product,
         available: product.stock > 0,
       }));
-      this.categories = this.processCategoriesData(categoriesData);
       this.loadError = null;
       this.retryCount = 0;
-    }, // === DATA PROCESSING METHODS ===
-
-    /**
-     * Process categories data with enhanced icons
-     */
-    processCategoriesData(categoriesData) {
-      const iconMap = getCategoryIconMap();
-
-      return categoriesData.map((category) => ({
-        ...category,
-        icon: iconMap[category.id.toLowerCase()] || "fas fa-utensils",
-      }));
     },
 
     // === SEARCH METHODS ===
@@ -422,7 +371,9 @@ const HomePage = {
       } catch (error) {
         console.error("Search navigation failed:", error);
       }
-    }, // === REVIEW CAROUSEL METHODS ===
+    },
+
+    // === REVIEW CAROUSEL METHODS ===
 
     /**
      * Start automatic review carousel
@@ -560,11 +511,9 @@ const HomePage = {
           });
         }, observerOptions);
 
-        // Observe elements for animation
+        // Observe elements for animation (removed category-card)
         document
-          .querySelectorAll(
-            ".category-card, .process-card, .featured-product-card"
-          )
+          .querySelectorAll(".process-card, .featured-product-card")
           .forEach((el) => observer.observe(el));
 
         console.log("HomePage effects initialized successfully");
@@ -619,7 +568,6 @@ const HomePage = {
           window.APP_CONSTANTS?.MESSAGES?.ERROR?.LOAD_FAILED ||
           "Failed to load content. Please refresh the page.";
         this.featuredProducts = [];
-        this.categories = [];
       }
     },
 
