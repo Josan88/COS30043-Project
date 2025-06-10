@@ -1,365 +1,277 @@
+/**
+ * Shopping Cart Component - Improved Version
+ *
+ * A comprehensive shopping cart component for the food ordering system.
+ * Features include cart management, service options, pricing calculations,
+ * promo codes, payment methods, and order placement.
+ *
+ * Key Features:
+ * - Responsive design for mobile and desktop
+ * - Multiple service methods (dine-in, pickup, delivery)
+ * - Dynamic pricing with discounts and taxes
+ * - Promo code system
+ * - Form validation
+ * - Analytics tracking
+ * - Error handling with retry logic
+ *
+ * @version 2.0.0 (Improved Readability)
+ */
+
+// =====================================================
+// CONSTANTS AND CONFIGURATION
+// =====================================================
+
+const PRICING_CONFIG = {
+  SERVICE_CHARGE_RATE: 0.05, // 5%
+  TAX_RATE: 0.06, // 6%
+  BULK_DISCOUNT_RATE: 0.05, // 5%
+  BULK_DISCOUNT_THRESHOLD: 3, // items
+  FREE_DELIVERY_THRESHOLD: 50, // RM
+  DELIVERY_FEE: 5, // RM
+  MIN_ORDER_AMOUNT: 5, // RM
+};
+
+const VALIDATION_PATTERNS = {
+  TABLE_NUMBER: /^[1-9]\d*$/,
+  PHONE: /^[\+]?[0-9\-\s\(\)]{8,}$/,
+  MIN_ADDRESS_LENGTH: 10,
+};
+
+const UI_CONFIG = {
+  DEBOUNCE_DELAY: 300, // ms
+  RETRY_ATTEMPTS: 3,
+  TOAST_DURATION: 5000, // ms
+};
+
+const DEFAULT_PROMO_CODES = [
+  {
+    code: "WELCOME10",
+    description: "10% off your entire order",
+    type: "percentage",
+    value: 10,
+    minOrder: 0,
+  },
+  {
+    code: "SAVE15",
+    description: "RM15 off orders over RM80",
+    type: "fixed",
+    value: 15,
+    minOrder: 80,
+  },
+  {
+    code: "HAPPY5",
+    description: "RM5 off any order",
+    type: "fixed",
+    value: 5,
+    minOrder: 0,
+  },
+];
+
+// =====================================================
+// SHOPPING CART COMPONENT
+// =====================================================
+
 const ShoppingCart = {
   template: `
     <div class="shopping-cart-page">
-      <div class="container">
-        <h1 class="mb-4">Your Order</h1>
-        
-        <!-- Empty Cart State -->
-        <div v-if="cartItems.length === 0" class="empty-cart-container">
-          <i class="fas fa-shopping-cart fa-4x mb-3 text-muted"></i>
-          <h3>Your order is empty</h3>
-          <p>Looks like you haven't added any food items to your order yet.</p>
-          <div class="empty-cart-cta mt-4">
-            <router-link to="/product" class="btn btn-primary">
-              <i class="fas fa-utensils"></i> Browse Our Menu
-            </router-link>
+      <!-- Cart Header Section -->
+      <section class="cart-header">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-12 col-md-6">
+              <h1 class="cart-title">
+                <i class="fas fa-shopping-cart me-2"></i>
+                Your Order
+              </h1>
+              <p class="cart-subtitle" v-if="hasCartItems">
+                Review your items before checkout
+              </p>
+            </div>
+            <div class="col-12 col-md-6 text-md-end mt-2 mt-md-0">
+              <div class="cart-status-badge" v-if="hasCartItems">
+                <span class="item-count">{{ cartSummary.itemCount }}</span>
+                <span class="item-text">{{ cartSummary.itemCount === 1 ? 'item' : 'items' }}</span>
+                <span class="total-amount">{{ formatCurrency(cartSummary.total) }}</span>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
         
-        <!-- Cart Items -->
-        <div v-else>
-          <div class="row">
-            <div class="col-lg-8">
-              <!-- Cart Items List -->
-              <div class="card mb-4">
-                <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                  <h5 class="mb-0">Your Food Items ({{ cartTotals.itemCount }})</h5>
-                  <div class="badge bg-primary">{{ cartTotals.itemCount }} {{ cartTotals.itemCount === 1 ? 'item' : 'items' }}</div>
+      <!-- Empty Cart State -->
+      <section v-if="!hasCartItems" class="empty-cart-section">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12 col-sm-10 col-md-8 col-lg-6 text-center">
+              <div class="empty-cart-container">
+                <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                <h2 class="empty-cart-title">Your order is empty</h2>
+                <p class="empty-cart-description">
+                  Looks like you haven't added any food items to your order yet.
+                </p>
+                <div class="empty-cart-cta">
+                  <router-link to="/product" class="btn btn-primary btn-lg">
+                    <i class="fas fa-utensils me-2"></i>
+                    Browse Our Menu
+                  </router-link>
                 </div>
-                <div class="card-body p-0">
-                  <!-- Card-based layout for items -->
-                  <div class="p-3" v-for="(item, index) in cartItems" :key="item.id">
-                    <cart-item 
-                      :item="item" 
-                      @remove-item="removeFromCart" 
-                      @update-cart="handleCartUpdate"
-                    ></cart-item>
-                    <hr v-if="index < cartItems.length - 1">
-                  </div>
-                  
-                  <div v-if="bulkDiscountApplied" class="p-3 savings-alert">
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="text-success">
-                        <i class="fas fa-tag me-1"></i> Group order discount applied
-                      </span>
-                      <span class="text-danger">-{{ $currency(discountAmount) }}</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="card-footer bg-white">
-                  <div class="d-flex justify-content-between">
-                    <router-link to="/product" class="btn btn-outline">
-                      <i class="fas fa-arrow-left me-1"></i> Add More Items
-                    </router-link>
-                    <button @click="clearCart" class="btn btn-danger">
-                      <i class="fas fa-trash me-1"></i> Clear Order
-                    </button>
-                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+        
+      <!-- Main Cart Content -->
+      <main v-else class="cart-main-content">
+        <div class="container">
+          <div class="row g-3 g-lg-4">
+            <!-- Cart Items Section (Left Column) -->
+            <div class="col-12 col-lg-8 order-2 order-lg-1">
+                <!-- Cart Items List -->
+              <cart-items-section 
+                v-if="!isLoading && cartItems.length > 0"
+                :cart-items="cartItems"
+                :cart-summary="cartSummary"
+                :bulk-discount-applied="discountCalculations.bulkDiscountApplied"
+                :discount-amount="discountCalculations.bulkDiscountAmount"
+                @remove-item="handleRemoveItem"
+                @update-cart="handleCartUpdate"
+                @clear-cart="handleClearCart"
+              />
+              
+              <!-- Loading State -->
+              <div v-else-if="isLoading" class="cart-loading">
+                <div class="text-center py-4">
+                  <i class="fas fa-spinner fa-spin fa-2x mb-3"></i>
+                  <p>Loading your cart...</p>
                 </div>
               </div>
               
-              <!-- Table Service Options -->
-              <div class="card mb-4">
-                <div class="card-header bg-white">
-                  <h5 class="mb-0"><i class="fas fa-concierge-bell me-2"></i> Service Method</h5>
-                </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-12">
-                      <label for="service-method" class="form-label">Choose Service</label>
-                      <select class="form-select" id="service-method" v-model="serviceMethod" @change="updateServiceDetails">
-                        <option value="dine-in">Dine-in</option>
-                        <option value="pickup">Pick-up</option>
-                        <option value="delivery">Delivery</option>
-                      </select>
-                    </div>
-
-                    <div v-if="serviceMethod === 'dine-in'" class="col-md-6">
-                      <label for="table-number" class="form-label">Table Number</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
-                        <input type="text" class="form-control" id="table-number" v-model="tableNumber" placeholder="Enter your table number">
-                      </div>
-                      <small class="text-muted">Find your table number displayed on your table</small>
-                    </div>
-
-                    <div v-if="serviceMethod === 'delivery'" class="col-12">
-                      <label for="delivery-address" class="form-label">Delivery Address</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
-                        <textarea class="form-control" id="delivery-address" v-model="deliveryAddress" rows="2" placeholder="Enter your delivery address"></textarea>
-                      </div>
-                    </div>
-
-                    <div v-if="serviceMethod === 'pickup' || serviceMethod === 'delivery'" class="col-md-6">
-                        <label for="phone-number" class="form-label">Phone Number</label>
-                        <div class="input-group">
-                          <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                          <input type="tel" class="form-control" id="phone-number" v-model="phoneNumber" placeholder="Enter your phone number">
-                        </div>
-                         <small class="text-muted">For order updates and pickup/delivery coordination</small>
-                    </div>
-
-                    <div class="col-12">
-                      <label for="special-requests" class="form-label">Special Requests (Optional)</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-comment-alt"></i></span>
-                        <textarea class="form-control" id="special-requests" v-model="specialRequests" rows="2"
-                          placeholder="Any special requests for your order?"></textarea>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Service Options Section -->
+              <service-options-section
+                :service-method="serviceMethod"
+                :table-number="tableNumber"
+                :delivery-address="deliveryAddress"
+                :phone-number="phoneNumber"
+                :special-requests="specialRequests"
+                :validation-errors="validationErrors"
+                @update-service-method="handleServiceMethodUpdate"
+                @update-table-number="handleTableNumberUpdate"
+                @update-delivery-address="handleDeliveryAddressUpdate"
+                @update-phone-number="handlePhoneNumberUpdate"
+                @update-special-requests="handleSpecialRequestsUpdate"
+              />
+              
             </div>
             
-            <!-- Order Summary -->
-            <div class="col-lg-4">
-              <div class="card mb-4 cart-summary">
-                <div class="card-header bg-white">
-                  <h5 class="mb-0"><i class="fas fa-receipt me-2"></i> Order Summary</h5>
-                </div>
-                <div class="card-body">
-                  <div class="order-summary">
-                    <table class="table">
-                      <tbody>
-                        <tr>
-                          <th>Subtotal ({{ cartTotals.itemCount }} {{ cartTotals.itemCount === 1 ? 'item' : 'items' }}):</th>
-                          <td>{{ $currency(cartTotals.subtotal) }}</td>
-                        </tr>
-                        
-                        <tr v-if="bulkDiscountApplied" class="text-success">
-                          <th>Group Order Discount:</th>
-                          <td>-{{ $currency(discountAmount) }}</td>
-                        </tr>
-                        
-                        <tr>
-                          <th>Service Charge ({{ serviceChargeRate * 100 }}%):</th>
-                          <td>{{ $currency(cartTotals.serviceCharge) }}</td>
-                        </tr>
-                        
-                        <tr>
-                          <th>Tax ({{ taxRate * 100 }}%):</th>
-                          <td>{{ $currency(cartTotals.tax) }}</td>
-                        </tr>
-                        
-                        <tr v-if="promoCodeApplied" class="text-success">
-                          <th>Promo Code ({{ activePromoCode.code }}):</th>
-                          <td>-{{ $currency(promoDiscount) }}</td>
-                        </tr>
-                        
-                        <tr class="total">
-                          <th>Total:</th>
-                          <td>{{ $currency(cartTotals.total) }}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  
-                  <!-- Estimated Time -->
-                  <div class="alert alert-info small mb-3">
-                    <div class="d-flex align-items-center">
-                      <i class="far fa-clock me-2 fa-2x"></i>
-                      <div>
-                        <div class="fw-bold mb-1">Estimated Preparation Time:</div>
-                        <div>{{ estimatedTime }}</div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Savings Summary -->
-                  <div v-if="totalSavings > 0" class="savings-alert p-3 mb-3">
-                    <div class="fw-bold"><i class="fas fa-piggy-bank me-2"></i> Your Savings: {{ $currency(totalSavings) }}</div>
-                    <ul class="mb-0 ps-3 mt-1">                      <li v-if="bulkDiscountApplied">Group order discount: {{ $currency(discountAmount) }}</li>
-                      <li v-if="promoCodeApplied">Promo code: {{ $currency(promoDiscount) }}</li>
-                    </ul>
-                  </div>
-                  
-                  <!-- Promo Code -->
-                  <div class="mb-3 promo-code-container">
-                    <label for="promo-code" class="form-label">Promo Code</label>
-                    <div class="input-group">
-                      <span class="input-group-text"><i class="fas fa-ticket-alt"></i></span>
-                      <input 
-                        type="text" 
-                        id="promo-code" 
-                        class="form-control" 
-                        v-model="promoCode"
-                        placeholder="Enter promo code"
-                        :disabled="promoCodeApplied"
-                      >
-                      <button 
-                        class="btn" 
-                        :class="promoCodeApplied ? 'btn-danger' : 'btn-outline'" 
-                        type="button"
-                        @click="promoCodeApplied ? removePromoCode() : applyPromoCode()"
-                      >
-                        {{ promoCodeApplied ? 'Remove' : 'Apply' }}
-                      </button>
-                    </div>
-                    <div v-if="promoError" class="text-danger small mt-1">
-                      <i class="fas fa-exclamation-circle me-1"></i> {{ promoError }}
-                    </div>
-                    <div v-if="promoCodeApplied" class="text-success small mt-1">
-                      <i class="fas fa-check-circle me-1"></i> {{ activePromoCode.description }}
-                    </div>
-                  </div>
-                  
-                  <!-- Payment Method Selection -->
-                  <div class="mb-3">
-                    <label class="form-label">Payment Method</label>
-                    
-                    <div class="payment-method-option" :class="{'active': paymentMethod === 'card'}" @click="paymentMethod = 'card'">
-                      <div class="d-flex align-items-center">
-                        <input class="form-check-input" type="radio" name="payment-method" id="payment-card" value="card" v-model="paymentMethod">
-                        <label class="form-check-label ms-2" for="payment-card">
-                          <span class="fw-bold">Credit/Debit Card</span>
-                        </label>
-                        <div class="ms-auto">
-                          <i class="fab fa-cc-visa me-1"></i>
-                          <i class="fab fa-cc-mastercard me-1"></i>
-                          <i class="fab fa-cc-amex"></i>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="payment-method-option" :class="{'active': paymentMethod === 'online'}" @click="paymentMethod = 'online'">
-                      <div class="d-flex align-items-center">
-                        <input class="form-check-input" type="radio" name="payment-method" id="payment-online" value="online" v-model="paymentMethod">
-                        <label class="form-check-label ms-2" for="payment-online">
-                          <span class="fw-bold">Mobile Payment</span>
-                        </label>
-                        <div class="ms-auto">
-                          <i class="fab fa-paypal me-1"></i>
-                          <i class="fas fa-mobile-alt"></i>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div class="payment-method-option" :class="{'active': paymentMethod === 'cash'}" @click="paymentMethod = 'cash'">
-                      <div class="d-flex align-items-center">
-                        <input class="form-check-input" type="radio" name="payment-method" id="payment-cash" value="cash" v-model="paymentMethod">
-                        <label class="form-check-label ms-2" for="payment-cash">
-                          <span class="fw-bold">Cash at Table</span>
-                        </label>
-                        <div class="ms-auto">
-                          <i class="fas fa-money-bill-wave"></i>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <!-- Place Order Button -->
-                  <button @click="placeOrder" class="btn btn-primary btn-lg btn-place-order w-100" :disabled="!isOrderValid">
-                    <i class="fas fa-utensils me-2"></i> Place Order
-                  </button>
-                </div>
-              </div>
             </div>
-          </div>
+            <!-- Order Summary Section (Right Column) -->
+            <aside class="col-12 col-lg-4 order-1 order-lg-2">              
+              <order-summary-section
+                :cart-summary="cartSummary"
+                :discount-calculations="discountCalculations"
+                :estimated-time="estimatedTime"
+                :promo-code="promoCode"
+                :promo-error="promoError"
+                :promo-code-applied="promoCodeApplied"
+                :active-promo-code="activePromoCode"
+                :payment-method="paymentMethod"
+                :is-order-valid="canPlaceOrder"
+                :is-submitting="isSubmitting"
+                @update-promo-code="handleUpdatePromoCode"
+                @apply-promo-code="handleApplyPromoCode"
+                @remove-promo-code="handleRemovePromoCode"
+                @update-payment-method="handlePaymentMethodUpdate"
+                @place-order="handlePlaceOrder"
+              />
+            </aside>
           
-          <!-- Recommended Items -->
-          <div class="recommendations mt-4">
-            <h3 class="mb-3">You Might Also Like</h3>
-            <div class="row">
-              <div v-for="product in recommendedProducts" :key="product.id" class="col-6 col-md-3 mb-4">
-                <product-card :product="product" class="h-100"></product-card>
-              </div>
-            </div>
-          </div>
+          <!-- Recommended Items Section -->
+          <recommended-items-section
+            v-if="recommendedProducts.length > 0"
+            :recommended-products="recommendedProducts"
+          />
+          
         </div>
-      </div>
+      </main>
     </div>
   `,
+
+  // =====================================================
+  // COMPONENT DATA
+  // =====================================================
   data() {
     return {
+      // Core cart data
       cartItems: [],
+      cartSummary: {
+        subtotal: 0,
+        serviceCharge: 0,
+        tax: 0,
+        deliveryFee: 0,
+        total: 0,
+        itemCount: 0,
+      },
+
+      // Service options
+      serviceMethod: "dine-in",
       tableNumber: "",
+      deliveryAddress: "",
+      phoneNumber: "",
       specialRequests: "",
+
+      // Promo code system
       promoCode: "",
       promoError: null,
       promoCodeApplied: false,
       activePromoCode: null,
-      paymentMethod: "card",
-      serviceMethod: "dine-in", // Default to dine-in
-      deliveryAddress: "",
-      phoneNumber: "",
-      serviceChargeRate: 0.05, // 5% service charge
-      taxRate: 0.06, // 6% tax rate
-      promoCodes: [
-        {
-          code: "WELCOME10",
-          description: "10% off your entire order",
-          type: "percentage",
-          value: 10,
-          minOrder: 0,
-        },
-        {
-          code: "SAVE15",
-          description: "RM15 off orders over RM80",
-          type: "fixed",
-          value: 15,
-          minOrder: 80,
-        },
-        {
-          code: "HAPPY5",
-          description: "RM5 off any order",
-          type: "fixed",
-          value: 5,
-          minOrder: 0,
-        },
-      ],
-      bulkDiscountRate:
-        window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_RATE || 0.05, // 5% bulk discount
-      bulkDiscountThreshold:
-        window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_THRESHOLD || 3, // Apply to items with quantity >= 3
-      recommendedProducts: [],
-      cartTotals: {
-        subtotal: 0,
-        serviceCharge: 0,
-        tax: 0,
-        total: 0,
-        itemCount: 0,
-      },
-      isLoading: false,
+      availablePromoCodes: [...DEFAULT_PROMO_CODES],
 
-      // Enhanced state management
+      // Payment
+      paymentMethod: "card",
+
+      // UI state
+      isLoading: false,
+      isSubmitting: false,
+      validationErrors: {},
+      // Recommendations
+      recommendedProducts: [],
+
+      // Configuration
       config: {
         pricing: {
           serviceChargeRate:
-            window.APP_CONSTANTS?.PRICING?.SERVICE_CHARGE_RATE || 0.05,
-          taxRate: window.APP_CONSTANTS?.PRICING?.TAX_RATE || 0.06,
+            window.APP_CONSTANTS?.PRICING?.SERVICE_CHARGE_RATE ||
+            PRICING_CONFIG.SERVICE_CHARGE_RATE,
+          taxRate:
+            window.APP_CONSTANTS?.PRICING?.TAX_RATE || PRICING_CONFIG.TAX_RATE,
+          bulkDiscountRate:
+            window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_RATE ||
+            PRICING_CONFIG.BULK_DISCOUNT_RATE,
+          bulkDiscountThreshold:
+            window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_THRESHOLD ||
+            PRICING_CONFIG.BULK_DISCOUNT_THRESHOLD,
           freeDeliveryThreshold:
-            window.APP_CONSTANTS?.PRICING?.FREE_DELIVERY_THRESHOLD || 50,
-          deliveryFee: window.APP_CONSTANTS?.PRICING?.DELIVERY_FEE || 5,
-          minOrderAmount: window.APP_CONSTANTS?.PRICING?.MIN_ORDER_AMOUNT || 5,
-        },
-        validation: {
-          tableNumberPattern:
-            window.APP_CONSTANTS?.VALIDATION?.PATTERNS?.TABLE_NUMBER ||
-            /^[1-9]\d*$/,
-          phonePattern:
-            window.APP_CONSTANTS?.VALIDATION?.PATTERNS?.PHONE ||
-            /^[\+]?[0-9\-\s\(\)]{8,}$/,
-          minAddressLength:
-            window.APP_CONSTANTS?.VALIDATION?.MIN_LENGTHS?.ADDRESS || 10,
+            window.APP_CONSTANTS?.PRICING?.FREE_DELIVERY_THRESHOLD ||
+            PRICING_CONFIG.FREE_DELIVERY_THRESHOLD,
+          deliveryFee:
+            window.APP_CONSTANTS?.PRICING?.DELIVERY_FEE ||
+            PRICING_CONFIG.DELIVERY_FEE,
+          minOrderAmount:
+            window.APP_CONSTANTS?.PRICING?.MIN_ORDER_AMOUNT ||
+            PRICING_CONFIG.MIN_ORDER_AMOUNT,
         },
         ui: {
-          debounceDelay: window.APP_CONSTANTS?.UI_CONFIG?.DEBOUNCE_DELAY || 300,
+          debounceDelay:
+            window.APP_CONSTANTS?.UI_CONFIG?.DEBOUNCE_DELAY ||
+            UI_CONFIG.DEBOUNCE_DELAY,
           retryAttempts:
-            window.APP_CONSTANTS?.VALIDATION?.MAX_RETRY_ATTEMPTS || 3,
+            window.APP_CONSTANTS?.VALIDATION?.MAX_RETRY_ATTEMPTS ||
+            UI_CONFIG.RETRY_ATTEMPTS,
         },
       },
 
-      // Error handling and retry state
-      errorState: {
-        hasError: false,
-        errorMessage: "",
-        retryCount: 0,
-        canRetry: true,
-      },
-
-      // Analytics tracking
+      // Analytics and error tracking
       analytics: {
         sessionStart: Date.now(),
         cartInteractions: 0,
@@ -367,33 +279,411 @@ const ShoppingCart = {
         serviceMethodChanges: 0,
         conversionEvents: [],
       },
+      errorState: {
+        hasError: false,
+        errorMessage: "",
+        retryCount: 0,
+        canRetry: true,
+      },
 
-      // Validation states
+      // Validation
       validation: {
         debounceTimeouts: new Map(),
-        isSubmitting: false,
       },
     };
   },
+
+  // =====================================================
+  // COMPUTED PROPERTIES
+  // =====================================================
+
   computed: {
-    bulkDiscountApplied() {
-      return this.cartItems.some(
-        (item) => item.quantity >= this.bulkDiscountThreshold
+    /**
+     * Check if cart has any items
+     */
+    hasCartItems() {
+      return this.cartItems.length > 0;
+    },
+
+    /**
+     * Calculate all discount-related values
+     */
+    discountCalculations() {
+      const bulkDiscountApplied = this.cartItems.some(
+        (item) => item.quantity >= this.config.pricing.bulkDiscountThreshold
+      );
+
+      const bulkDiscountAmount = bulkDiscountApplied
+        ? this.calculateBulkDiscountAmount()
+        : 0;
+
+      const promoDiscountAmount = this.promoCodeApplied
+        ? this.calculatePromoDiscountAmount()
+        : 0;
+
+      const totalSavings = bulkDiscountAmount + promoDiscountAmount;
+
+      return {
+        bulkDiscountApplied,
+        bulkDiscountAmount,
+        promoDiscountAmount,
+        totalSavings,
+      };
+    },
+
+    /**
+     * Calculate estimated preparation time
+     */
+    estimatedTime() {
+      const now = new Date();
+      let prepTime = this.cartItems.reduce((max, item) => {
+        const itemPrepTime = item.preparationTime || 15;
+        return Math.max(max, itemPrepTime);
+      }, 0);
+
+      const itemCount = this.cartItems.reduce(
+        (count, item) => count + item.quantity,
+        0
+      );
+
+      // Add extra time for large orders
+      if (itemCount > 6) {
+        prepTime += 5;
+      }
+
+      now.setMinutes(now.getMinutes() + prepTime);
+      const hours = now.getHours().toString().padStart(2, "0");
+      const minutes = now.getMinutes().toString().padStart(2, "0");
+
+      return `${hours}:${minutes} (approximately ${prepTime} minutes)`;
+    },
+
+    /**
+     * Check if order can be placed
+     */
+    canPlaceOrder() {
+      return (
+        this.hasCartItems &&
+        this.isFormValid &&
+        !this.isSubmitting &&
+        !this.errorState.hasError &&
+        this.cartSummary.total >= this.config.pricing.minOrderAmount
       );
     },
-    discountAmount() {
-      if (!this.bulkDiscountApplied) return 0;
+
+    /**
+     * Validate form based on service method
+     */
+    isFormValid() {
+      const errors = this.getValidationErrors();
+      this.validationErrors = errors;
+      return Object.keys(errors).length === 0;
+    },
+
+    /**
+     * Calculate delivery fee
+     */
+    deliveryFee() {
+      if (this.serviceMethod !== "delivery") return 0;
+
+      return this.cartSummary.subtotal >=
+        this.config.pricing.freeDeliveryThreshold
+        ? 0
+        : this.config.pricing.deliveryFee;
+    },
+  },
+
+  // =====================================================
+  // WATCHERS
+  // =====================================================
+
+  watch: {
+    // Form field watchers with debounced validation
+    tableNumber: {
+      handler(newVal) {
+        this.trackInteraction();
+        this.debouncedValidateField("tableNumber", newVal);
+      },
+    },
+
+    phoneNumber: {
+      handler(newVal) {
+        this.trackInteraction();
+        this.debouncedValidateField("phoneNumber", newVal);
+      },
+    },
+
+    deliveryAddress: {
+      handler(newVal) {
+        this.trackInteraction();
+        this.debouncedValidateField("deliveryAddress", newVal);
+      },
+    },
+
+    serviceMethod: {
+      handler(newVal, oldVal) {
+        if (oldVal !== newVal) {
+          this.analytics.serviceMethodChanges++;
+          this.trackAnalyticsEvent("service_method_changed", {
+            from: oldVal,
+            to: newVal,
+          });
+          this.clearErrorState();
+          this.recalculateCart();
+        }
+      },
+    },
+
+    cartItems: {
+      handler() {
+        this.recalculateCart();
+      },
+      deep: true,
+    },
+  },
+
+  // =====================================================
+  // LIFECYCLE HOOKS
+  // =====================================================
+
+  created() {
+    this.initializeComponent();
+  },
+
+  mounted() {
+    this.setupAccessibilityFeatures();
+  },
+
+  beforeUnmount() {
+    this.cleanup();
+  },
+
+  // =====================================================
+  // METHODS
+  // =====================================================
+
+  methods: {
+    // ---------------------------------------------
+    // INITIALIZATION METHODS
+    // ---------------------------------------------
+
+    /**
+     * Initialize the component
+     */
+    async initializeComponent() {
+      try {
+        this.setupEventListeners();
+        await this.loadCart();
+        await this.loadRecommendedProducts();
+        this.trackAnalyticsEvent("shopping_cart_viewed");
+      } catch (error) {
+        this.handleError(error, "Failed to initialize shopping cart");
+      }
+    },
+
+    /**
+     * Setup event listeners
+     */
+    setupEventListeners() {
+      window.addEventListener("cart-updated", this.loadCart);
+      window.addEventListener("resize", this.handleResize);
+      window.addEventListener("online", this.handleOnline);
+      window.addEventListener("offline", this.handleOffline);
+    },
+
+    /**
+     * Setup accessibility features
+     */
+    setupAccessibilityFeatures() {
+      const cartSummary = document.querySelector(".cart-summary");
+      if (cartSummary) {
+        cartSummary.setAttribute("aria-live", "polite");
+        cartSummary.setAttribute("role", "region");
+        cartSummary.setAttribute("aria-label", "Order summary");
+      }
+    },
+
+    /**
+     * Cleanup on component destruction
+     */
+    cleanup() {
+      this.cleanupEventListeners();
+      this.clearAllTimeouts();
+      this.trackAnalyticsEvent("shopping_cart_exited", {
+        sessionDuration: Date.now() - this.analytics.sessionStart,
+        finalCartValue: this.cartSummary.total,
+      });
+    },
+
+    /**
+     * Remove event listeners
+     */ cleanupEventListeners() {
+      window.removeEventListener("cart-updated", this.loadCart);
+      window.removeEventListener("resize", this.handleResize);
+      window.removeEventListener("online", this.handleOnline);
+      window.removeEventListener("offline", this.handleOffline);
+    },
+
+    // ---------------------------------------------
+    // CART MANAGEMENT METHODS
+    // ---------------------------------------------
+
+    /**
+     * Load cart items and details
+     */
+    async loadCart(retryCount = 0) {
+      try {
+        this.isLoading = true;
+        this.clearErrorState();
+
+        // Check if CartService is available
+        if (
+          !window.CartService ||
+          typeof window.CartService.getCartWithDetails !== "function"
+        ) {
+          console.warn("CartService not available, initializing empty cart");
+          this.cartItems = [];
+          this.recalculateCart();
+          return;
+        }
+
+        // Get cart items with details (returns array of promises)
+        const cartDetailsPromises = window.CartService.getCartWithDetails();
+
+        // Wait for all promises to resolve if we have promises
+        let cartDetails = [];
+        if (Array.isArray(cartDetailsPromises)) {
+          // Check if first item is a promise
+          if (
+            cartDetailsPromises.length > 0 &&
+            cartDetailsPromises[0] &&
+            typeof cartDetailsPromises[0].then === "function"
+          ) {
+            cartDetails = await Promise.all(cartDetailsPromises);
+          } else {
+            // Already resolved items
+            cartDetails = cartDetailsPromises;
+          }
+        }
+
+        // Ensure we have valid cart items
+        this.cartItems = cartDetails.filter(
+          (item) => item && typeof item === "object"
+        );
+
+        this.recalculateCart();
+        this.trackAnalyticsEvent("cart_loaded", {
+          itemCount: this.cartItems.length,
+          retryCount,
+        });
+      } catch (error) {
+        console.error("Error loading cart details:", error);
+
+        if (retryCount < this.config.ui.retryAttempts) {
+          setTimeout(() => {
+            this.loadCart(retryCount + 1);
+          }, 1000 * (retryCount + 1));
+        } else {
+          this.handleError(error, "Failed to load cart details");
+        }
+      } finally {
+        this.isLoading = false;
+      }
+    }
+    /**
+     * Recalculate cart totals
+     */,
+    recalculateCart() {
+      try {
+        // Validate cart items before calculation
+        const validCartItems = this.cartItems.filter(
+          (item) =>
+            item &&
+            typeof item === "object" &&
+            typeof item.price === "number" &&
+            typeof item.quantity === "number" &&
+            !isNaN(item.price) &&
+            !isNaN(item.quantity) &&
+            item.quantity > 0
+        );
+
+        const subtotal = validCartItems.reduce(
+          (total, item) => total + item.price * item.quantity,
+          0
+        );
+
+        const itemCount = validCartItems.reduce(
+          (count, item) => count + item.quantity,
+          0
+        );
+
+        // Ensure discount calculations don't return NaN
+        const bulkDiscountAmount =
+          this.discountCalculations.bulkDiscountAmount || 0;
+        const promoDiscountAmount =
+          this.discountCalculations.promoDiscountAmount || 0;
+
+        const discountedSubtotal = Math.max(
+          0,
+          subtotal - bulkDiscountAmount - promoDiscountAmount
+        );
+        const serviceCharge =
+          discountedSubtotal * this.config.pricing.serviceChargeRate;
+        const tax =
+          (discountedSubtotal + serviceCharge) * this.config.pricing.taxRate;
+        const deliveryFee = this.deliveryFee || 0;
+        const total = discountedSubtotal + serviceCharge + tax + deliveryFee;
+
+        this.cartSummary = {
+          subtotal: this.roundToTwoDecimals(subtotal),
+          serviceCharge: this.roundToTwoDecimals(serviceCharge),
+          tax: this.roundToTwoDecimals(tax),
+          deliveryFee: this.roundToTwoDecimals(deliveryFee),
+          total: this.roundToTwoDecimals(total),
+          itemCount,
+        };
+      } catch (error) {
+        // Reset to safe defaults on error
+        this.cartSummary = {
+          subtotal: 0,
+          serviceCharge: 0,
+          tax: 0,
+          deliveryFee: 0,
+          total: 0,
+          itemCount: 0,
+        };
+        this.handleError(error, "Failed to calculate cart totals");
+      }
+    },
+
+    // ---------------------------------------------
+    // DISCOUNT CALCULATION METHODS
+    // ---------------------------------------------
+
+    /**
+     * Calculate bulk discount amount
+     */
+    calculateBulkDiscountAmount() {
       return this.cartItems.reduce((total, item) => {
-        if (item.quantity >= this.bulkDiscountThreshold) {
-          return total + item.price * item.quantity * this.bulkDiscountRate;
+        if (item.quantity >= this.config.pricing.bulkDiscountThreshold) {
+          return (
+            total +
+            item.price * item.quantity * this.config.pricing.bulkDiscountRate
+          );
         }
         return total;
       }, 0);
     },
-    promoDiscount() {
+
+    /**
+     * Calculate promo code discount amount
+     */
+    calculatePromoDiscountAmount() {
       if (!this.promoCodeApplied || !this.activePromoCode) return 0;
+
       const subtotalAfterBulkDiscount =
-        this.cartTotals.subtotal - this.discountAmount;
+        this.cartSummary.subtotal -
+        this.discountCalculations.bulkDiscountAmount;
 
       switch (this.activePromoCode.type) {
         case "percentage":
@@ -410,600 +700,41 @@ const ShoppingCart = {
           return 0;
       }
     },
-    totalSavings() {
-      let savings = 0;
-      if (this.bulkDiscountApplied) {
-        savings += this.discountAmount;
-      }
-      if (this.promoCodeApplied) {
-        savings += this.promoDiscount;
-      }
-      return savings;
-    },
-    estimatedTime() {
-      const now = new Date();
-      let prepTime = this.cartItems.reduce((max, item) => {
-        const itemPrepTime = item.preparationTime || 15;
-        return Math.max(max, itemPrepTime);
-      }, 0);
-      const itemCount = this.cartItems.reduce(
-        (count, item) => count + item.quantity,
-        0
-      );
-      if (itemCount > 6) {
-        prepTime += 5;
-      }
-      now.setMinutes(now.getMinutes() + prepTime);
-      const hours = now.getHours().toString().padStart(2, "0");
-      const minutes = now.getMinutes().toString().padStart(2, "0");
-      return `${hours}:${minutes} (approximately ${prepTime} minutes)`;
-    },
-    isOrderValid() {
-      if (this.cartItems.length === 0) return false;
-      if (this.serviceMethod === "dine-in" && !this.tableNumber.trim())
-        return false;
-      if (this.serviceMethod === "delivery" && !this.deliveryAddress.trim())
-        return false;
-      if (
-        (this.serviceMethod === "pickup" ||
-          this.serviceMethod === "delivery") &&
-        !this.phoneNumber.trim()
-      )
-        return false;
-      return true;
-    },
 
-    // Enhanced computed properties for validation and UI state
-    validationState() {
-      return {
-        tableNumber:
-          this.serviceMethod === "dine-in"
-            ? this.validateTableNumber(this.tableNumber)
-            : { isValid: true },
-        phoneNumber:
-          this.serviceMethod === "pickup" || this.serviceMethod === "delivery"
-            ? this.validatePhoneNumber(this.phoneNumber)
-            : { isValid: true },
-        deliveryAddress:
-          this.serviceMethod === "delivery"
-            ? this.validateDeliveryAddress(this.deliveryAddress)
-            : { isValid: true },
-        promoCode: this.promoCode
-          ? this.validatePromoCode(this.promoCode)
-          : { isValid: true },
-      };
-    },
+    // ---------------------------------------------
+    // EVENT HANDLERS
+    // ---------------------------------------------
 
-    formErrors() {
-      const errors = [];
-      if (
-        this.serviceMethod === "dine-in" &&
-        !this.validationState.tableNumber.isValid
-      ) {
-        errors.push(this.validationState.tableNumber.message);
-      }
-      if (
-        (this.serviceMethod === "pickup" ||
-          this.serviceMethod === "delivery") &&
-        !this.validationState.phoneNumber.isValid
-      ) {
-        errors.push(this.validationState.phoneNumber.message);
-      }
-      if (
-        this.serviceMethod === "delivery" &&
-        !this.validationState.deliveryAddress.isValid
-      ) {
-        errors.push(this.validationState.deliveryAddress.message);
-      }
-      return errors;
-    },
+    /**
+     * Handle cart item removal
+     */
+    async handleRemoveItem(productId) {
+      try {
+        const item = this.cartItems.find((item) => item.id === productId);
+        const itemName = item ? item.name : "Item";
 
-    canPlaceOrder() {
-      return (
-        this.isOrderValid &&
-        this.formErrors.length === 0 &&
-        !this.validation.isSubmitting &&
-        !this.errorState.hasError &&
-        this.cartTotals.total >= this.config.pricing.minOrderAmount
-      );
-    },
+        if (confirm(`Remove ${itemName} from your order?`)) {
+          window.CartService.removeFromCart(productId);
+          await this.loadCart();
+          await this.loadRecommendedProducts();
 
-    deliveryFee() {
-      if (this.serviceMethod !== "delivery") return 0;
-      return this.cartTotals.subtotal >=
-        this.config.pricing.freeDeliveryThreshold
-        ? 0
-        : this.config.pricing.deliveryFee;
-    },
-
-    finalTotal() {
-      return this.cartTotals.total + this.deliveryFee;
-    },
-
-    analyticsData() {
-      return {
-        sessionDuration: Date.now() - this.analytics.sessionStart,
-        cartValue: this.cartTotals.total,
-        itemCount: this.cartTotals.itemCount,
-        interactions: this.analytics.cartInteractions,
-        conversionScore: this.calculateConversionScore(),
-      };
-    },
-  },
-
-  // Enhanced watchers for form validation and analytics
-  watch: {
-    tableNumber: {
-      handler(newVal) {
-        this.analytics.cartInteractions++;
-        this.debouncedValidateField("tableNumber", newVal);
-      },
-      deep: false,
-    },
-
-    phoneNumber: {
-      handler(newVal) {
-        this.analytics.cartInteractions++;
-        this.debouncedValidateField("phoneNumber", newVal);
-      },
-      deep: false,
-    },
-
-    deliveryAddress: {
-      handler(newVal) {
-        this.analytics.cartInteractions++;
-        this.debouncedValidateField("deliveryAddress", newVal);
-      },
-      deep: false,
-    },
-
-    serviceMethod: {
-      handler(newVal, oldVal) {
-        if (oldVal !== newVal) {
-          this.analytics.serviceMethodChanges++;
-          this.trackAnalyticsEvent("service_method_changed", {
-            from: oldVal,
-            to: newVal,
+          this.trackAnalyticsEvent("item_removed_from_cart", {
+            itemId: productId,
+            itemName,
           });
-          this.clearErrorState();
-        }
-      },
-      immediate: false,
-    },
-
-    promoCode: {
-      handler(newVal) {
-        if (newVal && newVal.length > 2) {
-          this.debouncedValidateField("promoCode", newVal);
-        }
-      },
-      deep: false,
-    },
-
-    cartItems: {
-      handler(newItems, oldItems) {
-        if (newItems.length !== oldItems.length) {
-          this.trackAnalyticsEvent("cart_items_changed", {
-            itemCount: newItems.length,
-            cartValue: this.cartTotals.total,
-          });
-        }
-      },
-      deep: true,
-    },
-  },
-  // Enhanced lifecycle hooks
-  created() {
-    try {
-      this.initializeComponent();
-      this.loadCart();
-      this.loadRecommendedProducts();
-      this.setupEventListeners();
-      this.trackAnalyticsEvent("shopping_cart_viewed", {
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      this.handleError(error, "Failed to initialize shopping cart");
-    }
-  },
-
-  mounted() {
-    try {
-      this.setupAccessibilityFeatures();
-      this.initializeTooltips();
-    } catch (error) {
-      console.warn("Non-critical initialization error:", error);
-    }
-  },
-
-  beforeUnmount() {
-    try {
-      this.cleanupEventListeners();
-      this.clearAllTimeouts();
-      this.trackAnalyticsEvent("shopping_cart_exited", {
-        sessionDuration: Date.now() - this.analytics.sessionStart,
-        finalCartValue: this.cartTotals.total,
-      });
-    } catch (error) {
-      console.warn("Cleanup error:", error);
-    }
-  },
-  methods: {
-    // Enhanced initialization methods
-    initializeComponent() {
-      this.analytics.sessionStart = Date.now();
-      this.errorState = {
-        hasError: false,
-        errorMessage: "",
-        retryCount: 0,
-        canRetry: true,
-      };
-      this.validation.debounceTimeouts = new Map();
-    },
-
-    setupEventListeners() {
-      window.addEventListener("cart-updated", this.loadCart);
-      window.addEventListener("resize", this.handleResize);
-      window.addEventListener("online", this.handleOnline);
-      window.addEventListener("offline", this.handleOffline);
-    },
-
-    cleanupEventListeners() {
-      window.removeEventListener("cart-updated", this.loadCart);
-      window.removeEventListener("resize", this.handleResize);
-      window.removeEventListener("online", this.handleOnline);
-      window.removeEventListener("offline", this.handleOffline);
-    },
-
-    setupAccessibilityFeatures() {
-      // Ensure proper ARIA labels and focus management
-      const cartSummary = document.querySelector(".cart-summary");
-      if (cartSummary) {
-        cartSummary.setAttribute("aria-live", "polite");
-        cartSummary.setAttribute("role", "region");
-        cartSummary.setAttribute("aria-label", "Order summary");
-      }
-    },
-
-    initializeTooltips() {
-      // Initialize Bootstrap tooltips if available
-      if (window.bootstrap && window.bootstrap.Tooltip) {
-        const tooltipTriggerList = [].slice.call(
-          document.querySelectorAll('[data-bs-toggle="tooltip"]')
-        );
-        tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new window.bootstrap.Tooltip(tooltipTriggerEl);
-        });
-      }
-    },
-
-    // Enhanced validation methods
-    validateTableNumber(value) {
-      if (!value || !value.trim()) {
-        return {
-          isValid: false,
-          message: "Table number is required for dine-in orders",
-        };
-      }
-      if (!this.config.validation.tableNumberPattern.test(value.trim())) {
-        return { isValid: false, message: "Please enter a valid table number" };
-      }
-      return { isValid: true, message: "" };
-    },
-
-    validatePhoneNumber(value) {
-      if (!value || !value.trim()) {
-        return { isValid: false, message: "Phone number is required" };
-      }
-      if (!this.config.validation.phonePattern.test(value.trim())) {
-        return { isValid: false, message: "Please enter a valid phone number" };
-      }
-      return { isValid: true, message: "" };
-    },
-
-    validateDeliveryAddress(value) {
-      if (!value || !value.trim()) {
-        return { isValid: false, message: "Delivery address is required" };
-      }
-      if (value.trim().length < this.config.validation.minAddressLength) {
-        return {
-          isValid: false,
-          message: `Address must be at least ${this.config.validation.minAddressLength} characters`,
-        };
-      }
-      return { isValid: true, message: "" };
-    },
-
-    validatePromoCode(value) {
-      if (!value || !value.trim()) {
-        return { isValid: true, message: "" };
-      }
-      const code = value.trim().toUpperCase();
-      const promoCode = this.promoCodes.find((promo) => promo.code === code);
-      if (!promoCode) {
-        return { isValid: false, message: "Invalid promo code" };
-      }
-      if (
-        promoCode.minOrder > 0 &&
-        this.cartTotals.subtotal < promoCode.minOrder
-      ) {
-        return {
-          isValid: false,
-          message: `This code requires a minimum order of ${this.$currency(
-            promoCode.minOrder
-          )}`,
-        };
-      }
-      return { isValid: true, message: "" };
-    },
-
-    // Debounced validation
-    debouncedValidateField(field, value) {
-      // Clear existing timeout
-      if (this.validation.debounceTimeouts.has(field)) {
-        clearTimeout(this.validation.debounceTimeouts.get(field));
-      }
-
-      // Set new timeout
-      const timeoutId = setTimeout(() => {
-        this.validateField(field, value);
-        this.validation.debounceTimeouts.delete(field);
-      }, this.config.ui.debounceDelay);
-
-      this.validation.debounceTimeouts.set(field, timeoutId);
-    },
-
-    validateField(field, value) {
-      try {
-        let validationResult;
-        switch (field) {
-          case "tableNumber":
-            validationResult = this.validateTableNumber(value);
-            break;
-          case "phoneNumber":
-            validationResult = this.validatePhoneNumber(value);
-            break;
-          case "deliveryAddress":
-            validationResult = this.validateDeliveryAddress(value);
-            break;
-          case "promoCode":
-            validationResult = this.validatePromoCode(value);
-            break;
-          default:
-            return;
-        }
-
-        // Use ValidationService if available
-        if (window.ValidationService) {
-          window.ValidationService.setFieldValidation(field, validationResult);
-        }
-
-        // Track validation events
-        if (!validationResult.isValid) {
-          this.trackAnalyticsEvent("validation_error", {
-            field,
-            error: validationResult.message,
-          });
+          this.showToast("success", `${itemName} removed from cart`);
         }
       } catch (error) {
-        console.warn(`Validation error for field ${field}:`, error);
+        this.handleError(error, "Failed to remove item from cart");
       }
     },
 
-    clearAllTimeouts() {
-      this.validation.debounceTimeouts.forEach((timeoutId) => {
-        clearTimeout(timeoutId);
-      });
-      this.validation.debounceTimeouts.clear();
-    },
-
-    // Enhanced error handling
-    handleError(error, context = "An error occurred") {
-      console.error(`ShoppingCart Error - ${context}:`, error);
-
-      this.errorState = {
-        hasError: true,
-        errorMessage: error.message || context,
-        retryCount: this.errorState.retryCount + 1,
-        canRetry: this.errorState.retryCount < this.config.ui.retryAttempts,
-      };
-
-      // Track error in analytics
-      this.trackAnalyticsEvent("error_occurred", {
-        error: error.message || context,
-        retryCount: this.errorState.retryCount,
-      });
-
-      // Show toast notification if available
-      this.showToast("error", this.errorState.errorMessage);
-    },
-
-    clearErrorState() {
-      this.errorState = {
-        hasError: false,
-        errorMessage: "",
-        retryCount: 0,
-        canRetry: true,
-      };
-    },
-
-    // Enhanced analytics tracking
-    trackAnalyticsEvent(eventName, data = {}) {
+    /**
+     * Handle cart update (quantity, special instructions)
+     */
+    async handleCartUpdate(data) {
       try {
-        const event = {
-          name: eventName,
-          timestamp: Date.now(),
-          sessionId: this.analytics.sessionStart,
-          data: {
-            ...data,
-            cartValue: this.cartTotals.total,
-            itemCount: this.cartTotals.itemCount,
-            serviceMethod: this.serviceMethod,
-          },
-        };
-
-        this.analytics.conversionEvents.push(event);
-
-        // Send to analytics service if available
-        if (window.AnalyticsService) {
-          window.AnalyticsService.track(eventName, event.data);
-        }
-
-        // Console log for development
-        if (
-          typeof process !== "undefined" &&
-          process.env &&
-          process.env.NODE_ENV === "development"
-        ) {
-          console.log("Analytics Event:", event);
-        }
-      } catch (error) {
-        console.warn("Analytics tracking error:", error);
-      }
-    },
-
-    calculateConversionScore() {
-      let score = 0;
-
-      // Base score for items in cart
-      score += this.cartTotals.itemCount * 10;
-
-      // Bonus for higher cart value
-      score += Math.min(this.cartTotals.total / 10, 50);
-
-      // Bonus for promo code usage
-      if (this.promoCodeApplied) score += 20;
-
-      // Bonus for service method selection
-      if (this.serviceMethod !== "dine-in") score += 15;
-
-      // Penalty for validation errors
-      score -= this.formErrors.length * 5;
-
-      return Math.max(0, Math.min(100, score));
-    },
-
-    // Toast notifications
-    showToast(type, message, duration = 5000) {
-      try {
-        if (window.ToastService) {
-          window.ToastService.show(type, message, duration);
-        } else {
-          // Fallback to alert for critical messages
-          if (type === "error") {
-            alert(`Error: ${message}`);
-          }
-        }
-      } catch (error) {
-        console.warn("Toast notification error:", error);
-      }
-    },
-
-    // Event handlers
-    handleResize() {
-      // Responsive design adjustments
-      this.trackAnalyticsEvent("viewport_changed", {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-    },
-
-    handleOnline() {
-      this.clearErrorState();
-      this.showToast("success", "Connection restored");
-    },
-
-    handleOffline() {
-      this.showToast(
-        "warning",
-        "You are currently offline. Some features may not work properly."
-      );
-    }, // Enhanced service method handling
-    updateServiceDetails() {
-      try {
-        // Reset fields when service method changes to avoid carrying over irrelevant data
-        if (this.serviceMethod !== "dine-in") {
-          this.tableNumber = "";
-        }
-        if (this.serviceMethod !== "delivery") {
-          this.deliveryAddress = "";
-        }
-        if (this.serviceMethod === "dine-in") {
-          // Clear phone for dine-in if not needed
-          this.phoneNumber = "";
-        }
-
-        this.recalculateCart(); // Recalculate totals, delivery fees might change
-        this.clearErrorState();
-
-        // Track analytics
-        this.trackAnalyticsEvent("service_method_updated", {
-          method: this.serviceMethod,
-        });
-
-        // Show helpful toast
-        const messages = {
-          "dine-in": "Please enter your table number",
-          pickup: "Please provide your phone number for pickup coordination",
-          delivery: "Please enter your delivery address and phone number",
-        };
-
-        if (messages[this.serviceMethod]) {
-          this.showToast("info", messages[this.serviceMethod]);
-        }
-      } catch (error) {
-        this.handleError(error, "Failed to update service details");
-      }
-    },
-
-    // Enhanced cart loading with retry mechanism
-    async loadCart(retryCount = 0) {
-      try {
-        this.isLoading = true;
-        this.clearErrorState();
-
-        const cartDetails = await window.CartService.getCartWithDetails();
-
-        if (Array.isArray(cartDetails)) {
-          this.cartItems = await Promise.all(cartDetails);
-        } else {
-          this.cartItems = [];
-        }
-
-        this.recalculateCart();
-
-        // Track successful cart load
-        this.trackAnalyticsEvent("cart_loaded", {
-          itemCount: this.cartItems.length,
-          retryCount,
-        });
-      } catch (error) {
-        console.error("Error loading cart details:", error);
-
-        if (retryCount < this.config.ui.retryAttempts) {
-          // Retry after delay
-          setTimeout(() => {
-            this.loadCart(retryCount + 1);
-          }, 1000 * (retryCount + 1)); // Progressive delay
-
-          this.showToast(
-            "warning",
-            `Loading cart... (attempt ${retryCount + 2})`
-          );
-        } else {
-          // Fallback to basic cart service
-          this.cartItems = window.CartService.getCart();
-          this.handleError(error, "Failed to load cart details");
-        }
-      } finally {
-        this.isLoading = false;
-      }
-    },
-
-    // Enhanced cart update handling
-    handleCartUpdate(data) {
-      try {
-        this.analytics.cartInteractions++;
+        this.trackInteraction();
 
         window.CartService.updateQuantity(data.id, data.quantity);
 
@@ -1018,9 +749,7 @@ const ShoppingCart = {
           }
         }
 
-        this.loadCart();
-
-        // Track cart interaction
+        await this.loadCart();
         this.trackAnalyticsEvent("cart_item_updated", {
           itemId: data.id,
           newQuantity: data.quantity,
@@ -1031,149 +760,26 @@ const ShoppingCart = {
       } catch (error) {
         this.handleError(error, "Failed to update cart");
       }
-    }, // Enhanced recommended products loading
-    async loadRecommendedProducts(retryCount = 0) {
-      try {
-        const cartCategories = this.cartItems
-          .map((item) => item.category)
-          .filter(Boolean);
-        const cartIds = this.cartItems.map((item) => item.id);
-
-        if (cartCategories.length > 0) {
-          const mainCategory = cartCategories[0];
-          const categoryProducts =
-            await window.ProductService.getProductsByCategory(mainCategory);
-
-          this.recommendedProducts = categoryProducts
-            .filter((product) => !cartIds.includes(product.id))
-            .slice(0, 4);
-
-          if (this.recommendedProducts.length < 4) {
-            const popularProducts =
-              await window.ProductService.getPopularProducts(8);
-            const additionalProducts = popularProducts.filter(
-              (product) =>
-                !cartIds.includes(product.id) &&
-                !this.recommendedProducts.some((p) => p.id === product.id)
-            );
-            const neededCount = 4 - this.recommendedProducts.length;
-            this.recommendedProducts = [
-              ...this.recommendedProducts,
-              ...additionalProducts.slice(0, neededCount),
-            ];
-          }
-        } else {
-          this.recommendedProducts =
-            await window.ProductService.getPopularProducts(4);
-        }
-
-        // Track successful load
-        this.trackAnalyticsEvent("recommended_products_loaded", {
-          count: this.recommendedProducts.length,
-          retryCount,
-        });
-      } catch (error) {
-        console.error("Error loading recommended products:", error);
-
-        if (retryCount < this.config.ui.retryAttempts) {
-          setTimeout(() => {
-            this.loadRecommendedProducts(retryCount + 1);
-          }, 2000 * (retryCount + 1));
-        } else {
-          this.recommendedProducts = [];
-          this.handleError(error, "Failed to load recommended products");
-        }
-      }
     },
 
-    // Enhanced cart calculation with delivery fees
-    recalculateCart() {
+    /**
+     * Handle clear cart
+     */
+    async handleClearCart() {
       try {
-        const subtotal = this.cartItems.reduce((total, item) => {
-          return total + item.price * item.quantity;
-        }, 0);
-
-        const itemCount = this.cartItems.reduce((count, item) => {
-          return count + item.quantity;
-        }, 0);
-
-        const bulkDiscountAmount = this.bulkDiscountApplied
-          ? this.discountAmount
-          : 0;
-        const promoDiscountAmount = this.promoCodeApplied
-          ? this.promoDiscount
-          : 0;
-        const discountedSubtotal =
-          subtotal - bulkDiscountAmount - promoDiscountAmount;
-
-        const serviceCharge =
-          discountedSubtotal * this.config.pricing.serviceChargeRate;
-        const tax =
-          (discountedSubtotal + serviceCharge) * this.config.pricing.taxRate;
-        const deliveryFee = this.deliveryFee;
-
-        const total = discountedSubtotal + serviceCharge + tax + deliveryFee;
-
-        this.cartTotals = {
-          subtotal: parseFloat(subtotal.toFixed(2)),
-          serviceCharge: parseFloat(serviceCharge.toFixed(2)),
-          tax: parseFloat(tax.toFixed(2)),
-          deliveryFee: parseFloat(deliveryFee.toFixed(2)),
-          total: parseFloat(total.toFixed(2)),
-          itemCount,
-        };
-
-        // Update analytics
-        this.trackAnalyticsEvent("cart_recalculated", {
-          total: this.cartTotals.total,
-          itemCount: this.cartTotals.itemCount,
-        });
-      } catch (error) {
-        this.handleError(error, "Failed to calculate cart totals");
-      }
-    },
-
-    // Enhanced item removal with confirmation
-    removeFromCart(productId) {
-      try {
-        const item = this.cartItems.find((item) => item.id === productId);
-        const itemName = item ? item.name : "Item";
-
-        if (confirm(`Remove ${itemName} from your order?`)) {
-          window.CartService.removeFromCart(productId);
-          this.loadCart();
-          this.loadRecommendedProducts();
-
-          // Track removal
-          this.trackAnalyticsEvent("item_removed_from_cart", {
-            itemId: productId,
-            itemName: itemName,
-          });
-
-          this.showToast("success", `${itemName} removed from cart`);
-        }
-      } catch (error) {
-        this.handleError(error, "Failed to remove item from cart");
-      }
-    },
-
-    // Enhanced cart clearing with better UX
-    clearCart() {
-      try {
-        const itemCount = this.cartTotals.itemCount;
-        const cartValue = this.cartTotals.total;
+        const itemCount = this.cartSummary.itemCount;
+        const cartValue = this.cartSummary.total;
 
         if (
           confirm(
-            `Are you sure you want to clear your entire order? This will remove ${itemCount} items worth ${this.$currency(
+            `Are you sure you want to clear your entire order? This will remove ${itemCount} items worth ${this.formatCurrency(
               cartValue
             )}.`
           )
         ) {
           window.CartService.clearCart();
-          this.loadCart();
+          await this.loadCart();
 
-          // Track cart clear
           this.trackAnalyticsEvent("cart_cleared", {
             previousItemCount: itemCount,
             previousCartValue: cartValue,
@@ -1186,8 +792,47 @@ const ShoppingCart = {
       }
     },
 
-    // Enhanced promo code application
-    applyPromoCode() {
+    /**
+     * Handle service method update
+     */
+    handleServiceMethodUpdate(newMethod) {
+      this.serviceMethod = newMethod;
+      this.clearFieldsForServiceMethod();
+      this.showServiceMethodMessage();
+    },
+
+    /**
+     * Handle table number update
+     */
+    handleTableNumberUpdate(value) {
+      this.tableNumber = value;
+    },
+
+    /**
+     * Handle delivery address update
+     */
+    handleDeliveryAddressUpdate(value) {
+      this.deliveryAddress = value;
+    },
+
+    /**
+     * Handle phone number update
+     */
+    handlePhoneNumberUpdate(value) {
+      this.phoneNumber = value;
+    },
+
+    /**
+     * Handle special requests update
+     */
+    handleSpecialRequestsUpdate(value) {
+      this.specialRequests = value;
+    },
+
+    /**
+     * Handle promo code application
+     */
+    handleApplyPromoCode() {
       try {
         this.promoError = null;
         this.analytics.promoAttempts++;
@@ -1208,31 +853,36 @@ const ShoppingCart = {
           return;
         }
 
-        const promoCode = this.promoCodes.find((promo) => promo.code === code);
+        const promoCode = this.availablePromoCodes.find(
+          (promo) => promo.code === code
+        );
         this.promoCodeApplied = true;
         this.activePromoCode = promoCode;
         this.recalculateCart();
 
-        // Track successful application
         this.trackAnalyticsEvent("promo_code_applied", {
           code: code,
-          discount: this.promoDiscount,
+          discount: this.discountCalculations.promoDiscountAmount,
           type: promoCode.type,
         });
 
         this.showToast(
           "success",
-          `Promo code applied! You saved ${this.$currency(this.promoDiscount)}`
+          `Promo code applied! You saved ${this.formatCurrency(
+            this.discountCalculations.promoDiscountAmount
+          )}`
         );
       } catch (error) {
         this.handleError(error, "Failed to apply promo code");
       }
     },
 
-    // Enhanced promo code removal
-    removePromoCode() {
+    /**
+     * Handle promo code removal
+     */
+    handleRemovePromoCode() {
       try {
-        const savedAmount = this.promoDiscount;
+        const savedAmount = this.discountCalculations.promoDiscountAmount;
         const promoCode = this.activePromoCode?.code;
 
         this.promoCodeApplied = false;
@@ -1241,7 +891,6 @@ const ShoppingCart = {
         this.promoError = null;
         this.recalculateCart();
 
-        // Track removal
         this.trackAnalyticsEvent("promo_code_removed", {
           code: promoCode,
           previousDiscount: savedAmount,
@@ -1251,10 +900,29 @@ const ShoppingCart = {
       } catch (error) {
         this.handleError(error, "Failed to remove promo code");
       }
-    }, // Enhanced order placement with comprehensive validation and error handling
-    async placeOrder() {
+    },
+
+    /**
+     * Handle payment method update
+     */
+    handlePaymentMethodUpdate(method) {
+      this.paymentMethod = method;
+      this.trackAnalyticsEvent("payment_method_changed", { method });
+    },
+
+    /**
+     * Handle promo code update
+     */
+    handleUpdatePromoCode(value) {
+      this.promoCode = value;
+    },
+
+    /**
+     * Handle order placement
+     */
+    async handlePlaceOrder() {
       try {
-        // Pre-flight checks
+        // Check authentication
         if (!window.AuthService.isLoggedIn()) {
           localStorage.setItem("checkoutRedirect", true);
           this.trackAnalyticsEvent("checkout_redirect_to_login");
@@ -1262,108 +930,26 @@ const ShoppingCart = {
           return;
         }
 
+        // Validate order
         if (!this.canPlaceOrder) {
-          const errors = this.formErrors;
-          let message =
-            "Please complete all required fields for your selected service method.";
-
-          if (errors.length > 0) {
-            message = errors[0]; // Show first validation error
-          } else if (this.cartItems.length === 0) {
-            message =
-              "Your cart is empty. Please add some items before placing an order.";
-          } else if (
-            this.cartTotals.total < this.config.pricing.minOrderAmount
-          ) {
-            message = `Minimum order amount is ${this.$currency(
-              this.config.pricing.minOrderAmount
-            )}`;
-          }
-
-          this.showToast("warning", message);
+          this.showValidationErrors();
           return;
         }
 
-        // Set loading state
-        this.validation.isSubmitting = true;
+        this.isSubmitting = true;
         this.clearErrorState();
 
-        // Build comprehensive order data
-        const orderData = {
-          // Order basics
-          items: this.cartItems.map((item) => ({
-            ...item,
-            finalPrice: item.price,
-            subtotal: item.price * item.quantity,
-          })),
-          totals: {
-            ...this.cartTotals,
-            finalTotal: this.finalTotal,
-            savings: this.totalSavings,
-          },
+        // Build order data
+        const orderData = this.buildOrderData();
 
-          // Service details
-          serviceMethod: this.serviceMethod,
-          tableNumber:
-            this.serviceMethod === "dine-in" ? this.tableNumber : null,
-          deliveryAddress:
-            this.serviceMethod === "delivery" ? this.deliveryAddress : null,
-          phoneNumber:
-            this.serviceMethod === "pickup" || this.serviceMethod === "delivery"
-              ? this.phoneNumber
-              : null,
-          specialRequests: this.specialRequests || null,
-
-          // Payment information
-          payment: {
-            method: this.paymentMethod,
-            amount: this.finalTotal,
-            currency: "MYR",
-          },
-
-          // Discount information
-          discounts: {
-            promoCode: this.promoCodeApplied
-              ? {
-                  code: this.activePromoCode.code,
-                  type: this.activePromoCode.type,
-                  value: this.activePromoCode.value,
-                  discount: this.promoDiscount,
-                }
-              : null,
-            bulkDiscount: this.bulkDiscountApplied
-              ? {
-                  rate: this.bulkDiscountRate,
-                  threshold: this.bulkDiscountThreshold,
-                  amount: this.discountAmount,
-                }
-              : null,
-          },
-
-          // Metadata
-          orderTime: new Date().toISOString(),
-          estimatedDeliveryTime: this.estimatedTime,
-          status: "pending",
-          userId: window.AuthService.getCurrentUser().id,
-
-          // Analytics data
-          analytics: {
-            sessionDuration: Date.now() - this.analytics.sessionStart,
-            interactions: this.analytics.cartInteractions,
-            conversionScore: this.calculateConversionScore(),
-            serviceMethodChanges: this.analytics.serviceMethodChanges,
-            promoAttempts: this.analytics.promoAttempts,
-          },
-        };
-
-        // Track order attempt
+        // Track attempt
         this.trackAnalyticsEvent("order_placement_attempted", {
           orderValue: orderData.totals.finalTotal,
           itemCount: orderData.items.length,
           serviceMethod: orderData.serviceMethod,
         });
 
-        // Submit order with retry mechanism
+        // Submit order
         const result = await this.submitOrderWithRetry(orderData);
 
         // Success handling
@@ -1371,42 +957,363 @@ const ShoppingCart = {
           orderId: result.orderId || "unknown",
           orderValue: orderData.totals.finalTotal,
           paymentMethod: orderData.payment.method,
-        }); // Clear cart and show success
-        window.CartService.clearCart();
+        });
 
+        // Clear cart and navigate
+        window.CartService.clearCart();
         this.showToast(
           "success",
           "Order placed successfully! Your food will be prepared shortly."
         );
-
-        // Navigate to purchases page
         this.$router.push("/purchases");
       } catch (error) {
         this.handleError(error, "Failed to place order");
         this.trackAnalyticsEvent("order_placement_failed", {
           error: error.message,
-          orderValue: this.finalTotal,
+          orderValue: this.cartSummary.total,
         });
       } finally {
-        this.validation.isSubmitting = false;
+        this.isSubmitting = false;
       }
     },
 
-    // Order submission with retry mechanism
+    // ---------------------------------------------
+    // VALIDATION METHODS
+    // ---------------------------------------------
+
+    /**
+     * Get validation errors for current form state
+     */
+    getValidationErrors() {
+      const errors = {};
+
+      if (this.serviceMethod === "dine-in" && !this.tableNumber.trim()) {
+        errors.tableNumber = "Table number is required for dine-in orders";
+      } else if (
+        this.serviceMethod === "dine-in" &&
+        !VALIDATION_PATTERNS.TABLE_NUMBER.test(this.tableNumber.trim())
+      ) {
+        errors.tableNumber = "Please enter a valid table number";
+      }
+
+      if (
+        (this.serviceMethod === "pickup" ||
+          this.serviceMethod === "delivery") &&
+        !this.phoneNumber.trim()
+      ) {
+        errors.phoneNumber = "Phone number is required";
+      } else if (
+        (this.serviceMethod === "pickup" ||
+          this.serviceMethod === "delivery") &&
+        !VALIDATION_PATTERNS.PHONE.test(this.phoneNumber.trim())
+      ) {
+        errors.phoneNumber = "Please enter a valid phone number";
+      }
+
+      if (this.serviceMethod === "delivery" && !this.deliveryAddress.trim()) {
+        errors.deliveryAddress = "Delivery address is required";
+      } else if (
+        this.serviceMethod === "delivery" &&
+        this.deliveryAddress.trim().length <
+          VALIDATION_PATTERNS.MIN_ADDRESS_LENGTH
+      ) {
+        errors.deliveryAddress = `Address must be at least ${VALIDATION_PATTERNS.MIN_ADDRESS_LENGTH} characters`;
+      }
+
+      return errors;
+    },
+
+    /**
+     * Validate promo code
+     */
+    validatePromoCode(code) {
+      if (!code || !code.trim()) {
+        return { isValid: true, message: "" };
+      }
+
+      const promoCode = this.availablePromoCodes.find(
+        (promo) => promo.code === code
+      );
+      if (!promoCode) {
+        return { isValid: false, message: "Invalid promo code" };
+      }
+
+      if (
+        promoCode.minOrder > 0 &&
+        this.cartSummary.subtotal < promoCode.minOrder
+      ) {
+        return {
+          isValid: false,
+          message: `This code requires a minimum order of ${this.formatCurrency(
+            promoCode.minOrder
+          )}`,
+        };
+      }
+
+      return { isValid: true, message: "" };
+    },
+
+    /**
+     * Debounced field validation
+     */
+    debouncedValidateField(field, value) {
+      if (this.validation.debounceTimeouts.has(field)) {
+        clearTimeout(this.validation.debounceTimeouts.get(field));
+      }
+
+      const timeoutId = setTimeout(() => {
+        this.validateField(field, value);
+        this.validation.debounceTimeouts.delete(field);
+      }, UI_CONFIG.DEBOUNCE_DELAY);
+
+      this.validation.debounceTimeouts.set(field, timeoutId);
+    },
+
+    /**
+     * Validate individual field
+     */
+    validateField(field, value) {
+      const errors = this.getValidationErrors();
+      this.validationErrors = errors;
+
+      if (errors[field]) {
+        this.trackAnalyticsEvent("validation_error", {
+          field,
+          error: errors[field],
+        });
+      }
+    },
+
+    // ---------------------------------------------
+    // UTILITY METHODS
+    // ---------------------------------------------
+
+    /**
+     * Create empty cart summary object
+     */
+    createEmptyCartSummary() {
+      return {
+        subtotal: 0,
+        serviceCharge: 0,
+        tax: 0,
+        deliveryFee: 0,
+        total: 0,
+        itemCount: 0,
+      };
+    },
+
+    /**
+     * Create configuration object
+     */
+    createConfigObject() {
+      return {
+        pricing: {
+          serviceChargeRate:
+            window.APP_CONSTANTS?.PRICING?.SERVICE_CHARGE_RATE ||
+            PRICING_CONFIG.SERVICE_CHARGE_RATE,
+          taxRate:
+            window.APP_CONSTANTS?.PRICING?.TAX_RATE || PRICING_CONFIG.TAX_RATE,
+          bulkDiscountRate:
+            window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_RATE ||
+            PRICING_CONFIG.BULK_DISCOUNT_RATE,
+          bulkDiscountThreshold:
+            window.APP_CONSTANTS?.PRICING?.BULK_DISCOUNT_THRESHOLD ||
+            PRICING_CONFIG.BULK_DISCOUNT_THRESHOLD,
+          freeDeliveryThreshold:
+            window.APP_CONSTANTS?.PRICING?.FREE_DELIVERY_THRESHOLD ||
+            PRICING_CONFIG.FREE_DELIVERY_THRESHOLD,
+          deliveryFee:
+            window.APP_CONSTANTS?.PRICING?.DELIVERY_FEE ||
+            PRICING_CONFIG.DELIVERY_FEE,
+          minOrderAmount:
+            window.APP_CONSTANTS?.PRICING?.MIN_ORDER_AMOUNT ||
+            PRICING_CONFIG.MIN_ORDER_AMOUNT,
+        },
+        ui: {
+          debounceDelay:
+            window.APP_CONSTANTS?.UI_CONFIG?.DEBOUNCE_DELAY ||
+            UI_CONFIG.DEBOUNCE_DELAY,
+          retryAttempts:
+            window.APP_CONSTANTS?.VALIDATION?.MAX_RETRY_ATTEMPTS ||
+            UI_CONFIG.RETRY_ATTEMPTS,
+        },
+      };
+    },
+
+    /**
+     * Create analytics object
+     */
+    createAnalyticsObject() {
+      return {
+        sessionStart: Date.now(),
+        cartInteractions: 0,
+        promoAttempts: 0,
+        serviceMethodChanges: 0,
+        conversionEvents: [],
+      };
+    },
+
+    /**
+     * Create error state object
+     */
+    createErrorState() {
+      return {
+        hasError: false,
+        errorMessage: "",
+        retryCount: 0,
+        canRetry: true,
+      };
+    }
+    /**
+     * Format currency value
+     */,
+    formatCurrency(amount) {
+      // Handle invalid amounts
+      if (typeof amount !== "number" || isNaN(amount) || !isFinite(amount)) {
+        amount = 0;
+      }
+
+      if (this.$currency) {
+        return this.$currency(amount);
+      }
+      return `RM ${amount.toFixed(2)}`;
+    }
+    /**
+     * Round number to two decimal places
+     */,
+    roundToTwoDecimals(num) {
+      if (typeof num !== "number" || isNaN(num) || !isFinite(num)) {
+        return 0;
+      }
+      return parseFloat(num.toFixed(2));
+    },
+
+    /**
+     * Clear fields when service method changes
+     */
+    clearFieldsForServiceMethod() {
+      if (this.serviceMethod !== "dine-in") {
+        this.tableNumber = "";
+      }
+      if (this.serviceMethod !== "delivery") {
+        this.deliveryAddress = "";
+      }
+      if (this.serviceMethod === "dine-in") {
+        this.phoneNumber = "";
+      }
+    },
+
+    /**
+     * Show message for service method
+     */
+    showServiceMethodMessage() {
+      const messages = {
+        "dine-in": "Please enter your table number",
+        pickup: "Please provide your phone number for pickup coordination",
+        delivery: "Please enter your delivery address and phone number",
+      };
+
+      if (messages[this.serviceMethod]) {
+        this.showToast("info", messages[this.serviceMethod]);
+      }
+    },
+
+    /**
+     * Show validation errors
+     */
+    showValidationErrors() {
+      const errors = this.getValidationErrors();
+
+      if (Object.keys(errors).length > 0) {
+        const firstError = Object.values(errors)[0];
+        this.showToast("warning", firstError);
+      } else if (!this.hasCartItems) {
+        this.showToast(
+          "warning",
+          "Your cart is empty. Please add some items before placing an order."
+        );
+      } else if (this.cartSummary.total < this.config.pricing.minOrderAmount) {
+        this.showToast(
+          "warning",
+          `Minimum order amount is ${this.formatCurrency(
+            this.config.pricing.minOrderAmount
+          )}`
+        );
+      }
+    },
+
+    /**
+     * Build order data object
+     */
+    buildOrderData() {
+      return {
+        items: this.cartItems.map((item) => ({
+          ...item,
+          finalPrice: item.price,
+          subtotal: item.price * item.quantity,
+        })),
+        totals: {
+          ...this.cartSummary,
+          finalTotal: this.cartSummary.total,
+          savings: this.discountCalculations.totalSavings,
+        },
+        serviceMethod: this.serviceMethod,
+        tableNumber: this.serviceMethod === "dine-in" ? this.tableNumber : null,
+        deliveryAddress:
+          this.serviceMethod === "delivery" ? this.deliveryAddress : null,
+        phoneNumber:
+          this.serviceMethod === "pickup" || this.serviceMethod === "delivery"
+            ? this.phoneNumber
+            : null,
+        specialRequests: this.specialRequests || null,
+        payment: {
+          method: this.paymentMethod,
+          amount: this.cartSummary.total,
+          currency: "MYR",
+        },
+        discounts: {
+          promoCode: this.promoCodeApplied
+            ? {
+                code: this.activePromoCode.code,
+                type: this.activePromoCode.type,
+                value: this.activePromoCode.value,
+                discount: this.discountCalculations.promoDiscountAmount,
+              }
+            : null,
+          bulkDiscount: this.discountCalculations.bulkDiscountApplied
+            ? {
+                rate: this.config.pricing.bulkDiscountRate,
+                threshold: this.config.pricing.bulkDiscountThreshold,
+                amount: this.discountCalculations.bulkDiscountAmount,
+              }
+            : null,
+        },
+        orderTime: new Date().toISOString(),
+        estimatedDeliveryTime: this.estimatedTime,
+        status: "pending",
+        userId: window.AuthService.getCurrentUser().id,
+        analytics: {
+          sessionDuration: Date.now() - this.analytics.sessionStart,
+          interactions: this.analytics.cartInteractions,
+          serviceMethodChanges: this.analytics.serviceMethodChanges,
+          promoAttempts: this.analytics.promoAttempts,
+        },
+      };
+    },
+
+    /**
+     * Submit order with retry mechanism
+     */
     async submitOrderWithRetry(orderData, attempt = 1) {
       try {
-        const result = await window.CartService.submitOrder(orderData);
-        return result;
+        return await window.CartService.submitOrder(orderData);
       } catch (error) {
         if (attempt < this.config.ui.retryAttempts) {
           this.showToast(
             "warning",
             `Retrying order submission... (attempt ${attempt + 1})`
           );
-
-          // Progressive delay
           await new Promise((resolve) => setTimeout(resolve, 1000 * attempt));
-
           return this.submitOrderWithRetry(orderData, attempt + 1);
         } else {
           throw error;
@@ -1414,75 +1321,210 @@ const ShoppingCart = {
       }
     },
 
-    // Utility methods
-    getItemTotal(item) {
-      return item.price * item.quantity;
+    /**
+     * Load recommended products
+     */
+    async loadRecommendedProducts(retryCount = 0) {
+      try {
+        const cartCategories = this.cartItems
+          .map((item) => item.category)
+          .filter(Boolean);
+        const cartIds = this.cartItems.map((item) => item.id);
+
+        if (cartCategories.length > 0) {
+          const mainCategory = cartCategories[0];
+          const categoryProducts =
+            await window.ProductService.getProductsByCategory(mainCategory);
+
+          this.recommendedProducts = categoryProducts
+            .filter((product) => !cartIds.includes(product.id))
+            .slice(0, 4);
+
+          // Fill remaining slots with popular products if needed
+          if (this.recommendedProducts.length < 4) {
+            const popularProducts =
+              await window.ProductService.getPopularProducts(8);
+            const additionalProducts = popularProducts.filter(
+              (product) =>
+                !cartIds.includes(product.id) &&
+                !this.recommendedProducts.some((p) => p.id === product.id)
+            );
+            const neededCount = 4 - this.recommendedProducts.length;
+            this.recommendedProducts = [
+              ...this.recommendedProducts,
+              ...additionalProducts.slice(0, neededCount),
+            ];
+          }
+        } else {
+          this.recommendedProducts =
+            await window.ProductService.getPopularProducts(4);
+        }
+
+        this.trackAnalyticsEvent("recommended_products_loaded", {
+          count: this.recommendedProducts.length,
+          retryCount,
+        });
+      } catch (error) {
+        console.error("Error loading recommended products:", error);
+
+        if (retryCount < this.config.ui.retryAttempts) {
+          setTimeout(() => {
+            this.loadRecommendedProducts(retryCount + 1);
+          }, 2000 * (retryCount + 1));
+        } else {
+          this.recommendedProducts = [];
+          this.handleError(error, "Failed to load recommended products");
+        }
+      }
     },
 
-    getMaxQuantity(productId) {
+    // ---------------------------------------------
+    // ANALYTICS AND ERROR HANDLING METHODS
+    // ---------------------------------------------
+
+    /**
+     * Track user interaction
+     */
+    trackInteraction() {
+      this.analytics.cartInteractions++;
+    },
+
+    /**
+     * Track analytics event
+     */
+    trackAnalyticsEvent(eventName, data = {}) {
       try {
-        const product = window.ProductService.getProduct(productId);
-        return product ? product.stock : 50;
+        const event = {
+          name: eventName,
+          timestamp: Date.now(),
+          sessionId: this.analytics.sessionStart,
+          data: {
+            ...data,
+            cartValue: this.cartSummary.total,
+            itemCount: this.cartSummary.itemCount,
+            serviceMethod: this.serviceMethod,
+          },
+        };
+
+        this.analytics.conversionEvents.push(event);
+        if (window.AnalyticsService) {
+          window.AnalyticsService.track(eventName, event.data);
+        } // Development logging
+        if (
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1"
+        ) {
+          console.log("Analytics Event:", event);
+        }
       } catch (error) {
-        console.warn("Error getting max quantity:", error);
-        return 50; // Safe fallback
+        console.warn("Analytics tracking error:", error);
       }
+    },
+
+    /**
+     * Handle errors
+     */
+    handleError(error, context = "An error occurred") {
+      console.error(`ShoppingCart Error - ${context}:`, error);
+
+      this.errorState = {
+        hasError: true,
+        errorMessage: error.message || context,
+        retryCount: this.errorState.retryCount + 1,
+        canRetry: this.errorState.retryCount < this.config.ui.retryAttempts,
+      };
+
+      this.trackAnalyticsEvent("error_occurred", {
+        error: error.message || context,
+        retryCount: this.errorState.retryCount,
+      });
+
+      this.showToast("error", this.errorState.errorMessage);
+    },
+
+    /**
+     * Clear error state
+     */
+    clearErrorState() {
+      this.errorState = this.createErrorState();
+    },
+
+    /**
+     * Show toast notification
+     */
+    showToast(type, message, duration = UI_CONFIG.TOAST_DURATION) {
+      try {
+        if (window.ToastService) {
+          window.ToastService.show(type, message, duration);
+        } else if (type === "error") {
+          alert(`Error: ${message}`);
+        }
+      } catch (error) {
+        console.warn("Toast notification error:", error);
+      }
+    },
+
+    /**
+     * Clear all timeouts
+     */
+    clearAllTimeouts() {
+      this.validation.debounceTimeouts.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      this.validation.debounceTimeouts.clear();
+    },
+
+    // Event handlers for window events
+    handleResize() {
+      this.trackAnalyticsEvent("viewport_changed", {
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    },
+
+    handleOnline() {
+      this.clearErrorState();
+      this.showToast("success", "Connection restored");
+    },
+
+    handleOffline() {
+      this.showToast(
+        "warning",
+        "You are currently offline. Some features may not work properly."
+      );
     },
   },
 };
 
-// Enhanced global component registration with comprehensive debugging
+// =====================================================
+// COMPONENT REGISTRATION
+// =====================================================
+
 if (typeof window !== "undefined") {
   window.ShoppingCart = ShoppingCart;
 
-  // Enhanced component registration with error handling
   try {
-    if (window.Vue && window.Vue.component) {
-      window.Vue.component("shopping-cart", ShoppingCart);
+    // Register with Vue 3 app instance
+    if (window.app && window.app.component) {
+      window.app.component("shopping-cart", ShoppingCart);
     }
 
-    // Development environment debugging
     if (
-      typeof process !== "undefined" &&
-      process.env &&
-      process.env.NODE_ENV === "development"
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
     ) {
       console.log(
-        "✅ ShoppingCart Component Enhanced v2.0.0 - Registration Details:"
+        "✅ ShoppingCart Component v2.0.0 (Improved Readability) registered successfully"
       );
       console.log(
-        "   📦 Features: Cart management, service options, promotions, analytics"
+        "   📦 Features: Modular structure, clear naming, comprehensive documentation"
       );
       console.log(
-        "   🔧 Enhanced: Error handling, validation, retry logic, accessibility"
+        "   🔧 Improvements: Better organization, readable methods, clear separation of concerns"
       );
-      console.log("   🎯 Analytics: Session tracking, conversion optimization");
       console.log(
-        "   ♿ Accessibility: ARIA labels, keyboard navigation, screen reader support"
+        "   🎯 Code Quality: Consistent formatting, descriptive comments, logical grouping"
       );
-      console.log("   📱 Mobile: Responsive design, touch-friendly interface");
-      console.log(
-        "   🚀 Performance: Optimized calculations, efficient state management"
-      );
-    }
-
-    // Component health check
-    const healthCheck = {
-      hasTemplate: !!ShoppingCart.template,
-      hasData: typeof ShoppingCart.data === "function",
-      hasComputed: !!ShoppingCart.computed,
-      hasWatchers: !!ShoppingCart.watch,
-      hasMethods: !!ShoppingCart.methods,
-      hasLifecycleHooks: !!(ShoppingCart.created || ShoppingCart.mounted),
-      enhancementVersion: "2.0.0",
-    };
-
-    if (
-      typeof process !== "undefined" &&
-      process.env &&
-      process.env.NODE_ENV === "development"
-    ) {
-      console.log("🏥 ShoppingCart Health Check:", healthCheck);
     }
   } catch (error) {
     console.error("❌ ShoppingCart Component Registration Error:", error);
