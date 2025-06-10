@@ -291,11 +291,10 @@ window.app.component("product-card", {
      */
     productDetailPath() {
       return `/product/${this.product.id}`;
-    }
+    },
     /**
      * Get display image with fallback and optimization
-     */,
-    displayImage() {
+     */ displayImage() {
       const baseImage = this.imageError
         ? this.fallbackImage
         : this.product.image || this.fallbackImage;
@@ -547,11 +546,10 @@ window.app.component("product-card", {
       } else {
         return "fa-star text-muted";
       }
-    }
+    },
     /**
      * Format price with currency
-     */,
-    formatPrice(price) {
+     */ formatPrice(price) {
       const currency = window.APP_CONSTANTS?.PRICING?.CURRENCY || "RM";
       return `${currency}${price.toFixed(2)}`;
     },
@@ -642,13 +640,11 @@ window.app.component("product-card", {
       if (window.ToastService) {
         window.ToastService.show(message, type);
         return;
-      }
-
-      // Emit to parent component
+      } // Emit to parent component
       this.$emit("show-feedback", { message, type });
 
-      // Fallback to root event bus
-      this.$root.$emit("show-toast", { message, type });
+      // Fallback to EventBus
+      window.EventBus.emit("show-toast", { message, type });
     },
 
     /**
@@ -664,11 +660,10 @@ window.app.component("product-card", {
           source: "product-card",
         });
       }
-    }
+    },
     /**
      * Track favorite toggle analytics
-     */,
-    trackFavoriteToggle(isFavorite) {
+     */ trackFavoriteToggle(isFavorite) {
       if (window.analytics && typeof window.analytics.track === "function") {
         window.analytics.track(
           isFavorite ? "Add to Favorites" : "Remove from Favorites",
@@ -715,11 +710,10 @@ window.app.component("product-card", {
         fallbackUrl: this.fallbackImage,
         isMobile: window.innerWidth <= 575,
       });
-    }
+    },
     /**
      * Generate mobile-optimized fallback image URL
-     */,
-    generateMobileFallback() {
+     */ generateMobileFallback() {
       // Check if original image has different resolutions available
       const originalUrl = this.product.image;
       if (originalUrl && typeof originalUrl === "string") {
@@ -746,11 +740,10 @@ window.app.component("product-card", {
         window.innerHeight || document.documentElement.clientHeight;
       return rect.top > viewportHeight + 100; // 100px buffer
     },
-  }
+  },
   /**
    * Component lifecycle - load favorite status and setup image optimization
-   */,
-  async mounted() {
+   */ async mounted() {
     try {
       await this.loadFavoriteStatus();
 

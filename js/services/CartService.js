@@ -233,6 +233,38 @@ class CartService {
   }
 
   /**
+   * Update customizations for a food item in the cart by ID
+   */
+  updateItemCustomization(itemId, customizedItem) {
+    const itemIndex = this.cart.findIndex((item) => item.id === itemId);
+    if (itemIndex >= 0) {
+      // Update the item with new customizations
+      this.cart[itemIndex] = { ...this.cart[itemIndex], ...customizedItem };
+
+      // Recalculate price with customizations
+      let basePrice = customizedItem.basePrice || customizedItem.price;
+
+      // Add cost of customizations if they have a price
+      if (customizedItem.customizations) {
+        customizedItem.customizations.forEach((custom) => {
+          if (custom.price) {
+            basePrice += custom.price;
+          }
+        });
+      }
+
+      this.cart[itemIndex].price = basePrice;
+      this.cart[itemIndex].subTotal = basePrice * this.cart[itemIndex].quantity;
+
+      this.updateCartTotals();
+      this.saveCart();
+      this.notifyCartUpdate();
+    }
+
+    return this.cart;
+  }
+
+  /**
    * Find an item in the cart by ID and options
    */
   findItemInCart(itemId, options = {}) {

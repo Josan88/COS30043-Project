@@ -185,8 +185,7 @@ const ShoppingCart = {
                 @place-order="handlePlaceOrder"
               />
             </aside>
-          
-          <!-- Recommended Items Section -->
+            <!-- Recommended Items Section -->
           <recommended-items-section
             v-if="recommendedProducts.length > 0"
             :recommended-products="recommendedProducts"
@@ -194,6 +193,14 @@ const ShoppingCart = {
           
         </div>
       </main>
+        
+      <!-- Customization Modal -->
+      <customization-modal
+        v-if="showCustomizationModal"
+        :item="currentItemToCustomize"
+        @close="handleCloseCustomizationModal"
+        @customize="handleCustomizeItem"
+      />
     </div>
   `,
 
@@ -228,12 +235,15 @@ const ShoppingCart = {
       availablePromoCodes: [...DEFAULT_PROMO_CODES],
 
       // Payment
-      paymentMethod: "card",
-
-      // UI state
+      paymentMethod: "card", // UI state
       isLoading: false,
       isSubmitting: false,
       validationErrors: {},
+
+      // Customization modal
+      showCustomizationModal: false,
+      currentItemToCustomize: null,
+
       // Recommendations
       recommendedProducts: [],
 
@@ -483,12 +493,20 @@ const ShoppingCart = {
 
     /**
      * Setup event listeners
-     */
-    setupEventListeners() {
+     */ setupEventListeners() {
       window.addEventListener("cart-updated", this.loadCart);
       window.addEventListener("resize", this.handleResize);
       window.addEventListener("online", this.handleOnline);
       window.addEventListener("offline", this.handleOffline);
+
+      // Listen for customize item events from CartItem components using EventBus
+      window.EventBus.on(
+        "open-customization-modal",
+        this.handleOpenCustomizationModal
+      );
+
+      // Listen for toast notifications from other components
+      window.EventBus.on("show-toast", this.handleShowToast);
     },
 
     /**
@@ -522,6 +540,15 @@ const ShoppingCart = {
       window.removeEventListener("resize", this.handleResize);
       window.removeEventListener("online", this.handleOnline);
       window.removeEventListener("offline", this.handleOffline);
+
+      // Remove customize item event listener from EventBus
+      window.EventBus.off(
+        "open-customization-modal",
+        this.handleOpenCustomizationModal
+      );
+
+      // Remove toast notification listener
+      window.EventBus.off("show-toast", this.handleShowToast);
     },
 
     // ---------------------------------------------
@@ -698,9 +725,7 @@ const ShoppingCart = {
         default:
           return 0;
       }
-    },
-
-    // ---------------------------------------------
+    }, // ---------------------------------------------
     // EVENT HANDLERS
     // ---------------------------------------------
 
@@ -726,6 +751,70 @@ const ShoppingCart = {
       } catch (error) {
         this.handleError(error, "Failed to remove item from cart");
       }
+    },
+
+    /**
+     * Handle opening customization modal
+     */
+    handleOpenCustomizationModal(item) {
+      try {
+        this.currentItemToCustomize = item;
+        this.showCustomizationModal = true;
+
+        this.trackAnalyticsEvent("customization_modal_opened", {
+          itemId: item.id,
+          itemName: item.name,
+        });
+      } catch (error) {
+        this.handleError(error, "Failed to open customization modal");
+      }
+    },
+
+    /**
+     * Handle closing customization modal
+     */
+    handleCloseCustomizationModal() {
+      this.showCustomizationModal = false;
+      this.currentItemToCustomize = null;
+    },
+
+    /**
+     * Handle item customization
+     */
+    async handleCustomizeItem(customizedItem) {
+      try {
+        // Update the item in the cart with new customizations
+        window.CartService.updateItemCustomization(
+          customizedItem.id,
+          customizedItem
+        );
+
+        // Reload cart to reflect changes
+        await this.loadCart();
+
+        // Close the modal
+        this.handleCloseCustomizationModal();
+
+        this.trackAnalyticsEvent("item_customized", {
+          itemId: customizedItem.id,
+          itemName: customizedItem.name,
+          customizations: customizedItem.customizations,
+        });
+        this.showToast(
+          "success",
+          `${customizedItem.name} customization updated`
+        );
+      } catch (error) {
+        this.handleError(error, "Failed to update item customization");
+      }
+    },
+
+    /**
+     * Handle toast notifications from other components
+     */
+    handleShowToast(toastData) {
+      const { message, type } = toastData;
+      this.showToast(type, message);
     },
 
     /**
@@ -1437,17 +1526,17 @@ const ShoppingCart = {
       });
 
       this.showToast("error", this.errorState.errorMessage);
+    }
+    /**
+     * Clear error state
+     */,
+    clearErrorState() {
+      this.errorState = this.createErrorState();
     },
 
     /**
-     * Clear error state
-     */
-    clearErrorState() {
-      this.errorState = this.createErrorState();
-    }
-    /**
      * Show toast notification
-     */,
+     */
     showToast(type, message, duration = UI_CONFIG.TOAST_DURATION) {
       try {
         if (window.ToastService) {

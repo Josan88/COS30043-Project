@@ -151,9 +151,6 @@ window.app.component("cart-item", {
                   <li><a class="dropdown-item" href="#" @click.prevent="removeItem">
                     <i class="fas fa-trash me-2 text-danger"></i> Remove
                   </a></li>
-                  <li><a class="dropdown-item" href="#" @click.prevent="saveForLater">
-                    <i class="fas fa-bookmark me-2 text-primary"></i> Save for later
-                  </a></li>
                   <li v-if="isCustomizable"><a class="dropdown-item" href="#" @click.prevent="customizeItem">
                     <i class="fas fa-sliders-h me-2"></i> Customize
                   </a></li>
@@ -444,15 +441,15 @@ window.app.component("cart-item", {
     saveForLater() {
       this.showOptions = false;
       // In a real app, you'd save this to a wishlist
-      this.$root.$emit("show-toast", {
+      window.EventBus.emit("show-toast", {
         message: `${this.item.name} saved for later!`,
         type: "info",
       });
     },
     customizeItem() {
       this.showOptions = false;
-      // In a real app, open customization modal with current customizations
-      this.$root.$emit("open-customization-modal", this.item);
+      // Emit customize event through EventBus
+      window.EventBus.emit("open-customization-modal", this.item);
     },
     /**
      * Get CSS class for dietary option badge
