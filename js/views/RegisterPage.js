@@ -339,8 +339,6 @@ const RegisterPage = {
     return {
       // Configuration
       config: {
-        enableAnalytics:
-          window.APP_CONSTANTS?.FEATURES?.ANALYTICS_ENABLED ?? true,
         enableDebugMode: window.APP_CONSTANTS?.DEBUG?.ENABLED ?? false,
         validationDebounceMs:
           window.APP_CONSTANTS?.VALIDATION?.DEBOUNCE_MS ?? 300,
@@ -400,16 +398,6 @@ const RegisterPage = {
         code: null,
         retryCount: 0,
         lastError: null,
-      },
-
-      // Analytics State
-      analytics: {
-        sessionId: null,
-        startTime: null,
-        formInteractions: 0,
-        validationAttempts: 0,
-        fieldFocusCount: {},
-        errorsEncountered: [],
       },
 
       // Component State
@@ -566,24 +554,6 @@ const RegisterPage = {
         this.errorState.retryCount < this.config.maxRetryAttempts
       );
     },
-
-    // Analytics computed properties
-    formCompletionPercentage() {
-      const totalFields = 7; // email, firstName, lastName, phone, address, password, confirmPassword, terms
-      const completedFields =
-        [
-          this.formData.email,
-          this.formData.firstName,
-          this.formData.lastName,
-          this.formData.phone,
-          this.formData.address,
-          this.formData.password,
-          this.formData.confirmPassword,
-        ].filter((field) => field && field.toString().trim()).length +
-        (this.formData.agreeTerms ? 1 : 0);
-
-      return Math.round((completedFields / totalFields) * 100);
-    },
   },
   watch: {
     // Form data watchers with debounced validation
@@ -591,7 +561,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("email");
           this.debouncedValidateField("email");
         }
       },
@@ -602,7 +571,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("firstName");
           this.debouncedValidateField("firstName");
         }
       },
@@ -613,7 +581,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("lastName");
           this.debouncedValidateField("lastName");
         }
       },
@@ -624,7 +591,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("phone");
           this.debouncedValidateField("phone");
         }
       },
@@ -635,7 +601,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("address");
           this.debouncedValidateField("address");
         }
       },
@@ -646,7 +611,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("password");
           this.debouncedValidateField("password");
           // Also validate confirm password when password changes
           if (this.formData.confirmPassword) {
@@ -661,7 +625,6 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("confirmPassword");
           this.debouncedValidateField("confirmPassword");
         }
       },
@@ -672,60 +635,27 @@ const RegisterPage = {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
           this.uiState.isFormDirty = true;
-          this.trackFieldInteraction("agreeTerms");
           this.validateField("agreeTerms"); // Immediate validation for checkbox
         }
       },
       immediate: false,
-    },
-
-    // Watch for form validation state changes
+    }, // Watch for form validation state changes
     "validation.errors": {
       handler(newErrors) {
         this.validation.isValid = Object.keys(newErrors).length === 0;
-
-        // Track validation errors for analytics
-        if (this.config.enableAnalytics) {
-          const errorFields = Object.keys(newErrors);
-          if (errorFields.length > 0) {
-            this.analytics.errorsEncountered = [
-              ...new Set([...this.analytics.errorsEncountered, ...errorFields]),
-            ];
-          }
-        }
       },
       deep: true,
       immediate: true,
     },
-
-    // Watch modal states for analytics
-    "uiState.showTermsModal": function (isOpen) {
-      if (isOpen && this.config.enableAnalytics) {
-        this.trackAnalyticsEvent("modal_opened", { modal: "terms" });
-      }
-    },
-
-    "uiState.showPrivacyModal": function (isOpen) {
-      if (isOpen && this.config.enableAnalytics) {
-        this.trackAnalyticsEvent("modal_opened", { modal: "privacy" });
-      }
-    },
   },
-
   created() {
     try {
-      // Initialize analytics session
-      if (this.config.enableAnalytics) {
-        this.initializeAnalytics();
-      }
-
       // Set up component state
       this.componentState.isMounted = false;
 
       if (this.config.enableDebugMode) {
         console.log("RegisterPage: Component created", {
           config: this.config,
-          analyticsEnabled: this.config.enableAnalytics,
         });
       }
     } catch (error) {
@@ -738,18 +668,8 @@ const RegisterPage = {
       this.componentState.isMounted = true;
 
       // Initialize the application
-      await this.initializeComponent();
-
-      // Set up focus management
+      await this.initializeComponent(); // Set up focus management
       this.setupFocusManagement();
-
-      // Track page view for analytics
-      if (this.config.enableAnalytics) {
-        this.trackAnalyticsEvent("page_view", {
-          page: "register",
-          timestamp: new Date().toISOString(),
-        });
-      }
 
       if (this.config.enableDebugMode) {
         console.log("RegisterPage: Component mounted successfully");
@@ -764,24 +684,11 @@ const RegisterPage = {
       // Clean up debounce timeouts
       Object.values(this.validation.debounceTimeouts).forEach((timeout) => {
         if (timeout) clearTimeout(timeout);
-      });
-
-      // Clean up intervals and timeouts
+      }); // Clean up intervals and timeouts
       this.componentState.intervals.forEach((interval) =>
         clearInterval(interval)
       );
       this.componentState.timeouts.forEach((timeout) => clearTimeout(timeout));
-
-      // Track session end for analytics
-      if (this.config.enableAnalytics && this.analytics.startTime) {
-        const sessionDuration = Date.now() - this.analytics.startTime;
-        this.trackAnalyticsEvent("session_end", {
-          duration: sessionDuration,
-          formCompletion: this.formCompletionPercentage,
-          interactions: this.analytics.formInteractions,
-          errorsEncountered: this.analytics.errorsEncountered.length,
-        });
-      }
 
       if (this.config.enableDebugMode) {
         console.log("RegisterPage: Component cleanup completed");
@@ -832,37 +739,12 @@ const RegisterPage = {
         throw error;
       }
     },
-
-    initializeAnalytics() {
-      try {
-        this.analytics.sessionId = `reg_${Date.now()}_${Math.random()
-          .toString(36)
-          .substr(2, 9)}`;
-        this.analytics.startTime = Date.now();
-        this.analytics.formInteractions = 0;
-        this.analytics.validationAttempts = 0;
-        this.analytics.fieldFocusCount = {};
-        this.analytics.errorsEncountered = [];
-
-        if (this.config.enableDebugMode) {
-          console.log("Analytics initialized:", this.analytics.sessionId);
-        }
-      } catch (error) {
-        console.error("Error initializing analytics:", error);
-      }
-    },
-
     setupFocusManagement() {
       this.$nextTick(() => {
         try {
           const emailInput = this.$refs.emailInput;
           if (emailInput) {
             emailInput.focus();
-
-            // Track initial focus for analytics
-            if (this.config.enableAnalytics) {
-              this.trackFieldFocus("email");
-            }
           }
         } catch (error) {
           console.error("Error setting up focus management:", error);
@@ -906,15 +788,8 @@ const RegisterPage = {
       try {
         if (markTouched) {
           this.validation.touched[fieldName] = true;
-        }
-
-        // Clear existing error
+        } // Clear existing error
         this.$delete(this.validation.errors, fieldName);
-
-        // Increment validation attempts for analytics
-        if (this.config.enableAnalytics) {
-          this.analytics.validationAttempts++;
-        }
 
         const value = this.formData[fieldName];
         const shouldValidate =
@@ -1162,16 +1037,7 @@ const RegisterPage = {
       fields.forEach((field) => {
         this.validateField(field, true);
       });
-
       const isValid = Object.keys(this.validation.errors).length === 0;
-
-      if (this.config.enableAnalytics) {
-        this.trackAnalyticsEvent("form_validation", {
-          isValid,
-          errorCount: Object.keys(this.validation.errors).length,
-          errors: Object.keys(this.validation.errors),
-        });
-      }
 
       return isValid;
     },
@@ -1241,17 +1107,6 @@ const RegisterPage = {
         } else if (field === "confirm") {
           this.uiState.showConfirmPassword = !this.uiState.showConfirmPassword;
         }
-
-        // Track analytics
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("password_visibility_toggle", {
-            field,
-            visible:
-              field === "password"
-                ? this.uiState.showPassword
-                : this.uiState.showConfirmPassword,
-          });
-        }
       } catch (error) {
         console.error("Error toggling password visibility:", error);
       }
@@ -1273,10 +1128,6 @@ const RegisterPage = {
             if (closeButton) closeButton.focus();
           }
         });
-
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("modal_opened", { type: modalType });
-        }
       } catch (error) {
         console.error("Error opening modal:", error);
       }
@@ -1288,10 +1139,6 @@ const RegisterPage = {
           this.uiState.showTermsModal = false;
         } else if (modalType === "privacy") {
           this.uiState.showPrivacyModal = false;
-        }
-
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("modal_closed", { type: modalType });
         }
       } catch (error) {
         console.error("Error closing modal:", error);
@@ -1308,14 +1155,6 @@ const RegisterPage = {
         if (!this.validateAllFields()) {
           await this.scrollToFirstError();
           return;
-        }
-
-        // Track form submission attempt
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("form_submit_attempt", {
-            formCompletion: this.formCompletionPercentage,
-            validationAttempts: this.analytics.validationAttempts,
-          });
         }
 
         // Clear previous errors and set submitting state
@@ -1415,15 +1254,6 @@ const RegisterPage = {
           );
         }
 
-        // Track successful registration
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("registration_success", {
-            userId: result.user?.id,
-            completionTime: Date.now() - this.analytics.startTime,
-            formInteractions: this.analytics.formInteractions,
-          });
-        }
-
         // Dispatch auth-updated event
         window.dispatchEvent(
           new CustomEvent("auth-updated", {
@@ -1467,15 +1297,6 @@ const RegisterPage = {
           });
         }
 
-        // Track registration error
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("registration_error", {
-            errorCode: result.code,
-            errorMessage: result.message,
-            retryCount: this.errorState.retryCount,
-          });
-        }
-
         // Show error toast if available
         if (window.toast) {
           window.toast.error(errorMessage);
@@ -1490,14 +1311,7 @@ const RegisterPage = {
         if (this.errorState.retryCount >= this.config.maxRetryAttempts) {
           return;
         }
-
         this.errorState.retryCount++;
-
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("registration_retry", {
-            attempt: this.errorState.retryCount,
-          });
-        }
 
         await this.handleFormSubmit();
       } catch (error) {
@@ -1553,19 +1367,8 @@ const RegisterPage = {
         }
 
         // Set local error state
-        this.setError(errorMessage, context);
-
-        // Log for debugging
+        this.setError(errorMessage, context); // Log for debugging
         console.error(`RegisterPage Error [${context}]:`, error);
-
-        // Track error in analytics
-        if (this.config.enableAnalytics) {
-          this.trackAnalyticsEvent("error_occurred", {
-            context,
-            message: errorMessage,
-            timestamp: new Date().toISOString(),
-          });
-        }
 
         // Show error toast if available
         if (window.toast) {
@@ -1573,67 +1376,6 @@ const RegisterPage = {
         }
       } catch (handlingError) {
         console.error("Error in error handler:", handlingError);
-      }
-    },
-
-    // ================================
-    // ANALYTICS AND TRACKING METHODS
-    // ================================
-
-    trackAnalyticsEvent(eventName, eventData = {}) {
-      try {
-        if (!this.config.enableAnalytics) return;
-
-        const analyticsData = {
-          event: eventName,
-          sessionId: this.analytics.sessionId,
-          timestamp: new Date().toISOString(),
-          page: "register",
-          ...eventData,
-        };
-
-        // Use Analytics service if available
-        if (window.Analytics && typeof window.Analytics.track === "function") {
-          window.Analytics.track(eventName, analyticsData);
-        }
-
-        // Debug logging
-        if (this.config.enableDebugMode) {
-          console.log("Analytics Event:", analyticsData);
-        }
-      } catch (error) {
-        console.error("Analytics tracking error:", error);
-      }
-    },
-
-    trackFieldInteraction(fieldName) {
-      try {
-        if (!this.config.enableAnalytics) return;
-
-        this.analytics.formInteractions++;
-
-        this.trackAnalyticsEvent("field_interaction", {
-          field: fieldName,
-          totalInteractions: this.analytics.formInteractions,
-        });
-      } catch (error) {
-        console.error("Error tracking field interaction:", error);
-      }
-    },
-
-    trackFieldFocus(fieldName) {
-      try {
-        if (!this.config.enableAnalytics) return;
-
-        this.analytics.fieldFocusCount[fieldName] =
-          (this.analytics.fieldFocusCount[fieldName] || 0) + 1;
-
-        this.trackAnalyticsEvent("field_focus", {
-          field: fieldName,
-          focusCount: this.analytics.fieldFocusCount[fieldName],
-        });
-      } catch (error) {
-        console.error("Error tracking field focus:", error);
       }
     },
   },
@@ -1659,7 +1401,6 @@ if (typeof window !== "undefined") {
       version: "2.0.0",
       features: [
         "Enhanced Validation",
-        "Analytics Integration",
         "Error Handling",
         "Accessibility Features",
         "Performance Optimization",
@@ -1675,7 +1416,6 @@ if (typeof window !== "undefined") {
         "ValidationService",
         "APP_CONSTANTS",
         "ErrorHandler",
-        "Analytics",
       ],
     };
 

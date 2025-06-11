@@ -12,9 +12,7 @@ class CartService {
       deliveryFee: 0,
       total: 0,
     };
-    this.eventListeners = {};
-
-    // Configuration constants
+    this.eventListeners = {}; // Configuration constants
     this.config = {
       TAX_RATE: 0.1,
       FREE_DELIVERY_THRESHOLD: 15,
@@ -25,12 +23,55 @@ class CartService {
 
     this.loadCart();
   }
+
+  /**
+   * Get user-specific storage key for cart data
+   * @returns {string} User-specific storage key
+   */
+  getUserStorageKey() {
+    try {
+      // Check if AuthService is available and user is logged in
+      if (typeof AuthService !== "undefined" && AuthService.isLoggedIn()) {
+        const currentUser = AuthService.getCurrentUser();
+        if (currentUser && currentUser.email) {
+          return `${this.config.STORAGE_KEY}_${currentUser.email}`;
+        }
+      }
+      // Fallback to generic key for anonymous users
+      return `${this.config.STORAGE_KEY}_anonymous`;
+    } catch (error) {
+      console.error("Error getting user storage key:", error);
+      return `${this.config.STORAGE_KEY}_anonymous`;
+    }
+  }
+
+  /**
+   * Get user-specific storage key for orders data
+   * @returns {string} User-specific orders storage key
+   */
+  getUserOrdersStorageKey() {
+    try {
+      // Check if AuthService is available and user is logged in
+      if (typeof AuthService !== "undefined" && AuthService.isLoggedIn()) {
+        const currentUser = AuthService.getCurrentUser();
+        if (currentUser && currentUser.email) {
+          return `${this.config.ORDERS_STORAGE_KEY}_${currentUser.email}`;
+        }
+      }
+      // Fallback to generic key for anonymous users
+      return `${this.config.ORDERS_STORAGE_KEY}_anonymous`;
+    } catch (error) {
+      console.error("Error getting user orders storage key:", error);
+      return `${this.config.ORDERS_STORAGE_KEY}_anonymous`;
+    }
+  }
   /**
    * Load cart data from localStorage with error handling
    */
   loadCart() {
     try {
-      const savedCart = localStorage.getItem(this.config.STORAGE_KEY);
+      const userStorageKey = this.getUserStorageKey();
+      const savedCart = localStorage.getItem(userStorageKey);
       if (savedCart) {
         const parsedCart = JSON.parse(savedCart);
         this.cart = Array.isArray(parsedCart) ? parsedCart : [];
@@ -44,15 +85,15 @@ class CartService {
       this.clearCorruptedStorage();
     }
   }
-
   /**
    * Clear corrupted storage data
    * @private
    */
   clearCorruptedStorage() {
     try {
-      localStorage.removeItem(this.config.STORAGE_KEY);
-      console.log("Corrupted cart data cleared");
+      const userStorageKey = this.getUserStorageKey();
+      localStorage.removeItem(userStorageKey);
+      console.log("Corrupted cart data cleared for current user");
     } catch (error) {
       console.error("Error clearing corrupted storage:", error);
     }
@@ -62,8 +103,9 @@ class CartService {
    */
   saveCart() {
     try {
+      const userStorageKey = this.getUserStorageKey();
       const cartData = JSON.stringify(this.cart);
-      localStorage.setItem(this.config.STORAGE_KEY, cartData);
+      localStorage.setItem(userStorageKey, cartData);
       this.notifyListeners("update", this.cart);
     } catch (error) {
       console.error("Error saving cart:", error);
@@ -98,8 +140,7 @@ class CartService {
    * @param {Object} item - The food item to add
    * @param {Number} quantity - Quantity to add (default: 1)
    * @param {Object} options - Special instructions and customization options
-   */
-  /**
+   */ /**
    * Validate stock availability for an item
    * @param {Object} item - The product item
    * @param {Number} quantity - Requested quantity
@@ -108,8 +149,23 @@ class CartService {
   validateStock(item, quantity) {
     // Check if item has stock property
     if (typeof item.stock !== "number") {
+      // Try to get stock from ProductService if available
+      if (window.ProductService && item.id) {
+        try {
+          const productWithStock = window.ProductService.getProductById(
+            item.id
+          );
+          if (productWithStock && typeof productWithStock.stock === "number") {
+            item.stock = productWithStock.stock; // Update the item with stock info
+            return productWithStock.stock >= quantity;
+          }
+        } catch (error) {
+          console.warn(`Could not fetch stock for product ${item.id}:`, error);
+        }
+      }
+
       console.warn(
-        `Product ${item.name} (ID: ${item.id}) missing stock information`
+        `Product ${item.name} (ID: ${item.id}) missing stock information, allowing add to cart`
       );
       return true; // Allow if stock info is missing (backward compatibility)
     }
@@ -414,7 +470,94 @@ class CartService {
     return this.cart;
   }
   /**
-   * Calculate cart totals with configurable tax and delivery fees
+   * Handle user login - load user-specific cart
+   * This should be called when a user logs in
+   */
+  onUserLogin() {
+    try {
+      // Clear current cart
+      this.cart = [];
+      this.totals = { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
+
+      // Load user-specific cart
+      this.loadCart();
+
+      // Notify listeners about cart change
+      this.notifyListeners("update", this.cart);
+
+      // Trigger global cart-updated event for navbar
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("cart-updated", { detail: this.cart })
+        );
+      }
+
+      console.log("Cart loaded for logged-in user");
+    } catch (error) {
+      console.error("Error handling user login:", error);
+    }
+  }
+
+  /**
+   * Handle user logout - clear current cart and switch to anonymous cart
+   * This should be called when a user logs out
+   */
+  onUserLogout() {
+    try {
+      // Clear current user's cart from memory
+      this.cart = [];
+      this.totals = { subtotal: 0, tax: 0, deliveryFee: 0, total: 0 };
+
+      // Load anonymous cart if any
+      this.loadCart();
+
+      // Notify listeners about cart change
+      this.notifyListeners("update", this.cart);
+
+      // Trigger global cart-updated event for navbar
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(
+          new CustomEvent("cart-updated", { detail: this.cart })
+        );
+      }
+
+      console.log("Switched to anonymous cart");
+    } catch (error) {
+      console.error("Error handling user logout:", error);
+    }
+  }
+
+  /**
+   * Clear cart data for all users (admin function)
+   * WARNING: This will delete all cart data in localStorage
+   */
+  clearAllCartData() {
+    try {
+      // Get all localStorage keys
+      const keys = Object.keys(localStorage);
+
+      // Filter and remove cart-related keys
+      keys.forEach((key) => {
+        if (
+          key.startsWith(this.config.STORAGE_KEY) ||
+          key.startsWith(this.config.ORDERS_STORAGE_KEY)
+        ) {
+          localStorage.removeItem(key);
+        }
+      });
+
+      // Clear current cart
+      this.cart = [];
+      this.updateCartTotals();
+
+      console.log("All cart data cleared");
+    } catch (error) {
+      console.error("Error clearing all cart data:", error);
+    }
+  }
+
+  /**
+   * Update cart totals with configurable tax and delivery fees
    */
   updateCartTotals() {
     try {
@@ -558,8 +701,9 @@ class CartService {
     } catch (error) {
       console.error("Error submitting order:", error);
       // Save order to local storage as fallback
+      const userOrdersKey = this.getUserOrdersStorageKey();
       const savedOrders = JSON.parse(
-        localStorage.getItem("foodOrders") || "[]"
+        localStorage.getItem(userOrdersKey) || "[]"
       );
 
       const localOrder = {
@@ -572,7 +716,7 @@ class CartService {
       };
 
       savedOrders.push(localOrder);
-      localStorage.setItem("foodOrders", JSON.stringify(savedOrders));
+      localStorage.setItem(userOrdersKey, JSON.stringify(savedOrders));
 
       // Clear cart after successful local order
       this.clearCart();
@@ -602,8 +746,9 @@ class CartService {
    */
   getUserOrders(userId) {
     try {
-      // Try to load orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+      // Try to load orders from localStorage using user-specific key
+      const userOrdersKey = this.getUserOrdersStorageKey();
+      const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
 
       // Filter orders by userId
       return allOrders.filter(
@@ -622,8 +767,9 @@ class CartService {
    */
   getOrder(orderId) {
     try {
-      // Try to load orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+      // Try to load orders from localStorage using user-specific key
+      const userOrdersKey = this.getUserOrdersStorageKey();
+      const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
 
       // Find the specific order
       return allOrders.find(
@@ -644,8 +790,9 @@ class CartService {
    */
   cancelOrder(orderId) {
     try {
-      // Load all orders
-      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+      // Load all orders using user-specific key
+      const userOrdersKey = this.getUserOrdersStorageKey();
+      const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
 
       // Find the order
       const orderIndex = allOrders.findIndex(
@@ -671,10 +818,8 @@ class CartService {
       order.status = "cancelled";
       order.statusUpdates = order.statusUpdates || {};
       order.statusUpdates.cancelled = new Date().toISOString();
-      order.cancellationReason = "Cancelled by customer";
-
-      // Save updated orders list
-      localStorage.setItem("foodOrders", JSON.stringify(allOrders));
+      order.cancellationReason = "Cancelled by customer"; // Save updated orders list
+      localStorage.setItem(userOrdersKey, JSON.stringify(allOrders));
 
       // Notify listeners
       this.notifyListeners("orderCancelled", order);
@@ -696,8 +841,9 @@ class CartService {
    */
   updateUserOrder(updatedOrder) {
     try {
-      // Load all orders from localStorage
-      const allOrders = JSON.parse(localStorage.getItem("foodOrders") || "[]");
+      // Load all orders from localStorage using user-specific key
+      const userOrdersKey = this.getUserOrdersStorageKey();
+      const allOrders = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
 
       // Find the order index
       const orderIndex = allOrders.findIndex(
@@ -712,10 +858,8 @@ class CartService {
       }
 
       // Update the order
-      allOrders[orderIndex] = updatedOrder;
-
-      // Save back to localStorage
-      localStorage.setItem("foodOrders", JSON.stringify(allOrders));
+      allOrders[orderIndex] = updatedOrder; // Save back to localStorage
+      localStorage.setItem(userOrdersKey, JSON.stringify(allOrders));
 
       // Notify listeners about the updated order
       this.notifyListeners("orderUpdated", updatedOrder);

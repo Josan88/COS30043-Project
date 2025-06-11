@@ -18,10 +18,6 @@ const createHomePageConfig = () => ({
     maxSuggestions: 10,
     debounceDelay: 300,
   },
-  analytics: window.APP_CONSTANTS?.ANALYTICS || {
-    enabled: true,
-    sessionTimeout: 1800000,
-  },
   content: window.APP_CONSTANTS?.CONTENT || {
     featuredProductsCount: 3,
     reviewsPerPage: 4,

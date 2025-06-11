@@ -248,10 +248,6 @@ body {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.nav-link.router-link-active {
-  background-color: var(--secondary-color);
-}
-
 /* Badge for cart count */
 .badge {
   background-color: var(--accent-color) !important;

@@ -505,13 +505,6 @@ router.beforeEach((to, from, next) => {
 - ✅ Tablets (iPad, Android)
 - ✅ Desktop (Various resolutions)
 
-### Performance Metrics
-
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Cumulative Layout Shift**: < 0.1
-- **Time to Interactive**: < 3.0s
-
 ## 📊 Code Quality Metrics
 
 ### Code Organization
@@ -591,27 +584,35 @@ The FoodNow application was designed using a mobile-first approach with careful 
 **Design Focus**: Single-column layout optimized for touch interaction
 
 #### Home Page
+
 ![Mobile Portrait Home](wireframes/mobile-portrait-home.svg)
 
 #### Product Page
+
 ![Mobile Portrait Products](wireframes/mobile-portrait-products.svg)
 
 #### Shopping Cart
+
 ![Mobile Portrait Cart](wireframes/mobile-portrait-cart.svg)
 
 #### Login Page
+
 ![Mobile Portrait Login](wireframes/mobile-portrait-login.svg)
 
 #### Register Page
+
 ![Mobile Portrait Register](wireframes/mobile-portrait-register.svg)
 
 #### Account Page
+
 ![Mobile Portrait Account](wireframes/mobile-portrait-account.svg)
 
 #### Purchases Page
+
 ![Mobile Portrait Purchases](wireframes/mobile-portrait-purchases.svg)
 
 **Key Features**:
+
 - Single column product grid for optimal mobile viewing
 - Collapsible navigation with hamburger menu
 - Touch-optimized buttons (minimum 44px target size)
@@ -623,27 +624,35 @@ The FoodNow application was designed using a mobile-first approach with careful 
 **Design Focus**: Two-column layout utilizing wider screen space
 
 #### Home Page
+
 ![Mobile Landscape Home](wireframes/mobile-landscape-home.svg)
 
 #### Product Page
+
 ![Mobile Landscape Products](wireframes/mobile-landscape-products.svg)
 
 #### Shopping Cart
+
 ![Mobile Landscape Cart](wireframes/mobile-landscape-cart.svg)
 
 #### Login Page
+
 ![Mobile Landscape Login](wireframes/mobile-landscape-login.svg)
 
 #### Register Page
+
 ![Mobile Landscape Register](wireframes/mobile-landscape-register.svg)
 
 #### Account Page
+
 ![Mobile Landscape Account](wireframes/mobile-landscape-account.svg)
 
 #### Purchases Page
+
 ![Mobile Landscape Purchases](wireframes/mobile-landscape-purchases.svg)
 
 **Key Features**:
+
 - Two-column product grid maximizing screen real estate
 - Side-by-side form fields where appropriate
 - Expanded category navigation
@@ -655,27 +664,35 @@ The FoodNow application was designed using a mobile-first approach with careful 
 **Design Focus**: Multi-column layout with advanced features
 
 #### Home Page
+
 ![Desktop Home](wireframes/desktop-home.svg)
 
 #### Product Page
+
 ![Desktop Products](wireframes/desktop-products.svg)
 
 #### Shopping Cart
+
 ![Desktop Cart](wireframes/desktop-cart.svg)
 
 #### Login Page
+
 ![Desktop Login](wireframes/desktop-login.svg)
 
 #### Register Page
+
 ![Desktop Register](wireframes/desktop-register.svg)
 
 #### Account Page
+
 ![Desktop Account](wireframes/desktop-account.svg)
 
 #### Purchases Page
+
 ![Desktop Purchases](wireframes/desktop-purchases.svg)
 
 **Key Features**:
+
 - 4-6 column product grid for comprehensive browsing
 - Full navigation bar with all menu items visible
 - Advanced filtering panel with expanded options
@@ -690,10 +707,11 @@ All seven required pages have been designed with wireframes for three responsive
 
 - **21 Total Wireframes**: Complete coverage of all pages and breakpoints
 - **Mobile Portrait (320px-575px)**: Single-column, touch-optimized layouts
-- **Mobile Landscape (576px-767px)**: Two-column layouts maximizing screen space  
+- **Mobile Landscape (576px-767px)**: Two-column layouts maximizing screen space
 - **Desktop (992px+)**: Multi-column layouts with advanced features
 
 **Context View Grouping Implementation**:
+
 - **Row-Column Grid System**: Products arranged in responsive grid
 - **Context Grouping**: Items grouped by categories (Appetizers, Mains, Desserts)
 - **Filtering Panel**: Advanced search and filter options
@@ -705,6 +723,7 @@ All seven required pages have been designed with wireframes for three responsive
 **Accessibility and Usability Focus**
 
 The wireframes demonstrate comprehensive accessibility features:
+
 - **Accessible Forms**: ARIA labels and keyboard navigation
 - **Context Grouping**: Content organized by logical sections
 - **Responsive Tables**: Order summary with accessible table structure
@@ -716,16 +735,19 @@ The wireframes demonstrate comprehensive accessibility features:
 ### Design Principles Applied
 
 #### 1. Mobile-First Responsive Strategy
+
 - **Base Design**: Started with mobile portrait (320px)
 - **Progressive Enhancement**: Added features for larger screens
 - **Breakpoint Strategy**: Three distinct breakpoints with specific layouts
 
 #### 2. Context View Grouping
+
 - **Visual Hierarchy**: Clear separation between content sections
 - **Grid Implementation**: CSS Grid and Flexbox for responsive layouts
 - **Content Organization**: Logical grouping of related information
 
 #### 3. Comprehensive Wireframe Coverage
+
 - **All 7 Required Pages**: Complete wireframe coverage
 - **3 Responsive Breakpoints**: Mobile portrait, mobile landscape, desktop
 - **21 Total Wireframes**: Comprehensive design documentation
@@ -733,11 +755,13 @@ The wireframes demonstrate comprehensive accessibility features:
 - **Progressive Enhancement**: Feature-rich desktop layouts building on mobile foundation
 
 #### 3. Accessibility Integration
+
 - **Visual Design**: High contrast ratios and clear focus indicators
 - **Interaction Design**: Touch-friendly targets and keyboard navigation
 - **Information Architecture**: Semantic HTML structure
 
 #### 4. User Experience Optimization
+
 - **Navigation Flow**: Intuitive user journey from browsing to ordering
 - **Visual Feedback**: Loading states, hover effects, and transitions
 - **Content Strategy**: Clear information hierarchy and scannable content

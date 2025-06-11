@@ -144,9 +144,6 @@ class ToastService {
         this.setAutoDismiss(toastId, toastConfig.duration);
       }
 
-      // Track analytics
-      this.trackToast(toastConfig);
-
       return toastId;
     } catch (error) {
       console.error("Error showing toast:", error);
@@ -341,21 +338,6 @@ class ToastService {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
-  }
-
-  /**
-   * Track toast analytics
-   * @param {Object} config - Toast configuration
-   */
-  trackToast(config) {
-    if (window.analytics && typeof window.analytics.track === "function") {
-      window.analytics.track("Toast Shown", {
-        type: config.type,
-        hasSubtitle: !!config.subtitle,
-        duration: config.duration,
-        timestamp: config.timestamp,
-      });
-    }
   }
 
   // Convenience methods for different toast types

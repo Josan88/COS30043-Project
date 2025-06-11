@@ -442,23 +442,14 @@ const AccountPage = {
           totalItems: 0,
         },
         isLoading: false,
-      },
-
-      // Modal States
+      }, // Modal States
       modals: {
         logout: false,
         orderDetails: false,
         selectedOrder: null,
       },
 
-      // Analytics State
-      analytics: {
-        sessionStartTime: Date.now(),
-        profileUpdates: 0,
-        passwordUpdates: 0,
-        tabSwitches: 0,
-        interactions: {},
-      }, // Component State
+      // Component State
       componentState: {
         isMounted: false,
         hasInitialized: false,
@@ -729,7 +720,6 @@ const AccountPage = {
         if (oldData && this.componentState.hasInitialized) {
           this.profileState.isDirty = this.checkIfProfileChanged();
           this.uiState.hasUnsavedChanges = this.profileState.isDirty;
-          this.trackFieldInteraction("profile", "change");
         }
       },
       deep: true,
@@ -750,14 +740,6 @@ const AccountPage = {
       }
     }, // Watch for active tab changes
     "uiState.activeTab"(newTab, oldTab) {
-      if (oldTab) {
-        this.analytics.tabSwitches++;
-        this.trackEvent("tab_switch", {
-          from: oldTab,
-          to: newTab,
-        });
-      }
-
       // Load orders when switching to orders tab
       if (newTab === "orders") {
         this.loadUserOrders();
@@ -790,11 +772,6 @@ const AccountPage = {
         this._validatePasswordField.bind(this),
         this.config.debounceDelay
       );
-
-      // Track component creation
-      this.trackEvent("component_created", {
-        timestamp: Date.now(),
-      });
     } catch (error) {
       console.error("Error in AccountPage created hook:", error);
       this.handleComponentError(error, "created");
@@ -826,16 +803,8 @@ const AccountPage = {
      */
     async initializeComponent() {
       try {
-        this.uiState.isLoading = true;
-
-        // Load user data and orders
+        this.uiState.isLoading = true; // Load user data and orders
         await Promise.all([this.loadUserData(), this.loadUserOrders()]);
-
-        // Track component initialization
-        this.trackEvent("component_initialized", {
-          timestamp: Date.now(),
-          hasUserData: !!this.user.id,
-        });
 
         this.componentState.hasInitialized = true;
       } catch (error) {
@@ -1184,16 +1153,7 @@ const AccountPage = {
           this.focusFirstError("profile");
           return;
         }
-
         this.profileState.isSubmitting = true;
-        this.analytics.profileUpdates++;
-
-        // Track update attempt
-        this.trackEvent("profile_update_attempt", {
-          fields: Object.keys(this.profileForm).filter(
-            (key) => this.profileForm[key] !== this.originalUserData[key]
-          ),
-        });
 
         // Call AuthService to update profile
         const response = await window.AuthService?.updateProfile(
@@ -1211,15 +1171,8 @@ const AccountPage = {
           // Show success message          this.feedback.profile.success = window.APP_CONSTANTS?.MESSAGES?.SUCCESS?.PROFILE_UPDATED ||
           ("Your profile has been updated successfully.");
 
-          window.ToastService?.success(this.feedback.profile.success);
-
-          // Reset form state
+          window.ToastService?.success(this.feedback.profile.success); // Reset form state
           this.profileState.submitted = false;
-
-          // Track successful update
-          this.trackEvent("profile_update_success", {
-            updateTime: Date.now() - this.analytics.sessionStartTime,
-          });
         } else {
           this.feedback.profile.error =
             response?.message || "Failed to update profile. Please try again.";
@@ -1261,14 +1214,7 @@ const AccountPage = {
           this.focusFirstError("password");
           return;
         }
-
         this.passwordState.isSubmitting = true;
-        this.analytics.passwordUpdates++;
-
-        // Track password update attempt
-        this.trackEvent("password_update_attempt", {
-          strength: this.passwordState.strength.score,
-        });
 
         // Call AuthService to update password
         const response = await window.AuthService?.updatePassword(
@@ -1292,11 +1238,6 @@ const AccountPage = {
           this.passwordState.submitted = false;
           this.passwordState.validation.errors = {};
           this.passwordState.strength = { score: 0, feedback: "" };
-
-          // Track successful update
-          this.trackEvent("password_update_success", {
-            updateTime: Date.now() - this.analytics.sessionStartTime,
-          });
         } else {
           this.feedback.security.error =
             response?.message || "Failed to update password. Please try again.";
@@ -1342,19 +1283,12 @@ const AccountPage = {
         console.error("Error switching tab:", error);
       }
     },
-
     /**
-     * Toggle password visibility with analytics tracking
-     */
-    togglePasswordVisibility(field) {
+     * Toggle password visibility
+     */ togglePasswordVisibility(field) {
       try {
         this.passwordState.showPasswords[field] =
           !this.passwordState.showPasswords[field];
-
-        this.trackEvent("password_visibility_toggle", {
-          field,
-          visible: this.passwordState.showPasswords[field],
-        });
       } catch (error) {
         console.error("Error toggling password visibility:", error);
       }
@@ -1395,19 +1329,10 @@ const AccountPage = {
     confirmLogout() {
       this.modals.logout = true;
     },
-
     /**
-     * Logout user with analytics tracking
-     */
-    async logout() {
+     * Logout user
+     */ async logout() {
       try {
-        // Track logout
-        this.trackEvent("logout", {
-          sessionDuration: Date.now() - this.analytics.sessionStartTime,
-          profileUpdates: this.analytics.profileUpdates,
-          passwordUpdates: this.analytics.passwordUpdates,
-          tabSwitches: this.analytics.tabSwitches,
-        });
         window.AuthService?.logout();
         this.modals.logout = false;
 
@@ -1418,18 +1343,11 @@ const AccountPage = {
         window.ToastService?.error("Error during logout. Please try again.");
       }
     },
-
     /**
      * Filter orders by status
-     */
-    filterOrdersByStatus(status) {
+     */ filterOrdersByStatus(status) {
       this.ordersData.filters.status = status;
       this.ordersData.pagination.currentPage = 1;
-
-      this.trackEvent("orders_filter", {
-        filterType: "status",
-        value: status,
-      });
     },
 
     /**
@@ -1438,10 +1356,6 @@ const AccountPage = {
     searchOrders(query) {
       this.ordersData.filters.searchQuery = query;
       this.ordersData.pagination.currentPage = 1;
-
-      this.trackEvent("orders_search", {
-        queryLength: query.length,
-      });
     },
 
     /**
@@ -1467,65 +1381,9 @@ const AccountPage = {
 
       return statusMap[status.toLowerCase()] || "bg-secondary";
     },
-
-    /**
-     * Track field interactions for analytics
-     */
-    trackFieldInteraction(formType, action) {
-      try {
-        if (!this.analytics.interactions[formType]) {
-          this.analytics.interactions[formType] = {};
-        }
-
-        this.analytics.interactions[formType][action] =
-          (this.analytics.interactions[formType][action] || 0) + 1;
-      } catch (error) {
-        console.error("Error tracking field interaction:", error);
-      }
-    },
-
-    /**
-     * Generic event tracking method
-     */
-    trackEvent(eventName, eventData = {}) {
-      try {
-        const event = {
-          event: eventName,
-          timestamp: Date.now(),
-          component: "AccountPage",
-          ...eventData,
-        };
-
-        // Log to console in development
-        if (window.APP_CONSTANTS?.DEBUG?.ANALYTICS_LOGGING) {
-          console.log("Analytics Event:", event);
-        }
-
-        // Send to analytics service if available
-        if (window.AnalyticsService) {
-          window.AnalyticsService.track(event);
-        }
-
-        // Store in session for debugging
-        if (window.APP_CONSTANTS?.DEBUG?.STORE_ANALYTICS) {
-          const events = JSON.parse(
-            sessionStorage.getItem("analyticsEvents") || "[]"
-          );
-          events.push(event);
-          sessionStorage.setItem(
-            "analyticsEvents",
-            JSON.stringify(events.slice(-100))
-          );
-        }
-      } catch (error) {
-        console.error("Error tracking event:", error);
-      }
-    },
-
     /**
      * Handle component errors
-     */
-    handleComponentError(error, context = "unknown") {
+     */ handleComponentError(error, context = "unknown") {
       try {
         console.error(`AccountPage component error in ${context}:`, error);
 
@@ -1535,26 +1393,17 @@ const AccountPage = {
           context,
           timestamp: Date.now(),
         });
-
-        // Track error event
-        this.trackEvent("component_error", {
-          context,
-          error: error.message,
-          stack: error.stack,
-        });
       } catch (trackingError) {
         console.error("Error handling component error:", trackingError);
       }
     },
+
     /**
      * Cleanup component resources
-     */ cleanupComponent() {
+     */
+    cleanupComponent() {
       try {
-        // Track component cleanup
-        this.trackEvent("component_cleanup", {
-          sessionDuration: Date.now() - this.analytics.sessionStartTime,
-          interactions: this.analytics.interactions,
-        });
+        // No specific cleanup needed currently
       } catch (error) {
         console.error("Error cleaning up component:", error);
       }

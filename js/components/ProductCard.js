@@ -499,9 +499,7 @@ window.app.component("product-card", {
         // Validate product before adding
         if (!this.validateProductForCart()) {
           throw new Error("Product validation failed");
-        }
-
-        // Prepare cart item
+        } // Prepare cart item with all necessary product information
         const cartItem = {
           id: this.product.id,
           name: this.product.name,
@@ -510,6 +508,13 @@ window.app.component("product-card", {
           image: this.displayImage,
           quantity: 1,
           discount: this.hasDiscount ? this.product.discount : 0,
+          stock: this.product.stock || 0, // Include stock information for validation
+          category: this.product.category,
+          rating: this.product.rating,
+          reviewCount: this.product.reviewCount,
+          preparationTime: this.product.preparationTime,
+          calories: this.product.calories,
+          dietaryOptions: this.product.dietaryOptions || [],
         };
 
         // Add to cart using service
@@ -522,13 +527,8 @@ window.app.component("product-card", {
           throw new Error(
             "CartService is not available or addItem method is missing"
           );
-        }
-
-        // Show success feedback
+        } // Show success feedback
         this.showFeedback(`${this.product.name} added to cart!`, "success");
-
-        // Track analytics
-        this.trackAddToCart(cartItem);
       } catch (error) {
         console.error("Error adding product to cart:", error);
 
@@ -583,9 +583,6 @@ window.app.component("product-card", {
 
         const action = this.isFavorite ? "added to" : "removed from";
         this.showFeedback(`${this.product.name} ${action} favorites!`, "info");
-
-        // Track analytics
-        this.trackFavoriteToggle(this.isFavorite);
       } catch (error) {
         // Revert state on error
         this.isFavorite = !this.isFavorite;
@@ -728,35 +725,6 @@ window.app.component("product-card", {
 
       // Fallback to EventBus
       window.EventBus.emit("show-toast", { message, type });
-    },
-
-    /**
-     * Track add to cart analytics
-     */
-    trackAddToCart(cartItem) {
-      if (window.analytics && typeof window.analytics.track === "function") {
-        window.analytics.track("Add to Cart", {
-          productId: cartItem.id,
-          productName: cartItem.name,
-          price: cartItem.price,
-          discount: cartItem.discount,
-          source: "product-card",
-        });
-      }
-    },
-    /**
-     * Track favorite toggle analytics
-     */ trackFavoriteToggle(isFavorite) {
-      if (window.analytics && typeof window.analytics.track === "function") {
-        window.analytics.track(
-          isFavorite ? "Add to Favorites" : "Remove from Favorites",
-          {
-            productId: this.product.id,
-            productName: this.product.name,
-            source: "product-card",
-          }
-        );
-      }
     },
 
     /**

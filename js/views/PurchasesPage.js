@@ -733,23 +733,6 @@ const PurchasesPage = {
         noRefundAfter: 3600000, // 1 hour
       },
 
-      // === ANALYTICS INTEGRATION ===
-      analytics: {
-        sessionStartTime: Date.now(),
-        pageViews: 0,
-        ordersViewed: new Set(),
-        filtersUsed: new Set(),
-        searchQueries: [],
-        actionsPerformed: [],
-        timeSpentOnPage: 0,
-        engagementScore: 0,
-        conversionTracking: {
-          reordersInitiated: 0,
-          ratingsSubmitted: 0,
-          ordersChecked: 0,
-        },
-      },
-
       // === UI STATE MANAGEMENT ===
       ui: {
         isLoading: false,
@@ -932,19 +915,6 @@ const PurchasesPage = {
       );
     },
 
-    // === ANALYTICS DATA ===
-    analyticsData() {
-      return {
-        sessionDuration: Date.now() - this.analytics.sessionStartTime,
-        ordersViewedCount: this.analytics.ordersViewed.size,
-        filtersUsedCount: this.analytics.filtersUsed.size,
-        searchQueriesCount: this.analytics.searchQueries.length,
-        actionsCount: this.analytics.actionsPerformed.length,
-        engagementScore: this.calculateEngagementScore(),
-        conversionRate: this.calculateConversionRate(),
-      };
-    },
-
     // === UI HELPERS ===
     shouldShowLoadingState() {
       return this.ui.isLoading || this.componentState.isLoading;
@@ -982,16 +952,6 @@ const PurchasesPage = {
     // === ENHANCED SEARCH QUERY WATCHER ===
     searchQuery: {
       handler(newQuery, oldQuery) {
-        // Track search analytics
-        if (newQuery && newQuery !== oldQuery) {
-          this.trackSearchQuery(newQuery);
-          this.analytics.searchQueries.push({
-            query: newQuery,
-            timestamp: Date.now(),
-            resultsCount: 0, // Will be updated after filtering
-          });
-        }
-
         // Validate search query
         this.validateSearchQuery(newQuery);
 
@@ -1001,14 +961,10 @@ const PurchasesPage = {
         }
       },
       immediate: false,
-    },
-
-    // === FILTER WATCHERS WITH ANALYTICS ===
+    }, // === FILTER WATCHERS ===
     statusFilter: {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("status", newValue);
-          this.analytics.filtersUsed.add("status");
           this.filterOrders();
         }
       },
@@ -1017,8 +973,6 @@ const PurchasesPage = {
     deliveryTypeFilter: {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("deliveryType", newValue);
-          this.analytics.filtersUsed.add("deliveryType");
           this.filterOrders();
         }
       },
@@ -1027,8 +981,6 @@ const PurchasesPage = {
     "dateFilter.start": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("dateStart", newValue);
-          this.analytics.filtersUsed.add("dateRange");
           this.validateDateRange();
           this.filterOrders();
         }
@@ -1038,8 +990,6 @@ const PurchasesPage = {
     "dateFilter.end": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("dateEnd", newValue);
-          this.analytics.filtersUsed.add("dateRange");
           this.validateDateRange();
           this.filterOrders();
         }
@@ -1049,8 +999,6 @@ const PurchasesPage = {
     "priceFilter.min": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("priceMin", newValue);
-          this.analytics.filtersUsed.add("priceRange");
           this.validatePriceRange();
           this.filterOrders();
         }
@@ -1060,19 +1008,14 @@ const PurchasesPage = {
     "priceFilter.max": {
       handler(newValue, oldValue) {
         if (newValue !== oldValue) {
-          this.trackFilterUsage("priceMax", newValue);
-          this.analytics.filtersUsed.add("priceRange");
           this.validatePriceRange();
           this.filterOrders();
         }
       },
-    },
-
-    // === PAGINATION WATCHER ===
+    }, // === PAGINATION WATCHER ===
     "pagination.currentPage": {
       handler(newPage, oldPage) {
         if (newPage !== oldPage) {
-          this.trackPageNavigation(newPage, oldPage);
           this.scrollToTop();
         }
       },
@@ -1082,7 +1025,6 @@ const PurchasesPage = {
     "componentState.hasError": {
       handler(hasError) {
         if (hasError) {
-          this.trackError("Component Error", this.componentState.errorMessage);
           this.showErrorNotification(this.componentState.errorMessage);
         }
       },
@@ -1092,11 +1034,7 @@ const PurchasesPage = {
     orders: {
       handler(newOrders, oldOrders) {
         if (newOrders.length !== oldOrders.length) {
-          this.trackOrdersLoaded(newOrders.length);
           this.filterOrders();
-
-          // Update analytics
-          this.analytics.pageViews++;
 
           // Cache management
           this.updateOrderCache(newOrders);
@@ -1110,25 +1048,12 @@ const PurchasesPage = {
       handler(newFiltered) {
         // Update pagination
         this.updatePaginationMetadata(newFiltered.length);
-
-        // Update search results count in analytics
-        if (this.analytics.searchQueries.length > 0) {
-          const lastSearch =
-            this.analytics.searchQueries[
-              this.analytics.searchQueries.length - 1
-            ];
-          lastSearch.resultsCount = newFiltered.length;
-        }
-
-        // Track filter performance
-        this.trackFilterPerformance(newFiltered.length);
       },
     },
 
     // === UI STATE WATCHERS ===
     "ui.isMobile": {
       handler(isMobile) {
-        this.trackDeviceChange(isMobile ? "mobile" : "desktop");
         this.adjustUIForDevice(isMobile);
       },
     },
@@ -1152,16 +1077,11 @@ const PurchasesPage = {
     this.componentState.performanceMetrics.loadStartTime = Date.now();
 
     // Initialize debounced methods
-    this.initializeDebouncedMethods();
-
-    // Initialize component
+    this.initializeDebouncedMethods(); // Initialize component
     this.initializeComponent();
 
     // Load orders
     this.loadOrders();
-
-    // Track analytics
-    this.trackComponentCreated();
   },
   mounted() {
     // Performance tracking
@@ -1180,9 +1100,6 @@ const PurchasesPage = {
 
     // Setup auto-refresh if enabled
     this.setupAutoRefresh();
-
-    // Track component mounted
-    this.trackComponentMounted();
 
     // Mark component as initialized
     this.componentState.isInitialized = true;
@@ -1205,18 +1122,12 @@ const PurchasesPage = {
     // Clear intervals
     this.clearAutoRefresh();
 
-    // Track session end
-    this.trackSessionEnd();
-
     // Cleanup performance monitoring
     this.cleanupPerformanceMonitoring();
 
     // Debug logging
     if (this.componentState.debugMode) {
-      console.log("PurchasesPage unmounted", {
-        sessionDuration: this.analytics.sessionDuration,
-        analyticsData: this.analyticsData,
-      });
+      console.log("PurchasesPage unmounted");
     }
   },
 
@@ -1243,13 +1154,8 @@ const PurchasesPage = {
 
       // Set initial UI state
       this.ui.isLoading = true;
-      this.componentState.isLoading = true;
-
-      // Initialize pagination
+      this.componentState.isLoading = true; // Initialize pagination
       this.pagination.itemsPerPage = this.config.pagination.ordersPerPage;
-
-      // Initialize analytics
-      this.analytics.sessionStartTime = Date.now();
     },
 
     applyCustomStyles() {
@@ -1486,157 +1392,11 @@ const PurchasesPage = {
       }
       return true;
     },
-
-    // === ANALYTICS METHODS ===
-    trackComponentCreated() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_page_created", {
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-          sessionId: this.analytics.sessionStartTime,
-        });
-      }
-    },
-
-    trackComponentMounted() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_page_mounted", {
-          timestamp: Date.now(),
-          renderTime: this.componentState.performanceMetrics.renderTime,
-          ordersCount: this.orders.length,
-        });
-      }
-    },
-
-    trackSearchQuery(query) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_search", {
-          query,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackFilterUsage(filterType, filterValue) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_filter_used", {
-          filterType,
-          filterValue,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackOrdersLoaded(count) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_orders_loaded", {
-          count,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackPageNavigation(newPage, oldPage) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_page_navigation", {
-          newPage,
-          oldPage,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackError(errorType, errorMessage) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_error", {
-          errorType,
-          errorMessage,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-    trackSessionEnd() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_session_end", {
-          sessionDuration: Date.now() - this.analytics.sessionStartTime,
-          ordersViewed: this.analytics.ordersViewed.size,
-          filtersUsed: this.analytics.filtersUsed.size,
-          searchQueries: this.analytics.searchQueries.length,
-          actionsPerformed: this.analytics.actionsPerformed.length,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-    trackDeviceChange(deviceType) {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_device_change", {
-          deviceType,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-    trackPageVisible() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_page_visible", {
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackComponentCreated() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_component_created", {
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackComponentMounted() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_component_mounted", {
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
     handleNearBottomScroll() {
       // Handle infinite scroll or pagination when near bottom
       if (this.pagination.hasNextPage && !this.componentState.loading) {
         // Load more orders if pagination allows
         this.loadMoreOrders();
-      }
-
-      // Track scroll behavior
-      if (window.Analytics) {
-        window.Analytics.track("purchases_scroll_near_bottom", {
-          currentPage: this.pagination.currentPage,
-          totalOrders: this.orders.length,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
-    },
-
-    trackPageHidden() {
-      if (window.Analytics) {
-        window.Analytics.track("purchases_page_hidden", {
-          timeOnPage: Date.now() - this.analytics.sessionStartTime,
-          ordersViewed: this.analytics.ordersViewed.size,
-          filtersUsed: this.analytics.filtersUsed.size,
-          searchQueries: this.analytics.searchQueries.length,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
       }
     },
 
@@ -1673,10 +1433,7 @@ const PurchasesPage = {
       }
     },
     handleVisibilityChange() {
-      if (document.hidden) {
-        this.trackPageHidden();
-      } else {
-        this.trackPageVisible();
+      if (!document.hidden) {
         // Auto-refresh has been removed - orders will only refresh manually
       }
     },
@@ -1834,32 +1591,7 @@ const PurchasesPage = {
         0
       );
       return totalRating / ratedOrders.length;
-    },
-
-    calculateEngagementScore() {
-      const weights = {
-        ordersViewed: 1,
-        filtersUsed: 2,
-        searchQueries: 1.5,
-        actionsPerformed: 3,
-      };
-
-      return (
-        this.analytics.ordersViewed.size * weights.ordersViewed +
-        this.analytics.filtersUsed.size * weights.filtersUsed +
-        this.analytics.searchQueries.length * weights.searchQueries +
-        this.analytics.actionsPerformed.length * weights.actionsPerformed
-      );
-    },
-
-    calculateConversionRate() {
-      if (this.orders.length === 0) return 0;
-      return (
-        this.analytics.conversionTracking.reordersInitiated / this.orders.length
-      );
-    },
-
-    // === ERROR HANDLING METHODS ===
+    }, // === ERROR HANDLING METHODS ===
     handleError(message, error = null) {
       console.error("PurchasesPage Error:", message, error);
 
@@ -1873,8 +1605,6 @@ const PurchasesPage = {
           timestamp: Date.now(),
         });
       }
-
-      this.trackError("General Error", message);
     },
 
     showErrorNotification(message) {
@@ -1962,9 +1692,6 @@ const PurchasesPage = {
             duration: Date.now() - startTime,
             timestamp: Date.now(),
           });
-
-          // Track analytics
-          this.trackOrdersLoaded(this.orders.length);
         } else {
           this.orders = [];
           console.warn("User not logged in or missing user ID");
@@ -2214,9 +1941,6 @@ const PurchasesPage = {
         this.updatePaginationMetadata(filtered.length);
         this.resetToFirstPage();
 
-        // Track analytics
-        this.trackFilterPerformance(filtered.length);
-
         this.ui.loadingStates.filtering = false;
       } catch (error) {
         this.ui.loadingStates.filtering = false;
@@ -2291,21 +2015,8 @@ const PurchasesPage = {
     },
     toggleFilterMenu() {
       this.showFilterMenu = !this.showFilterMenu;
-
-      // Track analytics
-      if (window.Analytics) {
-        window.Analytics.track("purchases_filter_menu_toggled", {
-          isOpen: this.showFilterMenu,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
     },
-
     clearFilters() {
-      // Store previous state for analytics
-      const previousFiltersCount = this.getActiveFiltersCount();
-
       // Clear all filters
       this.statusFilter = "";
       this.deliveryTypeFilter = "";
@@ -2323,24 +2034,12 @@ const PurchasesPage = {
 
       // Reset sorting to default
       this.sortOptions.field = "orderTime";
-      this.sortOptions.direction = "desc";
-
-      // Apply filtering
+      this.sortOptions.direction = "desc"; // Apply filtering
       this.filterOrders();
-
-      // Track analytics
-      if (window.Analytics) {
-        window.Analytics.track("purchases_filters_cleared", {
-          previousFiltersCount,
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
-      }
 
       // Show notification
       this.showInfoNotification("All filters cleared");
     },
-
     toggleOrderDetails(orderId) {
       if (this.expandedOrders.includes(orderId)) {
         this.expandedOrders = this.expandedOrders.filter(
@@ -2348,24 +2047,6 @@ const PurchasesPage = {
         );
       } else {
         this.expandedOrders.push(orderId);
-
-        // Track order viewed for analytics
-        this.analytics.ordersViewed.add(orderId);
-        this.analytics.actionsPerformed.push({
-          action: "order_details_viewed",
-          orderId,
-          timestamp: Date.now(),
-        });
-      }
-
-      // Track analytics
-      if (window.Analytics) {
-        window.Analytics.track("purchases_order_details_toggled", {
-          orderId,
-          isExpanded: this.expandedOrders.includes(orderId),
-          timestamp: Date.now(),
-          userId: this.getCurrentUserId(),
-        });
       }
     },
 
@@ -2382,31 +2063,12 @@ const PurchasesPage = {
           items: order.items.map(() => ({ rating: 5, comment: "" })),
           isSubmitting: false,
           hasSubmitted: false,
-        };
-
-        // Reset validation
+        }; // Reset validation
         this.ratingValidation = {
           errors: {},
           isValid: true,
           touchedFields: new Set(),
         };
-
-        // Track analytics
-        this.analytics.actionsPerformed.push({
-          action: "rating_modal_opened",
-          orderId: order.id,
-          timestamp: Date.now(),
-        });
-
-        if (window.Analytics) {
-          window.Analytics.track("purchases_rating_started", {
-            orderId: order.id,
-            orderTotal: order.totals.total,
-            itemCount: order.items.length,
-            timestamp: Date.now(),
-            userId: this.getCurrentUserId(),
-          });
-        }
 
         // Open modal
         new bootstrap.Modal(document.getElementById("rateOrderModal")).show();

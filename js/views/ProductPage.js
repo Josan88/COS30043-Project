@@ -103,9 +103,11 @@ const ProductPage = {
                 {{ diet }}
                 <button class="btn-close btn-close-white ms-2" @click="removeDietaryFilter(diet)" aria-label="Clear dietary filter"></button>
               </span>
-            </div>
-          </div>            <!-- Enhanced Category Title & Statistics -->
-          <div v-if="filteredProducts.length > 0" class="mb-4 d-flex justify-content-between align-items-center">            <h2 v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</h2>
+            </div>          </div>
+          
+          <!-- Enhanced Category Title & Statistics -->
+          <div v-if="filteredProducts.length > 0" class="mb-4 d-flex justify-content-between align-items-center">
+            <h2 v-if="selectedCategory">{{ getCategoryLabel(selectedCategory) }}</h2>
             <h2 v-else>All Menu Items</h2>
           </div>
           
@@ -166,11 +168,11 @@ const ProductPage = {
                         <span class="ms-2">({{ minRating }}+ stars)</span>
                       </div>
                     </div>
-                    
-                    <!-- Dietary Options Filter -->
+                      <!-- Dietary Options Filter -->
                     <div class="col-md-12 mb-3">
                       <label class="form-label">Dietary Preferences</label>
-                      <div class="d-flex flex-wrap gap-2">                        <div v-for="option in dietaryOptions" :key="option.id" class="form-check form-check-inline">
+                      <div class="d-flex flex-wrap gap-2">
+                        <div v-for="option in dietaryOptions" :key="option.id" class="form-check form-check-inline">
                           <input 
                             class="form-check-input" 
                             type="checkbox" 
@@ -178,8 +180,7 @@ const ProductPage = {
                             :value="option.id" 
                             v-model="selectedDietaryOptions"
                             @change="applyFilters"
-                          >
-                          <label class="form-check-label" :for="'diet-' + option.id">
+                          >                          <label class="form-check-label" :for="'diet-' + option.id">
                             {{ option.name }}
                           </label>
                         </div>
@@ -336,9 +337,10 @@ const ProductPage = {
               <li class="breadcrumb-item active" aria-current="page">{{ currentProduct.name }}</li>
             </ol>
           </nav>
-          
-          <div class="row">            <!-- Enhanced Food Image with Accessibility -->
-            <div class="col-md-6 mb-4">              <div class="product-image-container">
+            <div class="row">
+            <!-- Enhanced Food Image with Accessibility -->
+            <div class="col-md-6 mb-4">
+              <div class="product-image-container">
                 <img 
                   :src="currentProduct.image" 
                   :alt="currentProduct.name + ' - ' + currentProduct.description.substring(0, 100)"
@@ -552,13 +554,11 @@ const ProductPage = {
         debounceDelay: window.APP_CONSTANTS?.UI_CONFIG?.DEBOUNCE_DELAY || 300,
         maxRetries: window.APP_CONSTANTS?.API?.MAX_RETRIES || 3,
 
-        // Cart and Analytics Configuration
+        // Cart Configuration
         addToCartSuccessMessage:
           window.APP_CONSTANTS?.MESSAGES?.CART_ADDED || "Added to your order!",
         customizedItemSuffix:
           window.APP_CONSTANTS?.UI_LABELS?.CUSTOMIZED_SUFFIX || " (Customized)",
-        enableAnalytics:
-          window.APP_CONSTANTS?.FEATURES?.ENABLE_ANALYTICS || true,
 
         // Performance Configuration
         scrollBehavior:
@@ -651,17 +651,6 @@ const ProductPage = {
         errors: {},
         debounceTimeouts: new Map(),
         isValidating: false,
-      },
-
-      // Analytics State
-      analytics: {
-        sessionStart: Date.now(),
-        searchCount: 0,
-        filterUsage: {},
-        productViews: [],
-        cartAdditions: 0,
-        pageViews: 0,
-        timeOnPage: 0,
       },
 
       // UI State Management
@@ -1043,20 +1032,6 @@ const ProductPage = {
       return this.getCategoryLabel(this.currentProduct.category);
     },
 
-    // Analytics computed properties
-    analyticsData() {
-      return {
-        sessionDuration: Date.now() - this.analytics.sessionStart,
-        searchCount: this.analytics.searchCount,
-        filterUsageCount: Object.keys(this.analytics.filterUsage).length,
-        productViewCount: this.analytics.productViews.length,
-        cartAdditionCount: this.analytics.cartAdditions,
-        pageViewCount: this.analytics.pageViews,
-        currentFilters: this.activeFilterSummary.length,
-        resultsCount: this.filteredProducts.length,
-      };
-    },
-
     // UI state helpers
     isMobileView() {
       return (
@@ -1084,12 +1059,10 @@ const ProductPage = {
       immediate: true,
       handler(to, from) {
         if (to.path === "") {
-          this.analytics.pageViews++;
           this.loadData();
           this.updateRouteAnalytics(to, from);
         } else if (to.path.startsWith("/product/") && to.params.id) {
           // Handle individual product detail view
-          this.analytics.pageViews++;
           this.loadProductDetails(to.params.id);
           this.updateRouteAnalytics(to, from);
         }
@@ -1272,9 +1245,6 @@ const ProductPage = {
       // Initialize mobile detection
       this.detectMobileDevice();
 
-      // Initialize analytics session
-      this.analytics.sessionStart = Date.now();
-
       if (this.config.enableAnalytics) {
         console.log("ProductPage component created");
       }
@@ -1326,11 +1296,6 @@ const ProductPage = {
 
       // Clear debounce timeouts
       this.clearValidationTimeouts();
-
-      // Track session end analytics
-      if (this.config.enableAnalytics) {
-        this.trackSessionEnd();
-      }
 
       // Reset component state
       this.componentState.isInitialized = false;

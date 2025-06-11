@@ -43,6 +43,12 @@ const AuthService = {
             delete userInfo.password;
             localStorage.setItem("user", JSON.stringify(userInfo));
             localStorage.setItem("isLoggedIn", "true");
+
+            // Notify CartService about user login to load user-specific cart
+            if (typeof window !== "undefined" && window.CartService) {
+              window.CartService.onUserLogin();
+            }
+
             return { success: true, user: userInfo };
           }
           // If admin user not found in DB or password in DB doesn't match 'admin'
@@ -79,11 +85,14 @@ const AuthService = {
       if (user && user.password === password) {
         // Clone user object and remove sensitive data
         const userInfo = { ...user };
-        delete userInfo.password;
-
-        // In a real app, would generate and return a JWT token
+        delete userInfo.password; // In a real app, would generate and return a JWT token
         localStorage.setItem("user", JSON.stringify(userInfo));
         localStorage.setItem("isLoggedIn", "true");
+
+        // Notify CartService about user login to load user-specific cart
+        if (typeof window !== "undefined" && window.CartService) {
+          window.CartService.onUserLogin();
+        }
 
         return { success: true, user: userInfo };
       }
@@ -132,9 +141,13 @@ const AuthService = {
       };
     }
   },
-
   // Logout user
   logout() {
+    // Notify CartService about user logout to switch to anonymous cart
+    if (typeof window !== "undefined" && window.CartService) {
+      window.CartService.onUserLogout();
+    }
+
     localStorage.removeItem("user");
     localStorage.removeItem("isLoggedIn");
     return { success: true };

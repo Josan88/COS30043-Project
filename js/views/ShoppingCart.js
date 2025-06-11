@@ -4,14 +4,12 @@
  * A comprehensive shopping cart component for the food ordering system.
  * Features include cart management, service options, pricing calculations,
  * promo codes, payment methods, and order placement.
- *
- * Key Features:
+ * * Key Features:
  * - Responsive design for mobile and desktop
  * - Multiple service methods (dine-in, pickup, delivery)
  * - Dynamic pricing with discounts and taxes
  * - Promo code system
  * - Form validation
- * - Analytics tracking
  * - Error handling with retry logic
  *
  * @version 2.0.0 (Improved Readability)
@@ -280,15 +278,6 @@ const ShoppingCart = {
             UI_CONFIG.RETRY_ATTEMPTS,
         },
       },
-
-      // Analytics and error tracking
-      analytics: {
-        sessionStart: Date.now(),
-        cartInteractions: 0,
-        promoAttempts: 0,
-        serviceMethodChanges: 0,
-        conversionEvents: [],
-      },
       errorState: {
         hasError: false,
         errorMessage: "",
@@ -406,26 +395,22 @@ const ShoppingCart = {
   // =====================================================
   // WATCHERS
   // =====================================================
-
   watch: {
     // Form field watchers with debounced validation
     tableNumber: {
       handler(newVal) {
-        this.trackInteraction();
         this.debouncedValidateField("tableNumber", newVal);
       },
     },
 
     phoneNumber: {
       handler(newVal) {
-        this.trackInteraction();
         this.debouncedValidateField("phoneNumber", newVal);
       },
     },
 
     deliveryAddress: {
       handler(newVal) {
-        this.trackInteraction();
         this.debouncedValidateField("deliveryAddress", newVal);
       },
     },
@@ -433,11 +418,6 @@ const ShoppingCart = {
     serviceMethod: {
       handler(newVal, oldVal) {
         if (oldVal !== newVal) {
-          this.analytics.serviceMethodChanges++;
-          this.trackAnalyticsEvent("service_method_changed", {
-            from: oldVal,
-            to: newVal,
-          });
           this.clearErrorState();
           this.recalculateCart();
         }
@@ -479,13 +459,11 @@ const ShoppingCart = {
 
     /**
      * Initialize the component
-     */
-    async initializeComponent() {
+     */ async initializeComponent() {
       try {
         this.setupEventListeners();
         await this.loadCart();
         await this.loadRecommendedProducts();
-        this.trackAnalyticsEvent("shopping_cart_viewed");
       } catch (error) {
         this.handleError(error, "Failed to initialize shopping cart");
       }
@@ -523,14 +501,9 @@ const ShoppingCart = {
 
     /**
      * Cleanup on component destruction
-     */
-    cleanup() {
+     */ cleanup() {
       this.cleanupEventListeners();
       this.clearAllTimeouts();
-      this.trackAnalyticsEvent("shopping_cart_exited", {
-        sessionDuration: Date.now() - this.analytics.sessionStart,
-        finalCartValue: this.cartSummary.total,
-      });
     },
 
     /**
@@ -591,18 +564,12 @@ const ShoppingCart = {
             // Already resolved items
             cartDetails = cartDetailsPromises;
           }
-        }
-
-        // Ensure we have valid cart items
+        } // Ensure we have valid cart items
         this.cartItems = cartDetails.filter(
           (item) => item && typeof item === "object"
         );
 
         this.recalculateCart();
-        this.trackAnalyticsEvent("cart_loaded", {
-          itemCount: this.cartItems.length,
-          retryCount,
-        });
       } catch (error) {
         console.error("Error loading cart details:", error);
 
@@ -736,16 +703,11 @@ const ShoppingCart = {
       try {
         const item = this.cartItems.find((item) => item.id === productId);
         const itemName = item ? item.name : "Item";
-
         if (confirm(`Remove ${itemName} from your order?`)) {
           window.CartService.removeFromCart(productId);
           await this.loadCart();
           await this.loadRecommendedProducts();
 
-          this.trackAnalyticsEvent("item_removed_from_cart", {
-            itemId: productId,
-            itemName,
-          });
           this.showToast("success", `${itemName} removed from cart`);
         }
       } catch (error) {
@@ -755,16 +717,10 @@ const ShoppingCart = {
 
     /**
      * Handle opening customization modal
-     */
-    handleOpenCustomizationModal(item) {
+     */ handleOpenCustomizationModal(item) {
       try {
         this.currentItemToCustomize = item;
         this.showCustomizationModal = true;
-
-        this.trackAnalyticsEvent("customization_modal_opened", {
-          itemId: item.id,
-          itemName: item.name,
-        });
       } catch (error) {
         this.handleError(error, "Failed to open customization modal");
       }
@@ -790,16 +746,9 @@ const ShoppingCart = {
         );
 
         // Reload cart to reflect changes
-        await this.loadCart();
-
-        // Close the modal
+        await this.loadCart(); // Close the modal
         this.handleCloseCustomizationModal();
 
-        this.trackAnalyticsEvent("item_customized", {
-          itemId: customizedItem.id,
-          itemName: customizedItem.name,
-          customizations: customizedItem.customizations,
-        });
         this.showToast(
           "success",
           `${customizedItem.name} customization updated`
@@ -815,14 +764,11 @@ const ShoppingCart = {
     handleShowToast(toastData) {
       const { message, type } = toastData;
       this.showToast(type, message);
-    }
+    },
     /**
      * Handle cart update (quantity, special instructions)
-     */,
-    async handleCartUpdate(data) {
+     */ async handleCartUpdate(data) {
       try {
-        this.trackInteraction();
-
         // Handle quantity updates with stock validation
         if (data.quantity !== undefined) {
           await window.CartService.updateQuantity(data.id, data.quantity);
@@ -840,12 +786,6 @@ const ShoppingCart = {
         }
 
         await this.loadCart();
-        this.trackAnalyticsEvent("cart_item_updated", {
-          itemId: data.id,
-          newQuantity: data.quantity,
-          hasSpecialInstructions: !!data.specialInstructions,
-        });
-
         this.showToast("success", "Cart updated successfully");
       } catch (error) {
         console.error("Cart update error:", error);
@@ -885,11 +825,6 @@ const ShoppingCart = {
         ) {
           window.CartService.clearCart();
           await this.loadCart();
-
-          this.trackAnalyticsEvent("cart_cleared", {
-            previousItemCount: itemCount,
-            previousCartValue: cartValue,
-          });
 
           this.showToast("info", "Your order has been cleared");
         }
@@ -937,11 +872,9 @@ const ShoppingCart = {
 
     /**
      * Handle promo code application
-     */
-    handleApplyPromoCode() {
+     */ handleApplyPromoCode() {
       try {
         this.promoError = null;
-        this.analytics.promoAttempts++;
 
         const code = this.promoCode.trim().toUpperCase();
         if (!code) {
@@ -952,10 +885,6 @@ const ShoppingCart = {
         const validationResult = this.validatePromoCode(code);
         if (!validationResult.isValid) {
           this.promoError = validationResult.message;
-          this.trackAnalyticsEvent("promo_code_failed", {
-            code: code,
-            reason: validationResult.message,
-          });
           return;
         }
 
@@ -965,12 +894,6 @@ const ShoppingCart = {
         this.promoCodeApplied = true;
         this.activePromoCode = promoCode;
         this.recalculateCart();
-
-        this.trackAnalyticsEvent("promo_code_applied", {
-          code: code,
-          discount: this.discountCalculations.promoDiscountAmount,
-          type: promoCode.type,
-        });
 
         this.showToast(
           "success",
@@ -985,8 +908,7 @@ const ShoppingCart = {
 
     /**
      * Handle promo code removal
-     */
-    handleRemovePromoCode() {
+     */ handleRemovePromoCode() {
       try {
         const savedAmount = this.discountCalculations.promoDiscountAmount;
         const promoCode = this.activePromoCode?.code;
@@ -997,11 +919,6 @@ const ShoppingCart = {
         this.promoError = null;
         this.recalculateCart();
 
-        this.trackAnalyticsEvent("promo_code_removed", {
-          code: promoCode,
-          previousDiscount: savedAmount,
-        });
-
         this.showToast("info", "Promo code removed");
       } catch (error) {
         this.handleError(error, "Failed to remove promo code");
@@ -1010,10 +927,8 @@ const ShoppingCart = {
 
     /**
      * Handle payment method update
-     */
-    handlePaymentMethodUpdate(method) {
+     */ handlePaymentMethodUpdate(method) {
       this.paymentMethod = method;
-      this.trackAnalyticsEvent("payment_method_changed", { method });
     },
 
     /**
@@ -1031,7 +946,6 @@ const ShoppingCart = {
         // Check authentication
         if (!window.AuthService.isLoggedIn()) {
           localStorage.setItem("checkoutRedirect", true);
-          this.trackAnalyticsEvent("checkout_redirect_to_login");
           this.$router.push("/login");
           return;
         }
@@ -1043,27 +957,11 @@ const ShoppingCart = {
         }
 
         this.isSubmitting = true;
-        this.clearErrorState();
-
-        // Build order data
+        this.clearErrorState(); // Build order data
         const orderData = this.buildOrderData();
-
-        // Track attempt
-        this.trackAnalyticsEvent("order_placement_attempted", {
-          orderValue: orderData.totals.finalTotal,
-          itemCount: orderData.items.length,
-          serviceMethod: orderData.serviceMethod,
-        });
 
         // Submit order
         const result = await this.submitOrderWithRetry(orderData);
-
-        // Success handling
-        this.trackAnalyticsEvent("order_placement_successful", {
-          orderId: result.orderId || "unknown",
-          orderValue: orderData.totals.finalTotal,
-          paymentMethod: orderData.payment.method,
-        });
 
         // Clear cart and navigate
         window.CartService.clearCart();
@@ -1074,10 +972,6 @@ const ShoppingCart = {
         this.$router.push("/purchases");
       } catch (error) {
         this.handleError(error, "Failed to place order");
-        this.trackAnalyticsEvent("order_placement_failed", {
-          error: error.message,
-          orderValue: this.cartSummary.total,
-        });
       } finally {
         this.isSubmitting = false;
       }
@@ -1177,17 +1071,9 @@ const ShoppingCart = {
 
     /**
      * Validate individual field
-     */
-    validateField(field, value) {
+     */ validateField(field, value) {
       const errors = this.getValidationErrors();
       this.validationErrors = errors;
-
-      if (errors[field]) {
-        this.trackAnalyticsEvent("validation_error", {
-          field,
-          error: errors[field],
-        });
-      }
     },
 
     // ---------------------------------------------
@@ -1244,24 +1130,10 @@ const ShoppingCart = {
             UI_CONFIG.RETRY_ATTEMPTS,
         },
       };
-    },
-
-    /**
-     * Create analytics object
-     */
-    createAnalyticsObject() {
-      return {
-        sessionStart: Date.now(),
-        cartInteractions: 0,
-        promoAttempts: 0,
-        serviceMethodChanges: 0,
-        conversionEvents: [],
-      };
-    },
-
+    }
     /**
      * Create error state object
-     */
+     */,
     createErrorState() {
       return {
         hasError: false,
@@ -1396,12 +1268,6 @@ const ShoppingCart = {
         estimatedDeliveryTime: this.estimatedTime,
         status: "pending",
         userId: window.AuthService.getCurrentUser().id,
-        analytics: {
-          sessionDuration: Date.now() - this.analytics.sessionStart,
-          interactions: this.analytics.cartInteractions,
-          serviceMethodChanges: this.analytics.serviceMethodChanges,
-          promoAttempts: this.analytics.promoAttempts,
-        },
       };
     },
 
@@ -1463,11 +1329,6 @@ const ShoppingCart = {
           this.recommendedProducts =
             await window.ProductService.getPopularProducts(4);
         }
-
-        this.trackAnalyticsEvent("recommended_products_loaded", {
-          count: this.recommendedProducts.length,
-          retryCount,
-        });
       } catch (error) {
         console.error("Error loading recommended products:", error);
 
@@ -1480,55 +1341,13 @@ const ShoppingCart = {
           this.handleError(error, "Failed to load recommended products");
         }
       }
-    },
-
+    }, // ---------------------------------------------
+    // ERROR HANDLING METHODS
     // ---------------------------------------------
-    // ANALYTICS AND ERROR HANDLING METHODS
-    // ---------------------------------------------
-
-    /**
-     * Track user interaction
-     */
-    trackInteraction() {
-      this.analytics.cartInteractions++;
-    },
-
-    /**
-     * Track analytics event
-     */
-    trackAnalyticsEvent(eventName, data = {}) {
-      try {
-        const event = {
-          name: eventName,
-          timestamp: Date.now(),
-          sessionId: this.analytics.sessionStart,
-          data: {
-            ...data,
-            cartValue: this.cartSummary.total,
-            itemCount: this.cartSummary.itemCount,
-            serviceMethod: this.serviceMethod,
-          },
-        };
-
-        this.analytics.conversionEvents.push(event);
-        if (window.AnalyticsService) {
-          window.AnalyticsService.track(eventName, event.data);
-        } // Development logging
-        if (
-          window.location.hostname === "localhost" ||
-          window.location.hostname === "127.0.0.1"
-        ) {
-          console.log("Analytics Event:", event);
-        }
-      } catch (error) {
-        console.warn("Analytics tracking error:", error);
-      }
-    },
 
     /**
      * Handle errors
-     */
-    handleError(error, context = "An error occurred") {
+     */ handleError(error, context = "An error occurred") {
       console.error(`ShoppingCart Error - ${context}:`, error);
 
       this.errorState = {
@@ -1537,11 +1356,6 @@ const ShoppingCart = {
         retryCount: this.errorState.retryCount + 1,
         canRetry: this.errorState.retryCount < this.config.ui.retryAttempts,
       };
-
-      this.trackAnalyticsEvent("error_occurred", {
-        error: error.message || context,
-        retryCount: this.errorState.retryCount,
-      });
 
       this.showToast("error", this.errorState.errorMessage);
     },
@@ -1574,14 +1388,9 @@ const ShoppingCart = {
         clearTimeout(timeoutId);
       });
       this.validation.debounceTimeouts.clear();
-    },
-
-    // Event handlers for window events
+    }, // Event handlers for window events
     handleResize() {
-      this.trackAnalyticsEvent("viewport_changed", {
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      // Handle window resize events
     },
 
     handleOnline() {

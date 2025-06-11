@@ -255,43 +255,25 @@ window.app.component("nav-bar", {
           method: "initializeComponent",
         });
       }
-    }
+    },
     /**
      * Toggle mobile navigation menu
-     */,
-    toggleNav() {
+     */ toggleNav() {
       this.isNavOpen = !this.isNavOpen;
 
       // Close user dropdown when opening nav
       if (this.isNavOpen) {
         this.isUserDropdownOpen = false;
       }
-
-      // Track navigation toggle for analytics
-      if (window.Analytics) {
-        window.Analytics.track("navigation_toggle", {
-          isOpen: this.isNavOpen,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    }
+    },
     /**
      * Toggle user dropdown menu
-     */,
-    toggleUserDropdown() {
+     */ toggleUserDropdown() {
       this.isUserDropdownOpen = !this.isUserDropdownOpen;
 
       // Close mobile nav when opening user dropdown
       if (this.isUserDropdownOpen) {
         this.isNavOpen = false;
-      }
-
-      // Track dropdown toggle for analytics
-      if (window.Analytics) {
-        window.Analytics.track("user_dropdown_toggle", {
-          isOpen: this.isUserDropdownOpen,
-          timestamp: new Date().toISOString(),
-        });
       }
     },
 
@@ -305,15 +287,6 @@ window.app.component("nav-bar", {
 
         // Close user dropdown
         this.isUserDropdownOpen = false;
-
-        // Track navigation click for analytics
-        if (window.Analytics) {
-          window.Analytics.track("navigation_click", {
-            itemName: item.name,
-            itemPath: item.path,
-            timestamp: new Date().toISOString(),
-          });
-        }
 
         // Handle special navigation items
         if (item.name === "Cart") {
@@ -394,27 +367,19 @@ window.app.component("nav-bar", {
         this.isUserDropdownOpen = false;
         this.isNavOpen = false;
       }
-    },
-
+    }
     /**
-     * Update cart item count from localStorage or service
-     */
+     * Update cart item count from CartService
+     */,
     updateCartCount() {
       try {
-        const cartKey = window.APP_CONSTANTS?.STORAGE_KEYS?.CART || "cart";
-        const cartData = localStorage.getItem(cartKey);
-
-        if (cartData) {
-          const cart = JSON.parse(cartData);
-          // Count total items in cart
-          this.cartItemCount = Array.isArray(cart)
-            ? cart.reduce((total, item) => total + (item.quantity || 1), 0)
-            : Object.values(cart).reduce(
-                (total, item) => total + (item.quantity || 1),
-                0
-              );
+        // Use CartService to get the current cart count
+        if (window.CartService) {
+          this.cartItemCount = window.CartService.getCartCount();
         } else {
+          // Fallback: try to get count from CartService global instance
           this.cartItemCount = 0;
+          console.warn("CartService not available for cart count update");
         }
 
         // Update navigation badge
