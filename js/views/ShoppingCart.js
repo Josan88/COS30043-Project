@@ -190,14 +190,12 @@ const ShoppingCart = {
           />
           
         </div>
-      </main>
-        
-      <!-- Customization Modal -->
-      <customization-modal
+      </main>      <!-- Customization Modal -->      <customization-modal
         v-if="showCustomizationModal"
-        :item="currentItemToCustomize"
+        :show="showCustomizationModal"
+        :product="currentItemToCustomize"
         @close="handleCloseCustomizationModal"
-        @customize="handleCustomizeItem"
+        @save="handleCustomizeItem"
       />
     </div>
   `,
@@ -732,30 +730,145 @@ const ShoppingCart = {
     handleCloseCustomizationModal() {
       this.showCustomizationModal = false;
       this.currentItemToCustomize = null;
-    },
-
+    }
     /**
      * Handle item customization
-     */
-    async handleCustomizeItem(customizedItem) {
+     */,
+    async handleCustomizeItem(customizationData) {
       try {
-        // Update the item in the cart with new customizations
-        window.CartService.updateItemCustomization(
-          customizedItem.id,
-          customizedItem
-        );
+        console.log("🔧 Starting customization process...");
+        console.log("📊 Customization data:", customizationData);
 
-        // Reload cart to reflect changes
-        await this.loadCart(); // Close the modal
+        // Find the item in the cart to get its current details
+        const itemToUpdate = this.currentItemToCustomize;
+        if (!itemToUpdate) {
+          throw new Error("No item selected for customization");
+        }
+
+        console.log("🎯 Item to update:", itemToUpdate);
+
+        // Create the customized item object with the new customization data
+        const customizedItem = {
+          ...itemToUpdate,
+          customization: customizationData,
+          basePrice: itemToUpdate.basePrice || itemToUpdate.price, // Preserve original base price
+          customizations:
+            this.convertCustomizationToLegacyFormat(customizationData),
+        };
+
+        console.log("✨ Customized item:", customizedItem);
+
+        // Use CartService's updateItemCustomization method which properly handles price calculations
+        if (
+          window.CartService &&
+          typeof window.CartService.updateItemCustomization === "function"
+        ) {
+          console.log("🛠️ Calling CartService.updateItemCustomization...");
+          const updatedCart = window.CartService.updateItemCustomization(
+            itemToUpdate.id,
+            customizedItem
+          );
+          console.log("📦 Updated cart from service:", updatedCart);
+        } else {
+          throw new Error(
+            "CartService.updateItemCustomization method not available"
+          );
+        } // Force Vue reactivity by creating a new array reference
+        console.log("🔄 Reloading cart to trigger UI update...");
+        await this.loadCart();
+
+        // Force reactivity update
+        this.$forceUpdate();
+
+        console.log("🎉 Cart items after update:", this.cartItems);
+
+        // Verify customization data preservation
+        const updatedItem = this.cartItems.find(
+          (item) => item.id === itemToUpdate.id
+        );
+        if (updatedItem) {
+          console.log(
+            "🔍 Verifying customization preservation for item:",
+            updatedItem.name
+          );
+          console.log("✨ Customization data:", updatedItem.customization);
+          console.log("🏷️ Price data:", {
+            currentPrice: updatedItem.price,
+            basePrice: updatedItem.basePrice,
+            subTotal: updatedItem.subTotal,
+          });
+
+          if (updatedItem.customization) {
+            console.log(
+              "✅ SUCCESS: Customization data preserved after cart reload!"
+            );
+          } else {
+            console.log(
+              "⚠️ WARNING: Customization data was lost during cart reload"
+            );
+          }
+        }
+
+        // Close the modal
         this.handleCloseCustomizationModal();
 
         this.showToast(
           "success",
-          `${customizedItem.name} customization updated`
+          `${itemToUpdate.name} customization updated successfully`
         );
+
+        console.log("✅ Customization process completed successfully");
       } catch (error) {
+        console.error("❌ Customization failed:", error);
         this.handleError(error, "Failed to update item customization");
       }
+    },
+
+    /**
+     * Convert new customization format to legacy format for CartService compatibility
+     */
+    convertCustomizationToLegacyFormat(customizationData) {
+      const legacyCustomizations = [];
+
+      // Add removed ingredients as customizations with negative impact
+      if (
+        customizationData.removedIngredients &&
+        customizationData.removedIngredients.length > 0
+      ) {
+        customizationData.removedIngredients.forEach((ingredient) => {
+          legacyCustomizations.push({
+            name: `Remove ${ingredient}`,
+            type: "remove",
+            price: 0,
+          });
+        });
+      }
+
+      // Add extra ingredients as customizations with price
+      if (
+        customizationData.addedIngredients &&
+        customizationData.addedIngredients.length > 0
+      ) {
+        customizationData.addedIngredients.forEach((ingredient) => {
+          legacyCustomizations.push({
+            name: `Add ${ingredient.name}`,
+            type: "add",
+            price: ingredient.price || 0,
+          });
+        });
+      }
+
+      // Add special instructions as customization
+      if (customizationData.specialInstructions) {
+        legacyCustomizations.push({
+          name: "Special Instructions",
+          type: "instruction",
+          value: customizationData.specialInstructions,
+          price: 0,
+        });
+      }
+
+      return legacyCustomizations;
     },
 
     /**
@@ -1130,11 +1243,10 @@ const ShoppingCart = {
             UI_CONFIG.RETRY_ATTEMPTS,
         },
       };
-    }
+    },
     /**
      * Create error state object
-     */,
-    createErrorState() {
+     */ createErrorState() {
       return {
         hasError: false,
         errorMessage: "",

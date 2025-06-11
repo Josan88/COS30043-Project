@@ -373,21 +373,35 @@ class CartService {
 
     return this.cart;
   }
-
   /**
    * Update customizations for a food item in the cart by ID
    */
   updateItemCustomization(itemId, customizedItem) {
     const itemIndex = this.cart.findIndex((item) => item.id === itemId);
     if (itemIndex >= 0) {
+      // Store the original base price if not already stored
+      if (!this.cart[itemIndex].basePrice) {
+        this.cart[itemIndex].basePrice = this.cart[itemIndex].price;
+      }
+
       // Update the item with new customizations
       this.cart[itemIndex] = { ...this.cart[itemIndex], ...customizedItem };
 
       // Recalculate price with customizations
-      let basePrice = customizedItem.basePrice || customizedItem.price;
+      let basePrice =
+        this.cart[itemIndex].basePrice ||
+        customizedItem.basePrice ||
+        customizedItem.price;
 
-      // Add cost of customizations if they have a price
-      if (customizedItem.customizations) {
+      // Handle new customization format (from CustomizationModal)
+      if (
+        customizedItem.customization &&
+        customizedItem.customization.extraPrice
+      ) {
+        basePrice += customizedItem.customization.extraPrice;
+      }
+      // Handle legacy customizations format
+      else if (customizedItem.customizations) {
         customizedItem.customizations.forEach((custom) => {
           if (custom.price) {
             basePrice += custom.price;
@@ -397,10 +411,9 @@ class CartService {
 
       this.cart[itemIndex].price = basePrice;
       this.cart[itemIndex].subTotal = basePrice * this.cart[itemIndex].quantity;
-
       this.updateCartTotals();
       this.saveCart();
-      this.notifyCartUpdate();
+      this.notifyListeners("update", this.cart);
     }
 
     return this.cart;
@@ -922,18 +935,33 @@ class CartService {
     return cartItems.map((item) => {
       try {
         // Get full product details from ProductService using the correct method name
-        const productDetails = window.ProductService.getProductById(item.id);
-
-        // Return a promise since getProductById is async
+        const productDetails = window.ProductService.getProductById(item.id); // Return a promise since getProductById is async
         return Promise.resolve(productDetails)
           .then((details) => {
-            // If product details found, merge with cart item
+            // If product details found, merge with cart item while preserving customization data
             if (details) {
               return {
                 ...details,
+                // Preserve cart-specific data
                 quantity: item.quantity,
                 specialInstructions: item.specialInstructions || "",
-                subTotal: item.price * item.quantity,
+
+                // Preserve customization data (both new and legacy formats)
+                customization: item.customization || details.customization,
+                customizations:
+                  item.customizations || details.customizations || [],
+
+                // Preserve price information (use cart price if customized, otherwise product price)
+                price: item.price !== undefined ? item.price : details.price,
+                basePrice: item.basePrice || details.price, // Store original price for future calculations
+
+                // Calculate subTotal based on current price and quantity
+                subTotal:
+                  (item.price !== undefined ? item.price : details.price) *
+                  item.quantity,
+
+                // Preserve any other cart-specific options
+                options: item.options || {},
               };
             }
             // If product not found, return original cart item
