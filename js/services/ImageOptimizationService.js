@@ -420,7 +420,6 @@ class ImageOptimizationService {
       isMobilePortrait: this.isMobilePortrait(),
     };
   }
-
   /**
    * Apply consistent image containers to improve positioning
    */
@@ -435,13 +434,37 @@ class ImageOptimizationService {
         parent.classList.contains("card-image-container") ||
         parent.classList.contains("image-aspect-container") ||
         parent.classList.contains("hero-image-container") ||
-        parent.classList.contains("category-image-container")
+        parent.classList.contains("category-image-container") ||
+        parent.classList.contains("product-thumbnail-container") ||
+        parent.classList.contains("avatar-image-container")
       ) {
         return;
       }
 
-      // Determine container type based on image class or context
-      let containerClass = "image-aspect-container";
+      // Skip customer/user images and other special images that should not be affected
+      if (
+        img.classList.contains("avatar-image") ||
+        img.classList.contains("user-avatar") ||
+        img.classList.contains("profile-image") ||
+        img.classList.contains("customer-image") ||
+        img.classList.contains("user-image") ||
+        img.classList.contains("navbar-brand") ||
+        img.classList.contains("logo") ||
+        img.classList.contains("icon") ||
+        parent.classList.contains("avatar-circle") ||
+        parent.classList.contains("user-avatar") ||
+        parent.classList.contains("profile-section") ||
+        parent.classList.contains("navbar-brand") ||
+        img.closest(".avatar-circle") ||
+        img.closest(".user-avatar") ||
+        img.closest(".profile-section") ||
+        img.closest(".navbar-brand")
+      ) {
+        return;
+      }
+
+      // Only apply containers to food/product related images
+      let containerClass = null;
 
       if (img.classList.contains("hero-image")) {
         containerClass = "hero-image-container";
@@ -449,31 +472,34 @@ class ImageOptimizationService {
         containerClass = "category-image-container";
       } else if (
         img.classList.contains("food-image") ||
-        img.classList.contains("card-img-top")
+        img.classList.contains("card-img-top") ||
+        img.classList.contains("product-image") ||
+        img.classList.contains("responsive-image")
       ) {
         containerClass = "card-image-container";
       } else if (img.classList.contains("product-thumbnail")) {
         containerClass = "product-thumbnail-container";
-      } else if (img.classList.contains("avatar-image")) {
-        containerClass = "avatar-image-container";
       }
 
-      // Create container wrapper
-      const container = document.createElement("div");
-      container.className = containerClass;
+      // Only create container if we determined a specific container type
+      if (containerClass) {
+        // Create container wrapper
+        const container = document.createElement("div");
+        container.className = containerClass;
 
-      // Wrap the image
-      parent.insertBefore(container, img);
-      container.appendChild(img);
+        // Wrap the image
+        parent.insertBefore(container, img);
+        container.appendChild(img);
 
-      // Ensure image has proper positioning classes
-      img.style.position = "absolute";
-      img.style.top = "0";
-      img.style.left = "0";
-      img.style.width = "100%";
-      img.style.height = "100%";
-      img.style.objectFit = "cover";
-      img.style.objectPosition = "center";
+        // Ensure image has proper positioning classes
+        img.style.position = "absolute";
+        img.style.top = "0";
+        img.style.left = "0";
+        img.style.width = "100%";
+        img.style.height = "100%";
+        img.style.objectFit = "cover";
+        img.style.objectPosition = "center";
+      }
     });
   }
 }

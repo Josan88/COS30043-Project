@@ -134,8 +134,8 @@ const HomePage = {
           <div class="row">
             <div class="col-12">
               <div class="hero-content">
-                <h1>Delicious Food Delivered Fast</h1>
-                <p>Order from your favorite restaurants with just a few clicks</p>
+                <h1>FoodNow</h1>
+                <p>Order with just a few clicks</p>
                 <div class="hero-cta">
                   <router-link to="/product" class="btn-primary-custom">
                     <i class="fas fa-utensils"></i> Order Now
