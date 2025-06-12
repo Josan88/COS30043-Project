@@ -144,8 +144,7 @@ const ShoppingCart = {
                   <p>Loading your cart...</p>
                 </div>
               </div>
-              
-              <!-- Service Options Section -->
+                <!-- Service Options Section -->
               <service-options-section
                 :service-method="serviceMethod"
                 :table-number="tableNumber"
@@ -159,9 +158,6 @@ const ShoppingCart = {
                 @update-phone-number="handlePhoneNumberUpdate"
                 @update-special-requests="handleSpecialRequestsUpdate"
               />
-              
-            </div>
-            
             </div>
             <!-- Order Summary Section (Right Column) -->
             <aside class="col-12 col-lg-4 order-1 order-lg-2">              
@@ -181,16 +177,22 @@ const ShoppingCart = {
                 @remove-promo-code="handleRemovePromoCode"
                 @update-payment-method="handlePaymentMethodUpdate"
                 @place-order="handlePlaceOrder"
-              />
-            </aside>
-            <!-- Recommended Items Section -->
-          <recommended-items-section
-            v-if="recommendedProducts.length > 0"
-            :recommended-products="recommendedProducts"
-          />
+              />            </aside>
+          </div>
           
+          <!-- Recommended Items Section -->
+          <div class="row" v-if="recommendedProducts.length > 0">
+            <div class="col-12">
+              <recommended-items-section
+                :recommended-products="recommendedProducts"
+              />
+            </div>
+          </div>
         </div>
-      </main>      <!-- Customization Modal -->      <customization-modal
+      </main>
+      
+      <!-- Customization Modal -->
+      <customization-modal
         v-if="showCustomizationModal"
         :show="showCustomizationModal"
         :product="currentItemToCustomize"
@@ -730,11 +732,10 @@ const ShoppingCart = {
     handleCloseCustomizationModal() {
       this.showCustomizationModal = false;
       this.currentItemToCustomize = null;
-    }
+    },
     /**
      * Handle item customization
-     */,
-    async handleCustomizeItem(customizationData) {
+     */ async handleCustomizeItem(customizationData) {
       try {
         console.log("🔧 Starting customization process...");
         console.log("📊 Customization data:", customizationData);
