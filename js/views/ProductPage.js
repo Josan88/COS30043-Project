@@ -554,7 +554,7 @@ const ProductPage = {
               <!-- Quantity -->
               <div class="mb-4">
                 <label for="quantity" class="form-label">Quantity</label>
-                <div class="input-group" style="max-width: 150px;">
+                <div class="input-group">
                   <button class="btn btn-outline" type="button" @click="decrementQuantity" :disabled="quantity <= 1">
                     <i class="fas fa-minus"></i>
                   </button>
