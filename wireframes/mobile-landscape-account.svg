@@ -1,0 +1,137 @@
+﻿<svg width="768" height="576" viewBox="0 0 768 576" xmlns="http://www.w3.org/2000/svg">  <defs>
+    <style>
+      .bg { fill: #f8f9fa; }
+      .header { fill: #2c3e50; }
+      .card { fill: white; stroke: #dee2e6; stroke-width: 1; }
+      .text-primary { fill: #2c3e50; }
+      .text-secondary { fill: #6c757d; }
+      .text-accent { fill: #3498db; }
+      .text-success { fill: #27ae60; }
+      .text-warning { fill: #f39c12; }
+      .button-primary { fill: #3498db; }
+      .button-secondary { fill: #6c757d; }
+      .button-warning { fill: #f39c12; }
+      .border { stroke: #dee2e6; stroke-width: 1; fill: none; }
+      .small-text { font-size: 10px; }
+      .medium-text { font-size: 12px; }
+      .large-text { font-size: 14px; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect class="bg" width="768" height="576"/>
+
+  <!-- Header -->
+  <rect class="header" width="768" height="60"/>
+  <text x="16" y="35" class="text-primary" fill="white" font-size="18" font-weight="bold">My Account</text>
+  <circle cx="720" cy="30" r="18" fill="white" opacity="0.9"/>
+  <text x="712" y="36" class="text-primary medium-text"></text>
+
+  <!-- Main Content (Split Layout) -->
+  <!-- Left Section - Profile & Stats -->
+  <rect x="16" y="80" width="360" height="480" rx="8" class="card"/>
+  
+  <!-- Profile Section -->
+  <rect x="32" y="100" width="328" height="120" rx="6" fill="#f8f9fa"/>
+  <circle cx="80" cy="140" r="25" fill="#3498db"/>
+  <text x="70" y="148" fill="white" font-size="16" font-weight="bold">JD</text>
+  
+  <text x="120" y="130" class="text-primary large-text" font-weight="bold">John Doe</text>
+  <text x="120" y="148" class="text-secondary medium-text">john.doe@email.com</text>  <text x="120" y="165" class="text-secondary small-text">+1 (555) 123-4567</text>
+  <text x="120" y="180" class="text-secondary small-text">123 Main St, City, State</text>
+  
+  <rect x="280" y="120" width="70" height="25" rx="12" class="button-primary"/>
+  <text x="305" y="135" fill="white" class="small-text">Edit Profile</text>
+
+  <!-- Quick Stats -->
+  <rect x="32" y="240" width="328" height="80" rx="6" fill="#f8f9fa"/>
+  <text x="40" y="260" class="text-primary medium-text" font-weight="bold">Quick Stats</text>
+  
+  <rect x="40" y="270" width="75" height="40" rx="4" fill="white"/>
+  <text x="60" y="285" class="text-success large-text" font-weight="bold">47</text>
+  <text x="50" y="300" class="text-secondary small-text">Total Orders</text>
+  
+  <rect x="125" y="270" width="75" height="40" rx="4" fill="white"/>
+  <text x="145" y="285" class="text-warning large-text" font-weight="bold">4.8</text>
+  <text x="135" y="300" class="text-secondary small-text">Avg Rating</text>
+  
+  <rect x="210" y="270" width="75" height="40" rx="4" fill="white"/>
+  <text x="230" y="285" class="text-accent large-text" font-weight="bold">$284</text>
+  <text x="225" y="300" class="text-secondary small-text">Total Spent</text>
+  
+  <rect x="295" y="270" width="55" height="40" rx="4" fill="white"/>
+  <text x="310" y="285" class="text-success large-text" font-weight="bold">5</text>
+  <text x="305" y="300" class="text-secondary small-text">Rewards</text>
+
+  <!-- Membership Card -->
+  <rect x="32" y="340" width="328" height="60" rx="6" fill="linear-gradient(45deg, #3498db, #27ae60)"/>
+  <text x="40" y="360" fill="white" class="medium-text" font-weight="bold">Gold Member</text>
+  <text x="40" y="375" fill="white" class="small-text">Member since: January 2024</text>
+  <text x="40" y="390" fill="white" class="small-text">Benefits: Free delivery, 10% off orders, Priority support</text>
+  <text x="280" y="375" fill="white" class="large-text"></text>
+
+  <!-- Quick Actions -->
+  <rect x="32" y="420" width="328" height="120" rx="6" fill="#f8f9fa"/>
+  <text x="40" y="440" class="text-primary medium-text" font-weight="bold">Quick Actions</text>
+  
+  <rect x="40" y="450" width="150" height="30" rx="4" class="button-primary"/>
+  <text x="105" y="468" fill="white" class="medium-text">View Orders</text>
+  
+  <rect x="200" y="450" width="150" height="30" rx="4" class="button-secondary"/>
+  <text x="265" y="468" fill="white" class="medium-text">Reorder</text>
+  
+  <rect x="40" y="490" width="150" height="30" rx="4" class="button-warning"/>
+  <text x="105" y="508" fill="white" class="medium-text">Rewards</text>
+  
+  <rect x="200" y="490" width="150" height="30" rx="4" class="card"/>
+  <text x="265" y="508" class="text-secondary medium-text">Settings</text>
+
+  <!-- Right Section - Menu Options -->
+  <rect x="392" y="80" width="360" height="480" rx="8" class="card"/>
+  <text x="408" y="105" class="text-primary large-text" font-weight="bold">Account Menu</text>
+
+  <!-- Menu Items -->
+  <rect x="408" y="120" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="140" class="text-primary medium-text" font-weight="bold">Order History</text>
+  <text x="420" y="155" class="text-secondary small-text">View past orders and reorder favorites</text>
+  <text x="710" y="145" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="175" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="195" class="text-primary medium-text" font-weight="bold">Delivery Addresses</text>
+  <text x="420" y="210" class="text-secondary small-text">Manage saved addresses</text>
+  <text x="710" y="200" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="230" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="250" class="text-primary medium-text" font-weight="bold">Payment Methods</text>
+  <text x="420" y="265" class="text-secondary small-text">Manage cards and payment options</text>
+  <text x="710" y="255" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="285" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="305" class="text-primary medium-text" font-weight="bold">Rewards and Offers</text>
+  <text x="420" y="320" class="text-secondary small-text">View available rewards and promotions</text>
+  <text x="710" y="310" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="340" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="360" class="text-primary medium-text" font-weight="bold">Notifications</text>
+  <text x="420" y="375" class="text-secondary small-text">Manage notification preferences</text>
+  <text x="710" y="365" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="395" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="415" class="text-primary medium-text" font-weight="bold">Favorites</text>
+  <text x="420" y="430" class="text-secondary small-text">Your favorite restaurants and dishes</text>
+  <text x="710" y="420" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="450" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="470" class="text-primary medium-text" font-weight="bold">Privacy and Security</text>
+  <text x="420" y="485" class="text-secondary small-text">Account security and privacy settings</text>
+  <text x="710" y="475" class="text-secondary medium-text"></text>
+
+  <rect x="408" y="505" width="328" height="45" rx="6" fill="#f8f9fa"/>
+  <text x="420" y="525" class="text-primary medium-text" font-weight="bold">Help and Support</text>
+  <text x="420" y="540" class="text-secondary small-text">Get help or contact customer service</text>
+  <text x="710" y="530" class="text-secondary medium-text"></text>
+
+  <!-- Logout Button -->
+  <rect x="600" y="20" width="60" height="20" rx="10" fill="#e74c3c"/>
+  <text x="620" y="33" fill="white" class="small-text">Logout</text>
+</svg>
