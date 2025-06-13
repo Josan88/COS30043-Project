@@ -259,47 +259,14 @@ const ProductPage = {
                       Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredProducts.length) }} 
                       of {{ filteredProducts.length }} results
                     </p>
-                  </div>
-                  <div class="col-md-6 text-md-end">
-                    <div class="view-options d-inline-flex">
-                      <label class="me-2 align-self-center">View:</label>
-                      <button 
-                        class="btn btn-sm me-1" 
-                        :class="{ 'btn-primary': gridView === 'card', 'btn-outline-secondary': gridView !== 'card' }"
-                        @click="setGridView('card')"
-                        title="Card View"
-                      >
-                        <i class="fas fa-th"></i>
-                      </button>
-                      <button 
-                        class="btn btn-sm me-1" 
-                        :class="{ 'btn-primary': gridView === 'grid', 'btn-outline-secondary': gridView !== 'grid' }"
-                        @click="setGridView('grid')"
-                        title="Grid View"
-                      >
-                        <i class="fas fa-th-large"></i>
-                      </button>
-                      <button 
-                        class="btn btn-sm" 
-                        :class="{ 'btn-primary': gridView === 'list', 'btn-outline-secondary': gridView !== 'list' }"
-                        @click="setGridView('list')"
-                        title="List View"
-                      >
-                        <i class="fas fa-list"></i>
-                      </button>
-                    </div>
+                  </div>                  <div class="col-md-6 text-md-end">
+                    <!-- View options removed - automatic responsive view -->
                   </div>
                 </div>
               </div>
-              
-              <!-- Product Cards Grid -->
+                <!-- Product Cards Grid -->
               <div 
-                class="context-cards" 
-                :class="{
-                  'equal-height': gridView === 'card',
-                  'product-grid-enhanced': gridView === 'grid',
-                  'list-view': gridView === 'list'
-                }"
+                class="context-cards responsive-view"
               >
                 <div 
                   v-for="(product, index) in paginatedProducts" 
@@ -309,13 +276,13 @@ const ProductPage = {
                   v-scroll-reveal="{ delay: index * 100, threshold: 0.1 }"
                   role="article"
                   :aria-label="'Product: ' + product.name"
-                >
-                  <!-- Product Card Component -->
+                >                  <!-- Product Card Component -->
                   <product-card 
                     :product="product"
-                    :compact-mode="gridView === 'list'"
+                    :compact-mode="false"
                     :show-add-button="true"
                     :show-favorite-button="true"
+                    class="responsive-product-card"
                   ></product-card>
                 </div>
               </div>
@@ -716,10 +683,8 @@ const ProductPage = {
       // Product Detail State
       quantity: 1,
       specialInstructions: "",
-      showCustomizationModal: false,
-
-      // Grid View State
-      gridView: "card", // Options: 'card', 'grid', 'list'
+      showCustomizationModal: false, // Grid View State - Responsive by default
+      gridView: "list", // Default to list view for larger screens
       groupByCategory: false,
 
       // Enhanced Product Detail State
@@ -1167,7 +1132,7 @@ const ProductPage = {
       return (
         this.uiState.showScrollToTop && this.uiState.lastScrollPosition > 500
       );
-    },    // Active dietary filters for display
+    }, // Active dietary filters for display
     activeDietaryFilters() {
       return this.selectedDietaryOptions.map((id) => {
         const option = this.dietaryOptions.find((opt) => opt.id === id);
@@ -1178,13 +1143,17 @@ const ProductPage = {
     // Categories with their products for grouped view
     categoriesWithProducts() {
       if (!this.categories || !this.products) return [];
-      
-      return this.categories.map(category => ({
-        ...category,
-        products: this.products.filter(product => 
-          product.category === category.id || product.category === category.name
-        )
-      })).filter(category => category.products.length > 0);
+
+      return this.categories
+        .map((category) => ({
+          ...category,
+          products: this.products.filter(
+            (product) =>
+              product.category === category.id ||
+              product.category === category.name
+          ),
+        }))
+        .filter((category) => category.products.length > 0);
     },
   },
   watch: {
@@ -2391,9 +2360,6 @@ const ProductPage = {
 
       if (window.analytics) {
         window.analytics.track("filter_applied", {
-
-
-
           filterType,
           value: typeof value === "object" ? JSON.stringify(value) : value,
           usageCount: this.analytics.filterUsage[filterType],
@@ -2779,44 +2745,23 @@ const ProductPage = {
     // ===========================================
 
     /**
-     * Set the grid view mode
-     */
-    setGridView(viewType) {
-      this.gridView = viewType;
-      // Track grid view usage
-      if (this.config.enableAnalytics && window.analytics) {
-        window.analytics.track("grid_view_changed", {
-          viewType,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    },
-
-    /**
-     * Get CSS classes for product items based on grid view
+     * Get CSS classes for product items - simplified for responsive view
      */
     getProductItemClasses(index) {
       const classes = [];
-      
+
       // Add animation delay class
-      if (index < 12) { // Only animate first 12 items for performance
+      if (index < 12) {
+        // Only animate first 12 items for performance
         classes.push(`animate-delay-${Math.min(index, 11)}`);
       }
-      
-      // Add view-specific classes
-      switch (this.gridView) {
-        case 'list':
-          classes.push('list-view-item');
-          break;
-        case 'grid':
-          classes.push('grid-view-item');
-          break;
-        default:
-          classes.push('card-view-item');
-      }
-        return classes.join(' ');
-    }
-  }
+
+      // Add responsive product item class
+      classes.push("responsive-product-item");
+
+      return classes.join(" ");
+    },
+  },
 };
 
 // ===========================================
