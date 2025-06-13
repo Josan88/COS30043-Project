@@ -397,10 +397,16 @@ const ProductPage = {
           </div>
         </div>
       </div>
-      
-      <!-- Individual Food Item Detail View -->
+        <!-- Individual Food Item Detail View -->
       <div v-else class="product-detail">
         <div class="container">
+          <!-- Back to Menu Button -->
+          <div class="mb-3">
+            <button @click="goBackToMenu" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left me-2"></i>Back to Menu
+            </button>
+          </div>
+          
           <!-- Breadcrumb -->
           <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
@@ -440,8 +446,7 @@ const ProductPage = {
                 <span v-for="option in currentProduct.dietaryOptions" :key="option" class="badge bg-success me-1">
                   {{ option }}
                 </span>
-              </div>
-                <!-- Enhanced Rating with Custom Filter -->              <div class="mb-3">
+              </div>                <!-- Enhanced Rating with Custom Filter -->              <div class="mb-3">
                 <div class="ratings">
                   <span class="star-rating" v-html="formatStars(currentProduct.rating)"></span>
                   <span class="ms-2 text-muted">
@@ -586,9 +591,9 @@ const ProductPage = {
             </div>
           </div>
         </div>
-        
-        <!-- Customization Modal -->
+          <!-- Customization Modal -->
         <customization-modal 
+          v-if="currentProduct"
           :product="currentProduct" 
           :show="showCustomizationModal"
           @close="showCustomizationModal = false"
@@ -1162,12 +1167,19 @@ const ProductPage = {
     $route: {
       immediate: true,
       handler(to, from) {
-        if (to.path === "") {
+        if (to.path === "/product" && !to.params.id) {
+          // Handle product listing view
+          this.currentProduct = null;
           this.loadData();
           this.updateRouteAnalytics(to, from);
         } else if (to.path.startsWith("/product/") && to.params.id) {
           // Handle individual product detail view
           this.loadProductDetails(to.params.id);
+          this.updateRouteAnalytics(to, from);
+        } else if (to.path === "" || to.path === "/") {
+          // Handle empty path or home path
+          this.currentProduct = null;
+          this.loadData();
           this.updateRouteAnalytics(to, from);
         }
       },
@@ -1643,6 +1655,25 @@ const ProductPage = {
     handleProductsLoaded() {
       this.loadData();
       this.isLoading = false;
+    },
+
+    /**
+     * Navigate back to the menu listing page
+     */
+    goBackToMenu() {
+      // Clear current product to switch back to listing view
+      this.currentProduct = null;
+
+      // Navigate back to product listing
+      this.$router.push("/product");
+
+      // Track analytics if enabled
+      if (this.config.enableAnalytics && window.analytics) {
+        window.analytics.track("back_to_menu_clicked", {
+          from: "product_detail",
+          timestamp: new Date().toISOString(),
+        });
+      }
     },
 
     /**
