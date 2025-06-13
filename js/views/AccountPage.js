@@ -1019,11 +1019,10 @@ const AccountPage = {
               }
               break;
           }
-
           if (error) {
-            this.$set(this.profileState.validation.errors, fieldName, error);
+            this.profileState.validation.errors[fieldName] = error;
           } else {
-            this.$delete(this.profileState.validation.errors, fieldName);
+            delete this.profileState.validation.errors[fieldName];
           }
         }
       } catch (error) {
@@ -1083,11 +1082,10 @@ const AccountPage = {
               }
               break;
           }
-
           if (error) {
-            this.$set(this.passwordState.validation.errors, fieldName, error);
+            this.passwordState.validation.errors[fieldName] = error;
           } else {
-            this.$delete(this.passwordState.validation.errors, fieldName);
+            delete this.passwordState.validation.errors[fieldName];
           }
         }
       } catch (error) {

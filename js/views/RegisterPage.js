@@ -783,13 +783,12 @@ const RegisterPage = {
         delete this.validation.debounceTimeouts[fieldName];
       }, this.config.validationDebounceMs);
     },
-
     validateField(fieldName, markTouched = false) {
       try {
         if (markTouched) {
           this.validation.touched[fieldName] = true;
         } // Clear existing error
-        this.$delete(this.validation.errors, fieldName);
+        delete this.validation.errors[fieldName];
 
         const value = this.formData[fieldName];
         const shouldValidate =
@@ -810,7 +809,7 @@ const RegisterPage = {
         }
 
         if (errorMessage) {
-          this.$set(this.validation.errors, fieldName, errorMessage);
+          this.validation.errors[fieldName] = errorMessage;
         }
 
         if (this.config.enableDebugMode) {
@@ -822,26 +821,77 @@ const RegisterPage = {
         }
       } catch (error) {
         console.error(`Error validating field ${fieldName}:`, error);
-        this.$set(
-          this.validation.errors,
-          fieldName,
-          "Validation error occurred"
-        );
+        this.validation.errors[fieldName] = "Validation error occurred";
       }
     },
-
     validateWithService(fieldName, value) {
       try {
         const validationRules = this.getValidationRules(fieldName);
-        return window.ValidationService.validateField(
-          fieldName,
+        const rulesArray = this.convertRulesToArray(validationRules, fieldName);
+        const result = window.ValidationService.validateField(
           value,
-          validationRules
+          rulesArray,
+          fieldName
         );
+
+        return {
+          isValid: result.isValid,
+          message:
+            result.errors && result.errors.length > 0 ? result.errors[0] : null,
+        };
       } catch (error) {
         console.error("ValidationService error:", error);
         return { isValid: false, message: "Validation service error" };
       }
+    },
+
+    convertRulesToArray(rulesObject, fieldName) {
+      const rulesArray = [];
+
+      // Handle required rule
+      if (rulesObject.required) {
+        rulesArray.push({ type: "required" });
+      }
+
+      // Handle minLength rule
+      if (rulesObject.minLength !== undefined) {
+        rulesArray.push({ type: "minLength", length: rulesObject.minLength });
+      }
+
+      // Handle maxLength rule
+      if (rulesObject.maxLength !== undefined) {
+        rulesArray.push({ type: "maxLength", length: rulesObject.maxLength });
+      }
+
+      // Handle pattern rule
+      if (rulesObject.pattern) {
+        rulesArray.push({ type: "pattern", pattern: rulesObject.pattern });
+      }
+
+      // Handle field-specific rules
+      switch (fieldName) {
+        case "email":
+          rulesArray.push({ type: "email" });
+          break;
+        case "firstName":
+        case "lastName":
+          rulesArray.push({ type: "name" });
+          break;
+        case "phone":
+          rulesArray.push({ type: "phone" });
+          break;
+        case "password":
+          rulesArray.push({ type: "password", requireStrong: true });
+          break;
+        case "confirmPassword":
+          rulesArray.push({
+            type: "confirmPassword",
+            original: this.formData.password,
+          });
+          break;
+      }
+
+      return rulesArray;
     },
 
     validateWithBuiltIn(fieldName, value) {
