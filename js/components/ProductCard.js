@@ -226,15 +226,8 @@ window.app.component("product-card", {
                 </span>
               </div>
             </div>
-            
-            <!-- Action Buttons -->
+              <!-- Action Buttons -->
             <div class="d-flex flex-column gap-2">
-              <router-link 
-                :to="productDetailPath" 
-                class="btn btn-sm btn-outline-secondary"
-              >
-                <i class="fas fa-info-circle me-1"></i>Details
-              </router-link>
               <button 
                 v-if="showAddButton" 
                 @click.stop.prevent="addToCart" 
@@ -279,11 +272,9 @@ window.app.component("product-card", {
               decoding="async"
               @load="handleImageLoad"
               @error="handleImageError"
-            >
-            
+            >            
             <!-- Image overlay for hover effects -->
             <div class="image-overlay">
-              <span>View Details</span>
             </div>
               <!-- Discount Ribbon -->
             <div v-if="hasDiscount" class="ribbon">
@@ -425,16 +416,8 @@ window.app.component("product-card", {
                 <i class="fas fa-dumbbell me-1"></i>{{ nutritionalInfo.protein }}g protein
               </span>
             </div>
-            
-            <!-- Action Buttons -->
+              <!-- Action Buttons -->
             <div class="d-flex align-items-center justify-content-between">
-              <router-link 
-                :to="productDetailPath" 
-                class="btn btn-sm btn-outline-secondary"
-                :class="{ 'btn-xs': compactMode }"
-              >
-                <i class="fas fa-info-circle me-1"></i>Details
-              </router-link>
                 <button 
                 v-if="showAddButton" 
                 @click.stop.prevent="addToCart" 
