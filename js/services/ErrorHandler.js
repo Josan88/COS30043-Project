@@ -416,8 +416,3 @@ class ErrorHandler {
 
 // Create and expose singleton instance
 window.ErrorHandler = new ErrorHandler();
-
-// Export for module systems
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ErrorHandler;
-}

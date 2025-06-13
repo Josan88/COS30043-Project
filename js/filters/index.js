@@ -193,17 +193,6 @@ function calculateStats(array, property) {
   };
 }
 
-// Format file size
-function formatFileSize(bytes) {
-  if (!bytes || bytes === 0) return "0 Bytes";
-
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-}
-
 // Format relative time
 function formatRelativeTime(date) {
   if (!date) return "";
@@ -291,17 +280,6 @@ function formatAddress(address) {
   return parts.join(", ");
 }
 
-// Extract initials from name
-function getInitials(name, maxInitials = 2) {
-  if (!name || typeof name !== "string") return "";
-
-  return name
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase())
-    .slice(0, maxInitials)
-    .join("");
-}
-
 // Export filters for global use
 window.Filters = {
   currency: formatCurrency, // Add currency alias
@@ -319,14 +297,12 @@ window.Filters = {
   sortArray,
   groupBy,
   calculateStats,
-  fileSize: formatFileSize,
   relativeTime: formatRelativeTime,
   highlight: highlightText,
   stars: formatStars,
   percentage: formatPercentage,
   pluralize,
   address: formatAddress,
-  initials: getInitials,
 };
 
 // Immediately register filters if app instance exists

@@ -1475,8 +1475,3 @@ if (typeof window !== "undefined") {
     );
   }
 }
-
-// Export the component for module systems
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = RegisterPage;
-}

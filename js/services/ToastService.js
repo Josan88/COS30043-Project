@@ -467,8 +467,3 @@ class ToastService {
 
 // Create and expose singleton instance
 window.ToastService = new ToastService();
-
-// Export for module environments
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ToastService;
-}

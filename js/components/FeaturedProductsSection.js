@@ -41,26 +41,35 @@ const FeaturedProductsSection = {
           v-for="(product, index) in products" 
           :key="product.id" 
           class="card"
-          v-scroll-reveal="{ delay: index * 150, threshold: 0.2 }"        >
-          <div class="card-image-container">
-            <img 
-              v-if="product.image" 
-              :src="product.image" 
-              :alt="product.name"
-              class="food-image responsive-image"
-              loading="lazy"
-            />
-            <div v-else class="image-placeholder">
-              <i class="fas fa-utensils"></i>
-              <span>{{ product.name }}</span>
-            </div>
-            <div class="image-overlay">
-              <span>View Details</span>
-            </div>
+          v-scroll-reveal="{ delay: index * 150, threshold: 0.2 }"        >          <div class="card-image-container">
+            <router-link 
+              :to="'/product/' + product.id" 
+              :aria-label="'View details for ' + product.name"
+              class="d-block image-link"
+            >
+              <img 
+                v-if="product.image" 
+                :src="product.image" 
+                :alt="product.name"
+                class="food-image responsive-image"
+                loading="lazy"
+              />
+              <div v-else class="image-placeholder">
+                <i class="fas fa-utensils"></i>
+                <span>{{ product.name }}</span>
+              </div>
+              <div class="image-overlay">
+                <span>View Details</span>
+              </div>
+            </router-link>
           </div>
-          
-          <div class="card-content">
-            <h3 class="card-title">{{ product.name }}</h3>
+            <div class="card-content">
+            <router-link 
+              :to="'/product/' + product.id" 
+              class="text-decoration-none"
+            >
+              <h3 class="card-title">{{ product.name }}</h3>
+            </router-link>
             
             <div class="card-rating" v-if="product.rating">
               <span class="stars">

@@ -570,14 +570,11 @@ const PurchasesPage = {
             </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Cancel Order Confirmation Modal -->
-      <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-hidden="true">
+      </div>      <!-- Cancel Order Confirmation Modal -->
+      <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel">
         <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">Cancel Order</h5>
+          <div class="modal-content">            <div class="modal-header">
+              <h5 class="modal-title" id="cancelOrderModalLabel">Cancel Order</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -1090,16 +1087,11 @@ const PurchasesPage = {
     this.performance.componentMountTime = Date.now();
 
     // Apply custom styles for timeline and rating
-    this.applyCustomStyles();
-
-    // Setup event listeners
+    this.applyCustomStyles(); // Setup event listeners
     this.setupEventListeners();
 
     // Initialize UI state
     this.initializeUIState();
-
-    // Setup auto-refresh if enabled
-    this.setupAutoRefresh();
 
     // Mark component as initialized
     this.componentState.isInitialized = true;
@@ -1116,14 +1108,7 @@ const PurchasesPage = {
   },
 
   beforeUnmount() {
-    // Cleanup event listeners
-    this.cleanupEventListeners();
-
-    // Clear intervals
-    this.clearAutoRefresh();
-
-    // Cleanup performance monitoring
-    this.cleanupPerformanceMonitoring();
+    // Cleanup event listeners    this.cleanupEventListeners();
 
     // Debug logging
     if (this.componentState.debugMode) {
@@ -1266,10 +1251,6 @@ const PurchasesPage = {
       this.ui.isLoading = false;
       this.componentState.isLoading = false;
     },
-    setupAutoRefresh() {
-      // Auto-refresh mechanism has been removed
-      // Orders will only be loaded manually or on component mount
-    },
 
     // === CLEANUP METHODS ===
     cleanupEventListeners() {
@@ -1288,15 +1269,6 @@ const PurchasesPage = {
       if (this.keydownHandler) {
         document.removeEventListener("keydown", this.keydownHandler);
       }
-    },
-    clearAutoRefresh() {
-      // Auto-refresh mechanism has been removed
-      // This method is kept for compatibility but does nothing
-    },
-
-    cleanupPerformanceMonitoring() {
-      // Clear any performance monitoring intervals or cleanup
-      this.performance = null;
     },
 
     // === VALIDATION METHODS ===
@@ -1722,30 +1694,23 @@ const PurchasesPage = {
         }
       }
     },
-
     normalizeOrder(order) {
       // Ensure all required fields exist with defaults
-      return {
+      const normalized = {
         id: order.id || Date.now(),
         userId: order.userId || this.getCurrentUserId(),
         orderTime: order.orderTime || new Date().toISOString(),
         status: order.status || "pending",
         items: order.items || [],
-        totals: {
-          subtotal: order.totals?.subtotal || 0,
-          tax: order.totals?.tax || 0,
-          deliveryFee: order.totals?.deliveryFee || 0,
-          total: order.totals?.total || 0,
-          ...order.totals,
-        },
         delivery: {
-          method: order.delivery?.method || "delivery",
+          method: order.delivery?.method || order.serviceMethod || "delivery",
           details: order.delivery?.details || {},
           ...order.delivery,
         },
         payment: {
           method: order.payment?.method || "card",
           details: order.payment?.details || {},
+          amount: order.payment?.amount || order.totals?.total || 0,
           ...order.payment,
         },
         promoCode: order.promoCode || null,
@@ -1757,6 +1722,64 @@ const PurchasesPage = {
         cancellationReason: order.cancellationReason || null,
         estimatedDeliveryTime: order.estimatedDeliveryTime || null,
       };
+
+      // Handle totals with proper fallback calculation
+      if (
+        order.totals &&
+        typeof order.totals.total === "number" &&
+        order.totals.total > 0
+      ) {
+        // Use existing totals if they look valid
+        normalized.totals = {
+          subtotal: order.totals.subtotal || 0,
+          serviceCharge: order.totals.serviceCharge || 0,
+          tax: order.totals.tax || 0,
+          deliveryFee: order.totals.deliveryFee || 0,
+          total: order.totals.total,
+          ...order.totals,
+        };
+        console.log(
+          `Order ${order.id}: Using existing totals - Total: ${order.totals.total}`
+        );
+      } else {
+        // Calculate totals from items if totals are missing or invalid
+        console.log(
+          `Order ${order.id}: Calculating totals from items`,
+          order.items
+        );
+        const itemsSubtotal = (order.items || []).reduce((sum, item) => {
+          const itemPrice = item.finalPrice || item.price || 0;
+          const itemQuantity = item.quantity || 1;
+          console.log(
+            `  Item: ${
+              item.name
+            } - Price: ${itemPrice} x Qty: ${itemQuantity} = ${
+              itemPrice * itemQuantity
+            }`
+          );
+          return sum + itemPrice * itemQuantity;
+        }, 0);
+        // Apply basic calculations (using the same rates as ShoppingCart)
+        const serviceChargeRate = 0.05; // 5% - matches PRICING_CONFIG.SERVICE_CHARGE_RATE
+        const taxRate = 0.06; // 6% - matches PRICING_CONFIG.TAX_RATE
+        const serviceCharge = itemsSubtotal * serviceChargeRate;
+        const tax = (itemsSubtotal + serviceCharge) * taxRate;
+        const deliveryFee = order.totals?.deliveryFee || 0;
+        const total = itemsSubtotal + serviceCharge + tax + deliveryFee;
+
+        normalized.totals = {
+          subtotal: Math.round(itemsSubtotal * 100) / 100,
+          serviceCharge: Math.round(serviceCharge * 100) / 100,
+          tax: Math.round(tax * 100) / 100,
+          deliveryFee: deliveryFee,
+          total: Math.round(total * 100) / 100,
+        };
+
+        console.log(
+          `Order ${order.id}: Calculated totals - Subtotal: ${normalized.totals.subtotal}, Total: ${normalized.totals.total}`
+        );
+      }
+      return normalized;
     },
 
     updateOrderCache(orders) {
@@ -1775,44 +1798,6 @@ const PurchasesPage = {
       this.loadOrders();
     },
 
-    // New method to ensure all orders have the required structure
-    normalizeOrder(order) {
-      // Create a copy to avoid modifying the original
-      const normalizedOrder = { ...order };
-
-      // Ensure order has the required properties
-      normalizedOrder.totals = normalizedOrder.totals || {
-        subtotal: 0,
-        tax: 0,
-        deliveryFee: 0,
-        total: 0,
-      };
-      normalizedOrder.items = normalizedOrder.items || [];
-      normalizedOrder.status = normalizedOrder.status || "pending";
-      normalizedOrder.orderTime =
-        normalizedOrder.orderTime ||
-        order.orderDate ||
-        new Date().toISOString();
-
-      // Ensure order has delivery info
-      normalizedOrder.delivery = normalizedOrder.delivery || {
-        method: order.serviceMethod || "delivery",
-        details: {},
-      };
-
-      // Convert older format orders to new format
-      if (!normalizedOrder.delivery.method && normalizedOrder.serviceMethod) {
-        normalizedOrder.delivery = {
-          method: normalizedOrder.serviceMethod,
-          details: {
-            line1: normalizedOrder.deliveryAddress || "",
-            notes: normalizedOrder.specialRequests || "",
-          },
-        };
-      }
-
-      return normalizedOrder;
-    },
     filterOrders() {
       try {
         // Start performance tracking
@@ -2427,25 +2412,163 @@ const PurchasesPage = {
         this.filterOrders();
       }
     },
+    async reorderItems(order) {
+      try {
+        // Validate that order and items exist
+        if (!order || !order.items || !Array.isArray(order.items)) {
+          console.error("Invalid order data:", order);
+          if (window.toast) {
+            window.toast.error("Invalid order data. Cannot reorder items.");
+          } else {
+            alert("Invalid order data. Cannot reorder items.");
+          }
+          return;
+        }
 
-    reorderItems(order) {
-      // First clear the cart
-      window.CartService.clearCart();
+        // Validate that CartService is available
+        if (
+          !window.CartService ||
+          typeof window.CartService.addToCart !== "function"
+        ) {
+          console.error("CartService not available");
+          if (window.toast) {
+            window.toast.error(
+              "Cart service is not available. Please try again later."
+            );
+          } else {
+            alert("Cart service is not available. Please try again later.");
+          }
+          return;
+        } // Validate that ProductService is available
+        if (
+          !window.ProductService ||
+          typeof window.ProductService.getProductById !== "function"
+        ) {
+          console.error("ProductService not available");
+          if (window.toast) {
+            window.toast.error(
+              "Product service is not available. Please try again later."
+            );
+          } else {
+            alert("Product service is not available. Please try again later.");
+          }
+          return;
+        } // Ensure ProductService is initialized
+        try {
+          await window.ProductService.ensureInitialized();
+          const totalProducts = window.ProductService.menuItems.length;
+          console.log(
+            `ProductService initialized successfully with ${totalProducts} products`
+          );
+        } catch (error) {
+          console.error("Failed to initialize ProductService:", error);
+          if (window.toast) {
+            window.toast.error(
+              "Failed to load product catalog. Please try again later."
+            );
+          } else {
+            alert("Failed to load product catalog. Please try again later.");
+          }
+          return;
+        } // First clear the cart
+        window.CartService.clearCart();
 
-      // Add all items from the order to the cart
-      order.items.forEach((item) => {
-        window.CartService.addToCart({
-          id: item.id,
-          quantity: item.quantity,
-          specialInstructions: item.specialInstructions || "",
-        });
-      });
+        console.log("Reordering items:", order.items);
 
-      // Redirect to cart page
-      this.$router.push("/cart");
+        // Add all items from the order to the cart
+        let itemsAdded = 0;
+        let itemsSkipped = 0;
+        for (let index = 0; index < order.items.length; index++) {
+          const item = order.items[index];
+          try {
+            // Validate item data
+            if (!item || typeof item !== "object") {
+              console.warn(`Invalid item at index ${index}:`, item);
+              itemsSkipped++;
+              continue;
+            }
 
-      // Show success message
-      alert("Items have been added to your cart!");
+            // Try different possible ID fields
+            const itemId = item.id || item.productId || item.itemId;
+
+            if (!itemId) {
+              console.warn(`Item at index ${index} missing ID:`, item);
+              itemsSkipped++;
+              continue;
+            } // Get the full product details from ProductService (await the async call)
+            console.log(`Looking for product with ID: ${itemId}`);
+            try {
+              const productDetails = await window.ProductService.getProductById(
+                itemId
+              );
+              console.log(`Found product:`, productDetails);
+              if (productDetails) {
+                // Prepare options object with customizations and special instructions
+                const options = {
+                  specialInstructions: item.specialInstructions || "",
+                  customizations: item.customizations || [],
+                  ...item.options, // Merge any existing options
+                };
+
+                // Call addToCart with correct parameter structure
+                window.CartService.addToCart(
+                  productDetails, // Product details object
+                  item.quantity || 1, // Quantity as separate parameter
+                  options // Options as separate parameter
+                );
+                itemsAdded++;
+              }
+            } catch (productError) {
+              console.warn(
+                `Product with ID ${itemId} not found in catalog, skipping:`,
+                productError.message
+              );
+              itemsSkipped++;
+            }
+          } catch (error) {
+            console.error(
+              `Error adding item at index ${index} to cart:`,
+              error,
+              item
+            );
+            itemsSkipped++;
+          }
+        }
+
+        if (itemsAdded > 0) {
+          // Redirect to cart page
+          this.$router.push("/cart"); // Show success message with additional info if items were skipped
+          const successMessage =
+            itemsSkipped > 0
+              ? `${itemsAdded} items have been added to your cart! ${itemsSkipped} items were skipped (no longer available).`
+              : `${itemsAdded} items have been added to your cart!`;
+
+          if (window.toast) {
+            window.toast.success(successMessage);
+          } else {
+            alert(successMessage);
+          }
+        } else {
+          // Show error message if no items could be added
+          const errorMessage =
+            itemsSkipped > 0
+              ? "Could not add any items to cart. All products may no longer be available."
+              : "Could not add items to cart. Some products may no longer be available.";
+
+          if (window.toast) {
+            window.toast.error(errorMessage);
+          } else {
+            alert(errorMessage);
+          }
+        }
+      } catch (error) {
+        console.error("Error during reorder:", error);
+        if (window.toast) {
+          window.toast.error("An error occurred while adding items to cart.");
+        } else {
+          alert("An error occurred while adding items to cart.");
+        }
+      }
     },
 
     getStatusBadgeClass(status) {

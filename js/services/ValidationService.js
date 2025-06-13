@@ -597,8 +597,3 @@ class ValidationService {
 
 // Create and expose singleton instance
 window.ValidationService = new ValidationService();
-
-// Export for module environments
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ValidationService;
-}

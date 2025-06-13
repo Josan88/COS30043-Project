@@ -506,8 +506,3 @@ class ImageOptimizationService {
 
 // Initialize service
 window.ImageOptimizationService = new ImageOptimizationService();
-
-// Export for module systems
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = ImageOptimizationService;
-}

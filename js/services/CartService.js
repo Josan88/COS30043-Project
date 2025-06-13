@@ -145,8 +145,7 @@ class CartService {
    * @param {Object} item - The product item
    * @param {Number} quantity - Requested quantity
    * @returns {Boolean} - True if stock is sufficient
-   */
-  validateStock(item, quantity) {
+   */ validateStock(item, quantity) {
     // Check if item has stock property
     if (typeof item.stock !== "number") {
       // Try to get stock from ProductService if available
@@ -164,9 +163,17 @@ class CartService {
         }
       }
 
-      console.warn(
-        `Product ${item.name} (ID: ${item.id}) missing stock information, allowing add to cart`
-      );
+      // Only log warning in development environment to reduce console noise
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
+        console.warn(
+          `Product ${item.name || "Unknown"} (ID: ${
+            item.id
+          }) missing stock information, allowing add to cart`
+        );
+      }
       return true; // Allow if stock info is missing (backward compatibility)
     }
 
@@ -202,6 +209,45 @@ class CartService {
    * @param {Object} options - Special instructions and customization options
    */
   addToCart(item, quantity = 1, options = {}) {
+    // Validate input parameters
+    if (!item || typeof item !== "object") {
+      const error = new Error("Invalid item: item must be a valid object");
+      error.code = "INVALID_ITEM";
+      throw error;
+    }
+
+    if (!item.id) {
+      const error = new Error(
+        `Invalid item: missing required ID. Item: ${JSON.stringify(item)}`
+      );
+      error.code = "MISSING_ITEM_ID";
+      throw error;
+    }
+
+    if (!item.name) {
+      const error = new Error(
+        `Invalid item: missing required name for item ID ${item.id}`
+      );
+      error.code = "MISSING_ITEM_NAME";
+      throw error;
+    }
+
+    if (typeof item.price !== "number" || item.price < 0) {
+      const error = new Error(
+        `Invalid item: invalid price for item ${item.name} (ID: ${item.id})`
+      );
+      error.code = "INVALID_ITEM_PRICE";
+      throw error;
+    }
+
+    if (typeof quantity !== "number" || quantity <= 0) {
+      const error = new Error(
+        `Invalid quantity: must be a positive number, got ${quantity}`
+      );
+      error.code = "INVALID_QUANTITY";
+      throw error;
+    }
+
     // Check stock availability
     if (!this.validateStock(item, quantity)) {
       const error = new Error(
@@ -541,35 +587,6 @@ class CartService {
   }
 
   /**
-   * Clear cart data for all users (admin function)
-   * WARNING: This will delete all cart data in localStorage
-   */
-  clearAllCartData() {
-    try {
-      // Get all localStorage keys
-      const keys = Object.keys(localStorage);
-
-      // Filter and remove cart-related keys
-      keys.forEach((key) => {
-        if (
-          key.startsWith(this.config.STORAGE_KEY) ||
-          key.startsWith(this.config.ORDERS_STORAGE_KEY)
-        ) {
-          localStorage.removeItem(key);
-        }
-      });
-
-      // Clear current cart
-      this.cart = [];
-      this.updateCartTotals();
-
-      console.log("All cart data cleared");
-    } catch (error) {
-      console.error("Error clearing all cart data:", error);
-    }
-  }
-
-  /**
    * Update cart totals with configurable tax and delivery fees
    */
   updateCartTotals() {
@@ -698,10 +715,13 @@ class CartService {
       // Generate estimated delivery/pickup time
       const deliveryInfo = this.getEstimatedDeliveryTime();
       orderDetails.estimatedDelivery = deliveryInfo.estimatedTime;
-      orderDetails.estimatedMinutes = deliveryInfo.minutes;
-
-      // Submit order to database service - using correct method name addOrder
-      const orderId = await DatabaseService.addOrder(orderDetails);
+      orderDetails.estimatedMinutes = deliveryInfo.minutes; // Submit order to database service - using correct method name addOrder
+      const sanitizedOrderDetails = this.sanitizeOrderData(orderDetails);
+      console.log(
+        "Submitting order with sanitized data:",
+        sanitizedOrderDetails
+      );
+      const orderId = await DatabaseService.addOrder(sanitizedOrderDetails);
       orderDetails.id = orderId; // Add the ID to the order details
 
       // Clear cart after successful order
@@ -885,6 +905,55 @@ class CartService {
   }
 
   /**
+   * Sanitize order data for database storage
+   * Removes Vue reactivity proxies and functions that can't be cloned
+   */
+  sanitizeOrderData(orderDetails) {
+    try {
+      // Deep clone to remove Vue reactivity and convert to plain objects
+      const sanitized = JSON.parse(JSON.stringify(orderDetails));
+
+      // Ensure items array is properly sanitized
+      if (sanitized.items && Array.isArray(sanitized.items)) {
+        sanitized.items = sanitized.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          finalPrice: item.finalPrice || item.price,
+          subtotal: (item.finalPrice || item.price) * item.quantity,
+          image: item.image || "",
+          category: item.category || "",
+          specialInstructions: item.specialInstructions || "",
+          customizations: Array.isArray(item.customizations)
+            ? item.customizations
+            : [],
+          options: typeof item.options === "object" ? item.options : {},
+        }));
+      }
+
+      return sanitized;
+    } catch (error) {
+      console.error("Error sanitizing order data:", error);
+      // Fallback: create a minimal order object
+      return {
+        items: (orderDetails.items || []).map((item) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price || 0,
+          quantity: item.quantity || 1,
+          finalPrice: item.finalPrice || item.price || 0,
+          subtotal: (item.finalPrice || item.price || 0) * (item.quantity || 1),
+        })),
+        totals: orderDetails.totals || {},
+        orderDate: orderDetails.orderDate || new Date().toISOString(),
+        orderNumber: orderDetails.orderNumber || this.generateOrderNumber(),
+        status: orderDetails.status || "pending",
+      };
+    }
+  }
+
+  /**
    * Add event listener for cart changes
    */
   addEventListener(event, callback) {
@@ -964,21 +1033,55 @@ class CartService {
                 options: item.options || {},
               };
             }
-            // If product not found, return original cart item
-            return item;
+            // If product not found, return null to filter out later
+            console.warn(
+              `Product ${item.id} not found in catalog, removing from cart`
+            );
+            return null;
           })
           .catch((error) => {
             console.error(
               `Error resolving product details for ${item.id}:`,
               error
             );
-            return item;
+            return null; // Return null to filter out problematic items
           });
       } catch (error) {
         console.error(`Error getting details for product ${item.id}:`, error);
-        return item;
+        return null; // Return null to filter out problematic items
       }
     });
+  }
+
+  /**
+   * Validate that a cart item has all required properties and correct data types
+   * @param {Object} item - The item to validate
+   * @returns {boolean} True if item is valid, false otherwise
+   */
+  isValidCartItem(item) {
+    // Check if item exists and is an object
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+
+    // Check for required properties
+    const requiredProps = ["id", "name", "price", "quantity"];
+    const missingProps = requiredProps.filter((prop) => !(prop in item));
+
+    if (missingProps.length > 0) {
+      return false;
+    }
+
+    // Check data types
+    if (
+      typeof item.price !== "number" ||
+      typeof item.quantity !== "number" ||
+      item.quantity <= 0
+    ) {
+      return false;
+    }
+
+    return true;
   }
 }
 

@@ -377,18 +377,38 @@ const ShoppingCart = {
       const errors = this.getValidationErrors();
       this.validationErrors = errors;
       return Object.keys(errors).length === 0;
-    },
-
+    }
     /**
      * Calculate delivery fee
-     */
+     * Only delivery orders are charged delivery fees
+     * Pickup and dine-in orders have no delivery fee
+     */,
     deliveryFee() {
-      if (this.serviceMethod !== "delivery") return 0;
+      // Debug logging
+      console.log(
+        `Service method: '${this.serviceMethod}', Subtotal: ${this.cartSummary.subtotal}`
+      );
 
-      return this.cartSummary.subtotal >=
-        this.config.pricing.freeDeliveryThreshold
-        ? 0
-        : this.config.pricing.deliveryFee;
+      // Explicitly exclude pickup and dine-in from delivery charges
+      if (this.serviceMethod === "pickup" || this.serviceMethod === "dine-in") {
+        console.log("No delivery fee - pickup or dine-in service");
+        return 0;
+      }
+
+      // Only charge delivery fee for delivery orders
+      if (this.serviceMethod !== "delivery") {
+        console.log("No delivery fee - not a delivery order");
+        return 0;
+      }
+
+      // Check if order qualifies for free delivery
+      const fee =
+        this.cartSummary.subtotal >= this.config.pricing.freeDeliveryThreshold
+          ? 0
+          : this.config.pricing.deliveryFee;
+
+      console.log(`Delivery fee calculated: ${fee}`);
+      return fee;
     },
   },
 
@@ -548,9 +568,7 @@ const ShoppingCart = {
         }
 
         // Get cart items with details (returns array of promises)
-        const cartDetailsPromises = window.CartService.getCartWithDetails();
-
-        // Wait for all promises to resolve if we have promises
+        const cartDetailsPromises = window.CartService.getCartWithDetails(); // Wait for all promises to resolve if we have promises
         let cartDetails = [];
         if (Array.isArray(cartDetailsPromises)) {
           // Check if first item is a promise
@@ -560,14 +578,46 @@ const ShoppingCart = {
             typeof cartDetailsPromises[0].then === "function"
           ) {
             cartDetails = await Promise.all(cartDetailsPromises);
+            // Filter out null results from failed product lookups
+            cartDetails = cartDetails.filter((item) => item !== null);
           } else {
-            // Already resolved items
-            cartDetails = cartDetailsPromises;
+            // Already resolved items, filter out nulls
+            cartDetails = cartDetailsPromises.filter((item) => item !== null);
           }
-        } // Ensure we have valid cart items
-        this.cartItems = cartDetails.filter(
-          (item) => item && typeof item === "object"
-        );
+        }
+
+        // Ensure we have valid cart items with all required properties
+        this.cartItems = cartDetails.filter((item) => {
+          const isValid = window.CartService.isValidCartItem(item);
+          if (!isValid) {
+            console.warn("Invalid cart item filtered out:", item);
+          }
+          return isValid;
+        });
+
+        // If we filtered out invalid items, update the cart storage to remove them
+        const originalCartLength = window.CartService.getCart().length;
+        const validCartLength = this.cartItems.length;
+
+        if (originalCartLength > validCartLength) {
+          console.log(
+            `Cleaned up ${
+              originalCartLength - validCartLength
+            } invalid items from cart`
+          );
+          // Rebuild cart with only valid items
+          const validItemIds = this.cartItems.map((item) => item.id);
+          const currentCart = window.CartService.getCart();
+          const cleanedCart = currentCart.filter(
+            (item) => item && item.id && validItemIds.includes(item.id)
+          );
+
+          // Save the cleaned cart back to storage
+          if (cleanedCart.length !== currentCart.length) {
+            window.CartService.cart = cleanedCart;
+            window.CartService.saveCart();
+          }
+        }
 
         this.recalculateCart();
       } catch (error) {
@@ -624,7 +674,14 @@ const ShoppingCart = {
           discountedSubtotal * this.config.pricing.serviceChargeRate;
         const tax =
           (discountedSubtotal + serviceCharge) * this.config.pricing.taxRate;
-        const deliveryFee = this.deliveryFee || 0;
+
+        // Calculate delivery fee - explicitly ensure pickup and dine-in have no delivery fee
+        let deliveryFee = 0;
+        if (this.serviceMethod === "delivery") {
+          deliveryFee = this.deliveryFee || 0;
+        }
+        // Pickup and dine-in explicitly have no delivery fee
+
         const total = discountedSubtotal + serviceCharge + tax + deliveryFee;
 
         this.cartSummary = {
@@ -945,15 +1002,31 @@ const ShoppingCart = {
       } catch (error) {
         this.handleError(error, "Failed to clear cart");
       }
-    },
-
+    }
     /**
      * Handle service method update
-     */
+     */,
     handleServiceMethodUpdate(newMethod) {
-      this.serviceMethod = newMethod;
+      // Sanitize and validate service method
+      const validMethods = ["dine-in", "pickup", "delivery"];
+      const sanitizedMethod = (newMethod || "").trim().toLowerCase();
+
+      if (!validMethods.includes(sanitizedMethod)) {
+        console.warn(
+          `Invalid service method: ${newMethod}, defaulting to dine-in`
+        );
+        this.serviceMethod = "dine-in";
+      } else {
+        this.serviceMethod = sanitizedMethod;
+      }
+
       this.clearFieldsForServiceMethod();
       this.showServiceMethodMessage();
+
+      // Force recalculation to ensure delivery fees are updated
+      this.$nextTick(() => {
+        this.recalculateCart();
+      });
     },
 
     /**
@@ -1337,9 +1410,19 @@ const ShoppingCart = {
     buildOrderData() {
       return {
         items: this.cartItems.map((item) => ({
-          ...item,
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
           finalPrice: item.price,
           subtotal: item.price * item.quantity,
+          image: item.image || "",
+          category: item.category || "",
+          specialInstructions: item.specialInstructions || "",
+          customizations: Array.isArray(item.customizations)
+            ? [...item.customizations]
+            : [],
+          options: item.options ? { ...item.options } : {},
         })),
         totals: {
           ...this.cartSummary,

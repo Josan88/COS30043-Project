@@ -319,26 +319,3 @@ window.Helpers.setNestedProperty = function (obj, path, value) {
 
 // Log successful initialization
 console.log("✅ Helpers v2.0.0 - Enhanced Edition loaded successfully");
-
-// Also provide backward compatibility for existing code that might expect individual functions
-if (typeof window !== "undefined") {
-  // Export individual functions to global scope for backward compatibility
-  window.debounce = window.Helpers.debounce;
-  window.throttle = window.Helpers.throttle;
-  window.deepClone = window.Helpers.deepClone;
-  window.isEmpty = window.Helpers.isEmpty;
-  window.generateId = window.Helpers.generateId;
-  window.isValidEmail = window.Helpers.isValidEmail;
-  window.isValidPhone = window.Helpers.isValidPhone;
-  window.formatPrice = window.Helpers.formatPrice;
-  window.formatDate = window.Helpers.formatDate;
-  window.calculateDeliveryTime = window.Helpers.calculateDeliveryTime;
-  window.truncateText = window.Helpers.truncateText;
-  window.capitalizeWords = window.Helpers.capitalizeWords;
-  window.calculateDiscountPrice = window.Helpers.calculateDiscountPrice;
-  window.getResponsiveImageUrl = window.Helpers.getResponsiveImageUrl;
-  window.safeJsonParse = window.Helpers.safeJsonParse;
-  window.delay = window.Helpers.delay;
-  window.getNestedProperty = window.Helpers.getNestedProperty;
-  window.setNestedProperty = window.Helpers.setNestedProperty;
-}

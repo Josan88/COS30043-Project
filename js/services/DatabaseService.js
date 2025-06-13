@@ -310,15 +310,22 @@ const DatabaseService = {
         // Add order date if not provided
         if (!orderData.orderDate) {
           orderData.orderDate = new Date().toISOString();
-        }
-
-        // Set initial status if not provided
+        } // Set initial status if not provided
         if (!orderData.status) {
           orderData.status = "pending";
         }
 
+        // Ensure the order data is serializable (remove any functions or non-cloneable objects)
+        let cleanOrderData;
+        try {
+          cleanOrderData = JSON.parse(JSON.stringify(orderData));
+        } catch (error) {
+          console.error("Order data contains non-serializable content:", error);
+          throw new Error("Order data cannot be serialized for storage");
+        }
+
         // Add the order
-        const request = store.add(orderData);
+        const request = store.add(cleanOrderData);
 
         request.onsuccess = (event) => {
           const orderId = event.target.result;
