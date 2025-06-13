@@ -2772,3 +2772,961 @@ img {
 .list-mode-card .badge.small {
   font-size: 0.7rem;
 }
+
+/* ===========================================
+     ENHANCED PRODUCT CARD MODERN DESIGN
+     =========================================== */
+
+/* Modern Card Base Styles */
+.modern-card {
+  background: #ffffff;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+}
+
+.modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Enhanced Shadow System */
+.shadow-elevated {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.hover-rise-enhanced:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.08),
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 24px 48px rgba(0, 0, 0, 0.08);
+}
+
+/* Status Badges */
+.status-badges {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.trending-badge {
+  background: linear-gradient(135deg, #ff6b6b, #ff5722);
+  color: white;
+  animation: pulse-glow 2s infinite;
+}
+
+.featured-badge {
+  background: linear-gradient(135deg, #ffd700, #ffb300);
+  color: #333;
+}
+
+.new-badge {
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 4px 16px rgba(255, 107, 107, 0.6); }
+}
+
+/* Modern Image Container */
+.modern-image-container {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px 16px 0 0;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.modern-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.image-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modern-card:hover .image-gradient-overlay {
+  opacity: 1;
+}
+
+.modern-card:hover .modern-image {
+  transform: scale(1.1);
+}
+
+/* Enhanced Image Overlay */
+.modern-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0,  0, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(2px);
+}
+
+.overlay-content {
+  text-align: center;
+  color: white;
+  transform: translateY(20px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.overlay-content i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.overlay-content span {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.modern-card:hover .modern-image-overlay {
+  opacity: 1;
+}
+
+.modern-card:hover .overlay-content {
+  transform: translateY(0);
+}
+
+/* Modern Ribbon Design */
+.modern-ribbon {
+  position: absolute;
+  top: 16px;
+  right: -10px;
+  z-index: 15;
+  transform: rotate(10deg);
+}
+
+.ribbon-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  padding: 6px 16px 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: 4px;
+  box-shadow: 
+    0 2px 8px rgba(231, 76, 60, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.ribbon-content::after {
+  content: '';
+  position: absolute;
+  right: -4px;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 100% 8px;
+  border-color: transparent transparent #a93226 transparent;
+}
+
+/* Modern Favorite Button */
+.modern-favorite-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: none;
+  color: #666;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modern-favorite-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modern-favorite-btn .fa-heart.text-danger {
+  color: #e74c3c !important;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(0.9); }
+  20%, 40%, 60%, 80% { transform: scale(1.1); }
+  50%, 70% { transform: scale(1.05); }
+}
+
+.button-ripple {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.modern-favorite-btn:active .button-ripple {
+  width: 60px;
+  height: 60px;
+}
+
+/* Modern Dietary Badges */
+.dietary-badges-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.modern-dietary-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 8px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.modern-dietary-badge:hover {
+  transform: scale(1.05);
+}
+
+.modern-dietary-badge.bg-success {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+}
+
+.modern-dietary-badge .badge-text {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .modern-dietary-badge .badge-text {
+    display: inline;
+  }
+}
+
+/* Modern Card Body */
+.modern-card-body {
+  padding: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Modern Title */
+.modern-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.title-link:hover .modern-title {
+  color: #3498db;
+}
+
+.spicy-indicator {
+  margin-left: 0.5rem;
+}
+
+.spicy-indicator .fa-pepper-hot {
+  font-size: 0.8rem;
+  margin-left: 1px;
+}
+
+/* Modern Time Badge */
+.modern-time-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  color: #6c757d;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced Rating System */
+.modern-ratings {
+  margin-bottom: 0.75rem;
+}
+
+.star-rating-modern {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.stars-background, .stars-foreground {
+  display: flex;
+  gap: 1px;
+}
+
+.stars-background {
+  color: #dee2e6;
+}
+
+.stars-foreground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #ffd700;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.rating-text {
+  font-weight: 700;
+  color: #2c3e50;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.reviews-count {
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-left: 0.25rem;
+}
+
+/* Modern Description */
+.modern-description {
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Enhanced Price Section */
+.price-section {
+  margin-bottom: 1rem;
+}
+
+.price-display {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.original-price {
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.current-price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.regular-price {
+  color: #2c3e50;
+}
+
+.discounted-price {
+  color: #e74c3c;
+}
+
+.savings-badge {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Modern Stock Badges */
+.modern-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modern-stock-badge.in-stock {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.modern-stock-badge.low-stock {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.modern-stock-badge.out-of-stock {
+  background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Modern Stock Overlay */
+.modern-stock-overlay {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+}
+
+.stock-status-card {
+  background: rgba(255, 255, 255, 0.95);
+  color: #721c24;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.stock-status-card i {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Nutritional Info */
+.nutritional-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.nutrition-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.nutrition-item.calories i {
+  color: #ff6b35;
+}
+
+.nutrition-item.protein i {
+  color: #4ecdc4;
+}
+
+/* Modern Add to Cart Button */
+.modern-add-btn {
+  position: relative;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modern-add-btn.btn-success {
+  background: linear-gradient(135deg, #27ae60, #2ecc71);
+  color: white;
+}
+
+.modern-add-btn.btn-warning {
+  background: linear-gradient(135deg, #f39c12, #e67e22);
+  color: white;
+}
+
+.modern-add-btn.btn-disabled {
+  background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.modern-add-btn:not(.btn-disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(39, 174, 96, 0.25);
+}
+
+.button-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.button-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.modern-add-btn:hover .button-background {
+  opacity: 1;
+}
+
+/* List Mode Enhancements */
+.modern-list-layout {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.list-image-container.modern-image-container {
+  border-radius: 16px 0 0 16px;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 575.98px) {
+  .modern-card-body {
+    padding: 1rem;
+  }
+  
+  .modern-title {
+    font-size: 1rem;
+  }
+  
+  .current-price {
+    font-size: 1.1rem;
+  }
+  
+  .modern-add-btn {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .modern-list-layout {
+    flex-direction: column !important;
+  }
+  
+  .list-image-container.modern-image-container {
+    border-radius: 16px 16px 0 0;
+    width: 100% !important;
+    height: 150px !important;
+    margin-right: 0 !important;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Animation Classes */
+.card-trending {
+  animation: subtle-pulse 3s ease-in-out infinite;
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.01); }
+}
+
+.card-featured::before {
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 179, 0, 0.05) 100%);
+}
+
+.card-new {
+  position: relative;
+}
+
+.card-new::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(0, 242, 254, 0.05) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Loading States */
+.lazy-loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .modern-card {
+    background: linear-gradient(145deg, #2c3e50 0%, #34495e 100%);
+    color: #ecf0f1;
+  }
+  
+  .modern-title {
+    color: #ecf0f1;
+  }
+  
+  .title-link:hover .modern-title {
+    color: #3498db;
+  }
+  
+  .modern-description {
+    color: #bdc3c7;
+  }
+  
+  .regular-price {
+    color: #ecf0f1;
+  }
+}
+
+/* ===========================================
+     ADVANCED MICRO-INTERACTIONS & EFFECTS
+     =========================================== */
+
+/* Smooth Page Transitions */
+.product-card {
+  will-change: transform, box-shadow;
+}
+
+/* Enhanced Hover Effects with Staggered Animations */
+.modern-card:hover .modern-title {
+  transform: translateX(4px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-card:hover .modern-description {
+  transform: translateX(2px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.modern-card:hover .price-display {
+  transform: translateX(3px);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.2s;
+}
+
+/* Glassmorphism Effects */
+.modern-favorite-btn,
+.modern-time-badge,
+.modern-dietary-badge {
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Advanced Button Interactions */
+.modern-add-btn {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.modern-add-btn:active {
+  transform: translateY(-2px) rotateX(5deg);
+}
+
+.modern-add-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s;
+  z-index: 1;
+}
+
+.modern-add-btn:hover::before {
+  left: 100%;
+}
+
+/* Progressive Image Loading Effect */
+.modern-image {
+  filter: blur(0px);
+  transition: filter 0.5s ease;
+}
+
+.modern-image.lazy-loading {
+  filter: blur(5px);
+}
+
+/* Card Entrance Animations */
+.modern-card {
+  animation: cardEntrance 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+@keyframes cardEntrance {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered Card Animations */
+.modern-card:nth-child(1) { animation-delay: 0ms; }
+.modern-card:nth-child(2) { animation-delay: 100ms; }
+.modern-card:nth-child(3) { animation-delay: 200ms; }
+.modern-card:nth-child(4) { animation-delay: 300ms; }
+.modern-card:nth-child(5) { animation-delay: 400ms; }
+.modern-card:nth-child(6) { animation-delay: 500ms; }
+
+/* Enhanced Focus States for Accessibility */
+.modern-favorite-btn:focus,
+.modern-add-btn:focus,
+.title-link:focus {
+  outline: 3px solid #3498db;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Sophisticated Color Transitions */
+.modern-card {
+  background-image: 
+    linear-gradient(145deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%);
+  transition: background-image 0.5s ease;
+}
+
+.modern-card:hover {
+  background-image: 
+    linear-gradient(145deg, #ffffff 0%, #f1f3f4 30%, #f8f9fa 70%, #ffffff 100%);
+}
+
+/* Price Animation Effects */
+.current-price {
+  position: relative;
+  overflow: hidden;
+}
+
+.current-price::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.3), transparent);
+  transition: left 0.8s;
+}
+
+.modern-card:hover .current-price::after {
+  left: 100%;
+}
+
+/* Advanced Shadow Transitions */
+.modern-card {
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.05),
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 10px 20px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  transition: box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Refined Typography with Improved Readability */
+.modern-title {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.modern-description {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Enhanced Visual Hierarchy */
+.modern-card-body > * {
+  transition: transform 0.3s ease;
+}
+
+.modern-card:hover .modern-card-body > *:nth-child(odd) {
+  transform: translateX(2px);
+}
+
+.modern-card:hover .modern-card-body > *:nth-child(even) {
+  transform: translateX(4px);
+}
+
+/* Improved Mobile Touch Interactions */
+@media (pointer: coarse) {
+  .modern-card {
+    transition: transform 0.2s ease;
+  }
+  
+  .modern-card:active {
+    transform: scale(0.98);
+  }
+  
+  .modern-add-btn:active {
+    transform: scale(0.95);
+  }
+  
+  .modern-favorite-btn:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .modern-card,
+  .modern-image,
+  .modern-add-btn,
+  .modern-favorite-btn,
+  .button-ripple,
+  .overlay-content {
+    animation: none !important;
+    transition: none !important;
+  }
+  
+  .hover-rise-enhanced:hover {
+    transform: none;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  .modern-card {
+    border: 2px solid #000;
+    box-shadow: none;
+  }
+  
+  .modern-add-btn {
+    border: 2px solid currentColor;
+  }
+  
+  .modern-favorite-btn {
+    border: 2px solid currentColor;
+    background: white;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .modern-card {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
+  
+  .modern-favorite-btn,
+  .modern-add-btn,
+  .modern-image-overlay,
+  .status-badges {
+    display: none !important;
+  }
+}
+
+/* Performance Optimizations */
+.modern-card * {
+  box-sizing: border-box;
+}
+
+.modern-image {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* CSS Grid Fallback for Older Browsers */
+@supports not (display: grid) {
+  .product-grid-enhanced {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  
+  .product-grid-enhanced > * {
+    flex: 1 1 280px;
+    margin: 0.5rem;
+  }
+}

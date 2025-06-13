@@ -55,393 +55,450 @@ window.app.component("product-card", {
     },
   },
   template: `    <div 
-      class="card h-100 product-card shadow-sm border-0 position-relative"
+      class="card h-100 product-card modern-card shadow-elevated border-0 position-relative"
       :class="{ 
         'compact-card': compactMode, 
-        'hover-rise': !compactMode,
+        'hover-rise-enhanced': !compactMode,
         'out-of-stock': isOutOfStock,
-        'list-mode-card': listMode
+        'list-mode-card': listMode,
+        'card-trending': product.trending,
+        'card-featured': product.featured,
+        'card-new': product.isNew
       }"
       role="article"
       :aria-label="productAriaLabel"
     >
+      <!-- Modern Status Indicators -->
+      <div v-if="product.trending || product.featured || product.isNew" class="status-badges">
+        <span v-if="product.trending" class="status-badge trending-badge">
+          <i class="fas fa-fire"></i> Trending
+        </span>
+        <span v-if="product.featured" class="status-badge featured-badge">
+          <i class="fas fa-star"></i> Featured
+        </span>
+        <span v-if="product.isNew" class="status-badge new-badge">
+          <i class="fas fa-sparkles"></i> New
+        </span>
+      </div>
+
       <!-- List Mode Layout -->
-      <div v-if="listMode" class="d-flex flex-row">
+      <div v-if="listMode" class="d-flex flex-row modern-list-layout">
         <!-- Product Image Section - Left Side -->
-        <div class="position-relative list-image-container flex-shrink-0">
+        <div class="position-relative list-image-container flex-shrink-0 modern-image-container">
           <router-link 
             :to="productDetailPath" 
             :aria-label="viewDetailsAriaLabel"
-            class="d-block"
+            class="d-block image-link"
           >
-            <img 
-              :src="displayImage" 
-              :alt="imageAltText" 
-              class="list-image responsive-image"
-              :class="{ 
-                'lazy-loading': isImageLoading,
-                'image-error': imageError 
-              }"
-              loading="lazy"
-              decoding="async"
-              @load="handleImageLoad"
-              @error="handleImageError"
-            >
+            <!-- Modern Image with Gradient Overlay -->
+            <div class="image-wrapper">
+              <img 
+                :src="displayImage" 
+                :alt="imageAltText" 
+                class="list-image responsive-image modern-image"
+                :class="{ 
+                  'lazy-loading': isImageLoading,
+                  'image-error': imageError 
+                }"
+                loading="lazy"
+                decoding="async"
+                @load="handleImageLoad"
+                @error="handleImageError"
+              >
+              
+              <!-- Subtle gradient overlay for better text readability -->
+              <div class="image-gradient-overlay"></div>
+            </div>
             
-            <!-- Discount Ribbon -->
-            <div v-if="hasDiscount" class="ribbon">
-              <span class="bg-danger text-white px-2 py-1 small fw-bold">
+            <!-- Enhanced Discount Ribbon -->
+            <div v-if="hasDiscount" class="modern-ribbon">
+              <span class="ribbon-content">
+                <i class="fas fa-tag"></i>
                 {{ formatDiscount }} OFF
               </span>
             </div>
             
-            <!-- Stock Status Overlay -->
-            <div v-if="isOutOfStock" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center stock-overlay">
-              <div class="bg-dark bg-opacity-75 text-white px-2 py-1 rounded small">
-                <i class="fas fa-times-circle me-1"></i>
-                <strong>OUT OF STOCK</strong>
+            <!-- Modern Stock Status Overlay -->
+            <div v-if="isOutOfStock" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center modern-stock-overlay">
+              <div class="stock-status-card">
+                <i class="fas fa-times-circle"></i>
+                <span>OUT OF STOCK</span>
               </div>
             </div>
           </router-link>
           
-          <!-- Favorite Button - positioned on image -->
+          <!-- Enhanced Favorite Button -->
           <div 
             v-if="showFavoriteButton" 
             class="position-absolute top-0 end-0 m-2"
           >
             <button 
-              class="btn btn-sm btn-light rounded-circle shadow-sm favorite-btn" 
+              class="btn modern-favorite-btn" 
               @click.stop.prevent="toggleFavorite" 
               :aria-label="favoriteAriaLabel"
               :disabled="isProcessingFavorite"
             >
               <i class="fas fa-heart" :class="favoriteIconClass"></i>
+              <div class="button-ripple"></div>
             </button>
           </div>
           
-          <!-- Dietary Options Badges -->
+          <!-- Modern Dietary Options Badges -->
           <div 
             v-if="displayDietaryOptions.length > 0" 
             class="position-absolute bottom-0 start-0 m-2"
           >
-            <span 
-              v-for="option in displayDietaryOptions" 
-              :key="option.name" 
-              class="badge dietary-badge me-1 mb-1"
-              :class="option.badgeClass"
-              :title="option.description"
-            >
-              <i :class="option.icon" class="me-1"></i>
-              {{ option.name }}
-            </span>
+            <div class="dietary-badges-container">
+              <span 
+                v-for="option in displayDietaryOptions" 
+                :key="option.name" 
+                class="modern-dietary-badge"
+                :class="option.badgeClass"
+                :title="option.description"
+              >
+                <i :class="option.icon"></i>
+                <span class="badge-text">{{ option.name }}</span>
+              </span>
+            </div>
           </div>
         </div>
         
-        <!-- Product Info Section - Right Side -->
-        <div class="card-body d-flex flex-column flex-grow-1 p-3">
+        <!-- Enhanced Product Info Section -->
+        <div class="card-body d-flex flex-column flex-grow-1 p-3 modern-card-body">
           <!-- Title and Prep Time Row -->
           <div class="d-flex justify-content-between align-items-start mb-2">
             <router-link 
               :to="productDetailPath" 
-              class="text-decoration-none flex-grow-1"
+              class="text-decoration-none flex-grow-1 title-link"
             >
-              <h5 class="card-title mb-1 text-dark">
+              <h5 class="card-title mb-1 modern-title">
                 {{ product.name }}
+                <span v-if="product.spicyLevel" class="spicy-indicator">
+                  <i v-for="i in product.spicyLevel" :key="i" class="fas fa-pepper-hot text-danger"></i>
+                </span>
               </h5>
             </router-link>
             
             <div v-if="preparationTime" class="ms-2 flex-shrink-0">
-              <span class="badge bg-light text-dark small">
-                <i class="far fa-clock me-1"></i>{{ preparationTime }}
+              <span class="modern-time-badge">
+                <i class="far fa-clock"></i>
+                <span>{{ preparationTime }}</span>
               </span>
             </div>
           </div>
           
-          <!-- Rating Section -->
+          <!-- Enhanced Rating Section -->
           <div v-if="hasRating" class="mb-2">
-            <div class="ratings d-flex align-items-center">
-              <div class="star-rating me-2" :aria-label="ratingAriaLabel">
-                <i 
-                  v-for="i in maxStars" 
-                  :key="i" 
-                  class="fas"
-                  :class="getStarClass(i)"
-                ></i>
+            <div class="modern-ratings d-flex align-items-center">
+              <div class="star-rating-modern me-2" :aria-label="ratingAriaLabel">
+                <div class="stars-background">
+                  <i v-for="i in maxStars" :key="'bg-' + i" class="fas fa-star"></i>
+                </div>
+                <div class="stars-foreground" :style="{ width: (product.rating / maxStars) * 100 + '%' }">
+                  <i v-for="i in maxStars" :key="'fg-' + i" class="fas fa-star"></i>
+                </div>
               </div>
-              <span class="small text-muted">({{ formattedReviewCount }})</span>
+              <span class="rating-text">{{ product.rating }}</span>
+              <span class="reviews-count">({{ formattedReviewCount }})</span>
             </div>
           </div>
           
-          <!-- Description -->
-          <p class="card-text flex-grow-1 mb-2 small text-muted">
+          <!-- Enhanced Description -->
+          <p class="card-text flex-grow-1 mb-2 modern-description">
             {{ truncatedDescription }}
           </p>
           
-          <!-- Price and Actions Row -->
-          <div class="d-flex justify-content-between align-items-end">
-            <!-- Price Section -->
-            <div>
+          <!-- Modern Price and Actions Row -->
+          <div class="d-flex justify-content-between align-items-end modern-footer">
+            <!-- Enhanced Price Section -->
+            <div class="price-section">
               <div class="price-display d-flex align-items-center mb-1">
                 <span 
                   v-if="hasDiscount" 
-                  class="text-decoration-line-through text-muted me-2 small"
+                  class="original-price"
                 >
                   {{ formatPrice(product.price) }}
                 </span>
                 <span 
-                  class="fw-bold"
-                  :class="{ 'text-danger': hasDiscount, 'text-dark': !hasDiscount }"
+                  class="current-price"
+                  :class="{ 'discounted-price': hasDiscount, 'regular-price': !hasDiscount }"
                 >
                   {{ formatPrice(effectivePrice) }}
                 </span>
-                <span v-if="hasDiscount" class="badge bg-success ms-2 small">
+                <span v-if="hasDiscount" class="savings-badge">
                   Save {{ formatPrice(savingsAmount) }}
                 </span>
               </div>
               
-              <!-- Stock Status -->
-              <div v-if="stockStatusText">
+              <!-- Enhanced Stock Status -->
+              <div v-if="stockStatusText" class="stock-status">
                 <span 
-                  class="badge small"
+                  class="modern-stock-badge"
                   :class="{
-                    'bg-danger': isOutOfStock,
-                    'bg-warning text-dark': isLowStock
+                    'out-of-stock': isOutOfStock,
+                    'low-stock': isLowStock,
+                    'in-stock': !isOutOfStock && !isLowStock
                   }"
                 >
                   <i class="fas" :class="{
                     'fa-times-circle': isOutOfStock,
-                    'fa-exclamation-triangle': isLowStock
+                    'fa-exclamation-triangle': isLowStock,
+                    'fa-check-circle': !isOutOfStock && !isLowStock
                   }"></i>
                   {{ stockStatusText }}
                 </span>
               </div>
               
-              <!-- Nutritional Info -->
-              <div v-if="nutritionalInfo" class="d-flex flex-wrap">
-                <span class="small text-muted me-3">
-                  <i class="fas fa-fire-alt me-1 text-orange"></i>{{ nutritionalInfo.calories }} cal
+              <!-- Enhanced Nutritional Info -->
+              <div v-if="nutritionalInfo" class="nutritional-info">
+                <span class="nutrition-item calories">
+                  <i class="fas fa-fire-alt"></i>
+                  <span>{{ nutritionalInfo.calories }} cal</span>
                 </span>
-                <span v-if="nutritionalInfo.protein" class="small text-muted">
-                  <i class="fas fa-dumbbell me-1"></i>{{ nutritionalInfo.protein }}g protein
+                <span v-if="nutritionalInfo.protein" class="nutrition-item protein">
+                  <i class="fas fa-dumbbell"></i>
+                  <span>{{ nutritionalInfo.protein }}g protein</span>
                 </span>
               </div>
             </div>
-              <!-- Action Buttons -->
-            <div class="d-flex flex-column gap-2">
+            
+            <!-- Enhanced Action Buttons -->
+            <div class="action-buttons d-flex flex-column gap-2">
               <button 
                 v-if="showAddButton" 
                 @click.stop.prevent="addToCart" 
-                class="btn btn-sm"
+                class="btn modern-add-btn"
                 :class="{
-                  'btn-primary': !isOutOfStock && !isLowStock,
+                  'btn-success': !isOutOfStock && !isLowStock,
                   'btn-warning': isLowStock && !isOutOfStock,
-                  'btn-secondary': isOutOfStock
+                  'btn-disabled': isOutOfStock
                 }"
                 :disabled="isAddingToCart || isOutOfStock"
                 :aria-label="addToCartAriaLabel"
               >
-                <i v-if="!isAddingToCart && !isOutOfStock" class="fas fa-cart-plus me-1"></i>
-                <i v-else-if="!isAddingToCart && isOutOfStock" class="fas fa-ban me-1"></i>
-                <i v-else class="fas fa-spinner fa-spin me-1"></i>
-                {{ addToCartButtonText }}
+                <div class="button-content">
+                  <i v-if="!isAddingToCart && !isOutOfStock" class="fas fa-cart-plus"></i>
+                  <i v-else-if="!isAddingToCart && isOutOfStock" class="fas fa-ban"></i>
+                  <i v-else class="fas fa-spinner fa-spin"></i>
+                  <span>{{ addToCartButtonText }}</span>
+                </div>
+                <div class="button-background"></div>
               </button>
             </div>
           </div>
         </div>
       </div>
       
-      <!-- Default Grid Mode Layout -->
-      <div v-else>
-        <!-- Product Image Section -->
-        <div class="position-relative card-image-container">
+      <!-- Enhanced Default Grid Mode Layout -->
+      <div v-else class="modern-grid-layout">
+        <!-- Enhanced Product Image Section -->
+        <div class="position-relative card-image-container modern-image-container">
           <router-link 
             :to="productDetailPath" 
             :aria-label="viewDetailsAriaLabel"
-            class="d-block"
+            class="d-block image-link"
           >
-            <img 
-              :src="displayImage" 
-              :alt="imageAltText" 
-              class="card-img-top food-image responsive-image"
-              :class="{ 
-                'compact-image': compactMode, 
-                'lazy-loading': isImageLoading,
-                'image-error': imageError 
-              }"
-              loading="lazy"
-              decoding="async"
-              @load="handleImageLoad"
-              @error="handleImageError"
-            >            
-            <!-- Image overlay for hover effects -->
-            <div class="image-overlay">
+            <div class="image-wrapper">
+              <img 
+                :src="displayImage" 
+                :alt="imageAltText" 
+                class="card-img-top food-image responsive-image modern-image"
+                :class="{ 
+                  'compact-image': compactMode, 
+                  'lazy-loading': isImageLoading,
+                  'image-error': imageError 
+                }"
+                loading="lazy"
+                decoding="async"
+                @load="handleImageLoad"
+                @error="handleImageError"
+              >            
+              <!-- Enhanced Image overlay for hover effects -->
+              <div class="modern-image-overlay">
+                <div class="overlay-content">
+                  <i class="fas fa-eye"></i>
+                  <span>View Details</span>
+                </div>
+              </div>
             </div>
-              <!-- Discount Ribbon -->
-            <div v-if="hasDiscount" class="ribbon">
-              <span class="bg-danger text-white px-2 py-1 small fw-bold">
+              
+            <!-- Enhanced Discount Ribbon -->
+            <div v-if="hasDiscount" class="modern-ribbon">
+              <span class="ribbon-content">
+                <i class="fas fa-tag"></i>
                 {{ formatDiscount }} OFF
               </span>
             </div>
             
-            <!-- Stock Status Overlay -->
-            <div v-if="isOutOfStock" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center stock-overlay">
-              <div class="bg-dark bg-opacity-75 text-white px-3 py-2 rounded">
-                <i class="fas fa-times-circle me-2"></i>
-                <strong>OUT OF STOCK</strong>
+            <!-- Enhanced Stock Status Overlay -->
+            <div v-if="isOutOfStock" class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center modern-stock-overlay">
+              <div class="stock-status-card">
+                <i class="fas fa-times-circle"></i>
+                <span>OUT OF STOCK</span>
               </div>
             </div>
           </router-link>
           
-          <!-- Favorite Button -->
+          <!-- Enhanced Favorite Button -->
           <div 
             v-if="showFavoriteButton" 
             class="position-absolute top-0 end-0 m-2"
           >
             <button 
-              class="btn btn-sm btn-light rounded-circle shadow-sm favorite-btn" 
+              class="btn modern-favorite-btn" 
               @click.stop.prevent="toggleFavorite" 
               :aria-label="favoriteAriaLabel"
               :disabled="isProcessingFavorite"
             >
               <i class="fas fa-heart" :class="favoriteIconClass"></i>
+              <div class="button-ripple"></div>
             </button>
           </div>
           
-          <!-- Dietary Options Badges -->
+          <!-- Enhanced Dietary Options Badges -->
           <div 
             v-if="displayDietaryOptions.length > 0" 
             class="position-absolute bottom-0 start-0 m-2"
           >
-            <span 
-              v-for="option in displayDietaryOptions" 
-              :key="option.name" 
-              class="badge dietary-badge me-1 mb-1"
-              :class="option.badgeClass"
-              :title="option.description"
-            >
-              <i :class="option.icon" class="me-1"></i>
-              {{ option.name }}
-            </span>
+            <div class="dietary-badges-container">
+              <span 
+                v-for="option in displayDietaryOptions" 
+                :key="option.name" 
+                class="modern-dietary-badge"
+                :class="option.badgeClass"
+                :title="option.description"
+              >
+                <i :class="option.icon"></i>
+                <span class="badge-text">{{ option.name }}</span>
+              </span>
+            </div>
           </div>
         </div>
         
-        <!-- Card Body -->
-        <div class="card-body d-flex flex-column p-3">
-          <!-- Title and Prep Time Row -->
+        <!-- Enhanced Card Body -->
+        <div class="card-body modern-card-body">
+          <!-- Title and Prep Time -->
           <div class="d-flex justify-content-between align-items-start mb-2">
             <router-link 
               :to="productDetailPath" 
-              class="text-decoration-none flex-grow-1"
+              class="text-decoration-none flex-grow-1 title-link"
             >
-              <h5 class="card-title mb-1 text-dark" :class="{ 'h6': compactMode }">
+              <h5 class="card-title modern-title">
                 {{ product.name }}
+                <span v-if="product.spicyLevel" class="spicy-indicator">
+                  <i v-for="i in product.spicyLevel" :key="i" class="fas fa-pepper-hot text-danger"></i>
+                </span>
               </h5>
             </router-link>
             
             <div v-if="preparationTime" class="ms-2 flex-shrink-0">
-              <span class="badge bg-light text-dark small">
-                <i class="far fa-clock me-1"></i>{{ preparationTime }}
+              <span class="modern-time-badge">
+                <i class="far fa-clock"></i>
+                <span>{{ preparationTime }}</span>
               </span>
             </div>
           </div>
           
-          <!-- Rating Section -->
+          <!-- Enhanced Rating Section -->
           <div v-if="hasRating" class="mb-2">
-            <div class="ratings d-flex align-items-center">
-              <div class="star-rating me-2" :aria-label="ratingAriaLabel">
-                <i 
-                  v-for="i in maxStars" 
-                  :key="i" 
-                  class="fas"
-                  :class="getStarClass(i)"
-                ></i>
+            <div class="modern-ratings d-flex align-items-center">
+              <div class="star-rating-modern me-2" :aria-label="ratingAriaLabel">
+                <div class="stars-background">
+                  <i v-for="i in maxStars" :key="'bg-' + i" class="fas fa-star"></i>
+                </div>
+                <div class="stars-foreground" :style="{ width: (product.rating / maxStars) * 100 + '%' }">
+                  <i v-for="i in maxStars" :key="'fg-' + i" class="fas fa-star"></i>
+                </div>
               </div>
-              <span class="small text-muted">({{ formattedReviewCount }})</span>
+              <span class="rating-text">{{ product.rating }}</span>
+              <span class="reviews-count">({{ formattedReviewCount }})</span>
             </div>
           </div>
           
-          <!-- Price Section -->
-          <div class="mb-2">
-            <div class="price-display d-flex align-items-center">
-              <span 
-                v-if="hasDiscount" 
-                class="text-decoration-line-through text-muted me-2 small"
-              >
-                {{ formatPrice(product.price) }}
-              </span>
-              <span 
-                class="fw-bold"
-                :class="{ 'text-danger': hasDiscount, 'text-dark': !hasDiscount }"
-              >
-                {{ formatPrice(effectivePrice) }}
-              </span>            <span v-if="hasDiscount" class="badge bg-success ms-2 small">
-                Save {{ formatPrice(savingsAmount) }}
-              </span>
-            </div>
-            
-            <!-- Stock Status Indicator -->
-            <div v-if="stockStatusText" class="mb-2">
-              <span 
-                class="badge small"
-                :class="{
-                  'bg-danger': isOutOfStock,
-                  'bg-warning text-dark': isLowStock
-                }"
-              >
-                <i class="fas" :class="{
-                  'fa-times-circle': isOutOfStock,
-                  'fa-exclamation-triangle': isLowStock
-                }"></i>
-                {{ stockStatusText }}
-              </span>
-            </div>
-          </div>
-          
-          <!-- Description -->
-          <p 
-            v-if="!compactMode"
-            class="card-text flex-grow-1 mb-3 small text-muted"
-          >
+          <!-- Enhanced Description -->
+          <p class="card-text modern-description mb-3">
             {{ truncatedDescription }}
           </p>
           
-          <!-- Footer Actions -->
+          <!-- Enhanced Nutritional Info -->
+          <div v-if="nutritionalInfo" class="nutritional-info mb-3">
+            <span class="nutrition-item calories">
+              <i class="fas fa-fire-alt"></i>
+              <span>{{ nutritionalInfo.calories }} cal</span>
+            </span>
+            <span v-if="nutritionalInfo.protein" class="nutrition-item protein">
+              <i class="fas fa-dumbbell"></i>
+              <span>{{ nutritionalInfo.protein }}g protein</span>
+            </span>
+          </div>
+          
+          <!-- Enhanced Footer with Price and Action -->
           <div class="mt-auto">
-            <!-- Nutritional Info -->
-            <div v-if="nutritionalInfo" class="mb-2 d-flex flex-wrap">
-              <span class="small text-muted me-3">
-                <i class="fas fa-fire-alt me-1 text-orange"></i>{{ nutritionalInfo.calories }} cal
-              </span>
-              <span v-if="nutritionalInfo.protein" class="small text-muted me-3">
-                <i class="fas fa-dumbbell me-1"></i>{{ nutritionalInfo.protein }}g protein
-              </span>
+            <!-- Enhanced Price Display -->
+            <div class="price-section mb-3">
+              <div class="price-display">
+                <span 
+                  v-if="hasDiscount" 
+                  class="original-price"
+                >
+                  {{ formatPrice(product.price) }}
+                </span>
+                <span 
+                  class="current-price"
+                  :class="{ 'discounted-price': hasDiscount, 'regular-price': !hasDiscount }"
+                >
+                  {{ formatPrice(effectivePrice) }}
+                </span>
+                <span v-if="hasDiscount" class="savings-badge">
+                  Save {{ formatPrice(savingsAmount) }}
+                </span>
+              </div>
+              
+              <!-- Enhanced Stock Status -->
+              <div v-if="stockStatusText" class="stock-status mt-1">
+                <span 
+                  class="modern-stock-badge"
+                  :class="{
+                    'out-of-stock': isOutOfStock,
+                    'low-stock': isLowStock,
+                    'in-stock': !isOutOfStock && !isLowStock
+                  }"
+                >
+                  <i class="fas" :class="{
+                    'fa-times-circle': isOutOfStock,
+                    'fa-exclamation-triangle': isLowStock,
+                    'fa-check-circle': !isOutOfStock && !isLowStock
+                  }"></i>
+                  {{ stockStatusText }}
+                </span>
+              </div>
             </div>
-              <!-- Action Buttons -->
-            <div class="d-flex align-items-center justify-content-between">
-                <button 
-                v-if="showAddButton" 
-                @click.stop.prevent="addToCart" 
-                class="btn btn-sm"
-                :class="{
-                  'btn-xs': compactMode,
-                  'btn-primary': !isOutOfStock && !isLowStock,
-                  'btn-warning': isLowStock && !isOutOfStock,
-                  'btn-secondary': isOutOfStock
-                }"
-                :disabled="isAddingToCart || isOutOfStock"
-                :aria-label="addToCartAriaLabel"
-              >
-                <i v-if="!isAddingToCart && !isOutOfStock" class="fas fa-cart-plus me-1"></i>
-                <i v-else-if="!isAddingToCart && isOutOfStock" class="fas fa-ban me-1"></i>
-                <i v-else class="fas fa-spinner fa-spin me-1"></i>
-                {{ addToCartButtonText }}
-              </button>
-            </div>
+            
+            <!-- Enhanced Add to Cart Button -->
+            <button 
+              v-if="showAddButton" 
+              @click.stop.prevent="addToCart" 
+              class="btn modern-add-btn w-100"
+              :class="{
+                'btn-success': !isOutOfStock && !isLowStock,
+                'btn-warning': isLowStock && !isOutOfStock,
+                'btn-disabled': isOutOfStock
+              }"
+              :disabled="isAddingToCart || isOutOfStock"
+              :aria-label="addToCartAriaLabel"
+            >
+              <div class="button-content">
+                <i v-if="!isAddingToCart && !isOutOfStock" class="fas fa-cart-plus"></i>
+                <i v-else-if="!isAddingToCart && isOutOfStock" class="fas fa-ban"></i>
+                <i v-else class="fas fa-spinner fa-spin"></i>
+                <span>{{ addToCartButtonText }}</span>
+              </div>
+              <div class="button-background"></div>
+            </button>
           </div>
         </div>
       </div>
-    </div>
-  `,
+    </div>`,
   data() {
     return {
       // UI State
