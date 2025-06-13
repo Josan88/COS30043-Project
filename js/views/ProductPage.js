@@ -280,6 +280,7 @@ const ProductPage = {
                   <product-card 
                     :product="product"
                     :compact-mode="false"
+                    :list-mode="!isMobileView"
                     :show-add-button="true"
                     :show-favorite-button="true"
                     class="responsive-product-card"
@@ -306,9 +307,9 @@ const ProductPage = {
                     :key="product.id" 
                     class="product-item"
                     v-scroll-reveal="{ delay: index * 50, threshold: 0.1 }"
-                  >
-                    <product-card 
+                  >                    <product-card 
                       :product="product"
+                      :list-mode="!isMobileView"
                       :show-add-button="true"
                       :show-favorite-button="true"
                     ></product-card>
