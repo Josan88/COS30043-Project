@@ -279,39 +279,100 @@ const PurchasesPage = {
                   </div>
                 </div>
               </div>
-              
-              <!-- Delivery/Pickup Information -->
+                <!-- Service Information -->
               <div class="row mt-4">
                 <div class="col-md-6">
-                  <h6 class="mb-3">{{ order.delivery.method === 'pickup' ? 'Pickup' : 'Delivery' }} Information</h6>
+                  <h6 class="mb-3">Service Information</h6>
                   <div class="card">
                     <div class="card-body">
                       <p class="mb-2">
                         <strong>Method:</strong> 
-                        {{ order.delivery.method === 'express' ? 'Express Delivery' : 
-                           order.delivery.method === 'delivery' ? 'Standard Delivery' : 'Self Pickup' }}
+                        <span v-if="order.delivery.method === 'dine-in'">🍽️ Dine-in</span>
+                        <span v-else-if="order.delivery.method === 'pickup'">🚶 Self Pickup</span>
+                        <span v-else-if="order.delivery.method === 'delivery'">🚚 Delivery</span>
+                        <span v-else>{{ order.delivery.method }}</span>
                       </p>
                       
-                      <div v-if="order.delivery.method === 'pickup'">
-                        <p class="mb-1"><strong>Pickup Time:</strong> {{ order.delivery.details.pickupTime }}</p>
+                      <!-- Dine-in Information -->
+                      <div v-if="order.delivery.method === 'dine-in'">
+                        <p class="mb-1" v-if="order.delivery.details.tableNumber">
+                          <strong>Table Number:</strong> {{ order.delivery.details.tableNumber }}
+                        </p>
+                        <p class="mb-1" v-if="order.tableNumber">
+                          <strong>Table Number:</strong> {{ order.tableNumber }}
+                        </p>
                         <p class="mb-1"><strong>Restaurant Address:</strong></p>
                         <p class="mb-0">
-                          123 Food Street, Foodville<br>
-                          Kuala Lumpur, 50000<br>
-                          Malaysia
+                          <span v-if="order.delivery.details.restaurantAddress">
+                            {{ order.delivery.details.restaurantAddress.line1 }}<br>
+                            {{ order.delivery.details.restaurantAddress.city }}, {{ order.delivery.details.restaurantAddress.postcode }}<br>
+                            {{ order.delivery.details.restaurantAddress.country }}
+                          </span>
+                          <span v-else>
+                            123 Food Street, Foodville<br>
+                            Kuala Lumpur, 50000<br>
+                            Malaysia
+                          </span>
                         </p>
                       </div>
                       
+                      <!-- Pickup Information -->
+                      <div v-else-if="order.delivery.method === 'pickup'">
+                        <p class="mb-1" v-if="order.delivery.details.phoneNumber || order.phoneNumber">
+                          <strong>Contact Number:</strong> {{ order.delivery.details.phoneNumber || order.phoneNumber }}
+                        </p>
+                        <p class="mb-1" v-if="order.delivery.details.pickupTime">
+                          <strong>Estimated Pickup Time:</strong> {{ formatDateTime(order.delivery.details.pickupTime) }}
+                        </p>
+                        <p class="mb-1" v-else-if="order.estimatedDeliveryTime">
+                          <strong>Estimated Pickup Time:</strong> {{ formatDateTime(order.estimatedDeliveryTime) }}
+                        </p>
+                        <p class="mb-1"><strong>Restaurant Address:</strong></p>
+                        <p class="mb-0">
+                          <span v-if="order.delivery.details.restaurantAddress">
+                            {{ order.delivery.details.restaurantAddress.line1 }}<br>
+                            {{ order.delivery.details.restaurantAddress.city }}, {{ order.delivery.details.restaurantAddress.postcode }}<br>
+                            {{ order.delivery.details.restaurantAddress.country }}
+                          </span>
+                          <span v-else>
+                            123 Food Street, Foodville<br>
+                            Kuala Lumpur, 50000<br>
+                            Malaysia
+                          </span>
+                        </p>
+                      </div>
+                      
+                      <!-- Delivery Information -->
                       <div v-else>
+                        <p class="mb-1" v-if="order.delivery.details.phoneNumber || order.phoneNumber">
+                          <strong>Contact Number:</strong> {{ order.delivery.details.phoneNumber || order.phoneNumber }}
+                        </p>
+                        <p class="mb-1" v-if="order.delivery.details.estimatedDeliveryTime">
+                          <strong>Estimated Delivery Time:</strong> {{ formatDateTime(order.delivery.details.estimatedDeliveryTime) }}
+                        </p>
+                        <p class="mb-1" v-else-if="order.estimatedDeliveryTime">
+                          <strong>Estimated Delivery Time:</strong> {{ formatDateTime(order.estimatedDeliveryTime) }}
+                        </p>
                         <p class="mb-1"><strong>Delivery Address:</strong></p>
                         <p class="mb-2">
-                          {{ order.delivery.details.line1 }}<br>
-                          <span v-if="order.delivery.details.line2">{{ order.delivery.details.line2 }}<br></span>
-                          {{ order.delivery.details.city }}, {{ order.delivery.details.state }} {{ order.delivery.details.postcode }}
+                          <span v-if="order.delivery.details.deliveryAddress">
+                            {{ order.delivery.details.deliveryAddress }}
+                          </span>
+                          <span v-else-if="order.deliveryAddress">
+                            {{ order.deliveryAddress }}
+                          </span>
+                          <span v-else-if="order.delivery.details.line1">
+                            {{ order.delivery.details.line1 }}<br>
+                            <span v-if="order.delivery.details.line2">{{ order.delivery.details.line2 }}<br></span>
+                            {{ order.delivery.details.city }}, {{ order.delivery.details.state }} {{ order.delivery.details.postcode }}
+                          </span>
+                          <span v-else>
+                            Address not provided
+                          </span>
                         </p>
-                        <p class="mb-0" v-if="order.delivery.details.notes">
+                        <p class="mb-0" v-if="order.delivery.details.notes || order.specialRequests">
                           <strong>Delivery Notes:</strong><br>
-                          {{ order.delivery.details.notes }}
+                          {{ order.delivery.details.notes || order.specialRequests }}
                         </p>
                       </div>
                     </div>
@@ -1704,7 +1765,8 @@ const PurchasesPage = {
         items: order.items || [],
         delivery: {
           method: order.delivery?.method || order.serviceMethod || "delivery",
-          details: order.delivery?.details || {},
+          details:
+            order.delivery?.details || this.buildLegacyDeliveryDetails(order),
           ...order.delivery,
         },
         payment: {
@@ -2725,6 +2787,50 @@ const PurchasesPage = {
       if (diffInSeconds < 86400)
         return `${Math.floor(diffInSeconds / 3600)} hours ago`;
       return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    },
+
+    buildLegacyDeliveryDetails(order) {
+      // Build delivery details for orders that don't have the new structure
+      const serviceMethod =
+        order.serviceMethod || order.delivery?.method || "delivery";
+
+      switch (serviceMethod) {
+        case "dine-in":
+          return {
+            tableNumber: order.tableNumber,
+            restaurantAddress: {
+              line1: "123 Food Street, Foodville",
+              city: "Kuala Lumpur",
+              state: "Kuala Lumpur",
+              postcode: "50000",
+              country: "Malaysia",
+            },
+          };
+
+        case "pickup":
+          return {
+            phoneNumber: order.phoneNumber,
+            pickupTime: order.estimatedDeliveryTime,
+            restaurantAddress: {
+              line1: "123 Food Street, Foodville",
+              city: "Kuala Lumpur",
+              state: "Kuala Lumpur",
+              postcode: "50000",
+              country: "Malaysia",
+            },
+          };
+
+        case "delivery":
+          return {
+            phoneNumber: order.phoneNumber,
+            deliveryAddress: order.deliveryAddress,
+            estimatedDeliveryTime: order.estimatedDeliveryTime,
+            notes: order.specialRequests,
+          };
+
+        default:
+          return {};
+      }
     },
   },
 };

@@ -377,13 +377,12 @@ const ShoppingCart = {
       const errors = this.getValidationErrors();
       this.validationErrors = errors;
       return Object.keys(errors).length === 0;
-    }
+    },
     /**
      * Calculate delivery fee
      * Only delivery orders are charged delivery fees
      * Pickup and dine-in orders have no delivery fee
-     */,
-    deliveryFee() {
+     */ deliveryFee() {
       // Debug logging
       console.log(
         `Service method: '${this.serviceMethod}', Subtotal: ${this.cartSummary.subtotal}`
@@ -1002,11 +1001,10 @@ const ShoppingCart = {
       } catch (error) {
         this.handleError(error, "Failed to clear cart");
       }
-    }
+    },
     /**
      * Handle service method update
-     */,
-    handleServiceMethodUpdate(newMethod) {
+     */ handleServiceMethodUpdate(newMethod) {
       // Sanitize and validate service method
       const validMethods = ["dine-in", "pickup", "delivery"];
       const sanitizedMethod = (newMethod || "").trim().toLowerCase();
@@ -1438,6 +1436,7 @@ const ShoppingCart = {
             ? this.phoneNumber
             : null,
         specialRequests: this.specialRequests || null,
+        delivery: this.buildDeliveryDetails(),
         payment: {
           method: this.paymentMethod,
           amount: this.cartSummary.total,
@@ -1599,6 +1598,63 @@ const ShoppingCart = {
         "warning",
         "You are currently offline. Some features may not work properly."
       );
+    },
+
+    /**
+     * Build delivery details object based on service method
+     */
+    buildDeliveryDetails() {
+      const baseDelivery = {
+        method: this.serviceMethod,
+        details: {},
+      };
+
+      switch (this.serviceMethod) {
+        case "dine-in":
+          return {
+            ...baseDelivery,
+            details: {
+              tableNumber: this.tableNumber,
+              restaurantAddress: {
+                line1: "123 Food Street, Foodville",
+                city: "Kuala Lumpur",
+                state: "Kuala Lumpur",
+                postcode: "50000",
+                country: "Malaysia",
+              },
+            },
+          };
+
+        case "pickup":
+          return {
+            ...baseDelivery,
+            details: {
+              phoneNumber: this.phoneNumber,
+              pickupTime: this.estimatedTime,
+              restaurantAddress: {
+                line1: "123 Food Street, Foodville",
+                city: "Kuala Lumpur",
+                state: "Kuala Lumpur",
+                postcode: "50000",
+                country: "Malaysia",
+              },
+            },
+          };
+
+        case "delivery":
+          return {
+            ...baseDelivery,
+            details: {
+              phoneNumber: this.phoneNumber,
+              deliveryAddress: this.deliveryAddress,
+              estimatedDeliveryTime: this.estimatedTime,
+              notes: this.specialRequests,
+            },
+          };
+
+        default:
+          return baseDelivery;
+      }
     },
   },
 };
