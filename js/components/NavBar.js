@@ -121,31 +121,28 @@ window.app.component("nav-bar", {
           shouldShow: true,
           badge: true,
           badgeValue: 0,
-        },
-        {
+        },        {
           name: "Account",
           path: "/account",
           icon: "fas fa-user",
           ariaLabel: "My Account",
-          shouldShow: false, // Will be shown only for mobile when logged in
+          shouldShow: true, // Show for logged in users on all devices
           badge: false,
-          mobileOnly: true,
-        },
-        {
+          requiresAuth: true, // Only show when authenticated
+        },        {
           name: "Orders",
           path: "/purchases",
           icon: "fas fa-history",
           ariaLabel: "Order History",
-          shouldShow: false, // Will be shown only for mobile when logged in
+          shouldShow: true, // Show for logged in users on all devices
           badge: false,
-          mobileOnly: true,
-        },
-        {
+          requiresAuth: true, // Only show when authenticated
+        },        {
           name: "Sign Out",
           path: "#",
           icon: "fas fa-sign-out-alt",
           ariaLabel: "Sign Out",
-          shouldShow: false, // Will be shown only for mobile when logged in
+          shouldShow: false, // Only show in dropdown menu
           badge: false,
           mobileOnly: true,
           isAction: true,
@@ -192,8 +189,7 @@ window.app.component("nav-bar", {
       ],
     };
   },
-  computed: {
-    /**
+  computed: {    /**
      * Filter navigation items based on authentication state and device type
      */
     filteredNavigationItems() {
@@ -201,6 +197,11 @@ window.app.component("nav-bar", {
         // Handle mobile-only items
         if (item.mobileOnly) {
           return this.isLoggedIn && this.isMobileDevice();
+        }
+
+        // Handle items that require authentication
+        if (item.requiresAuth) {
+          return this.isLoggedIn;
         }
 
         // Hide sign in/register when logged in
@@ -221,13 +222,12 @@ window.app.component("nav-bar", {
 
         return item.shouldShow;
       });
-    },
-
-    /**
-     * Determine if user dropdown should be shown (desktop/tablet only)
+    },    /**
+     * Determine if user dropdown should be shown
+     * Show for authenticated users on desktop/tablet, and also on mobile when space is limited
      */
     showUserDropdown() {
-      return this.isLoggedIn && !this.isMobileDevice();
+      return this.isLoggedIn;
     },
   },
   watch: {
