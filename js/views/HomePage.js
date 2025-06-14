@@ -232,13 +232,12 @@ const HomePage = {
       // Search functionality
       searchQuery: "",
       searchResults: [],
-      searchTimeout: null,
-
-      // Content data
+      searchTimeout: null, // Content data
       featuredProducts: [],
       currentReviewIndex: 0,
       reviewInterval: null,
       userLocation: null,
+      restaurantLocation: null, // Added to store restaurant location when user is at restaurant
 
       // Static content
       latestNews: createLatestNewsData(),
@@ -443,29 +442,27 @@ const HomePage = {
 
       const word = count === 1 ? singular : plural || singular + "s";
       return `${count} ${word}`;
-    },
-
-    // === LOCATION METHODS ===
+    }, // === LOCATION METHODS ===
 
     /**
-     * Detect user location for personalized content
+     * Detect user location - assuming user is at the restaurant location
+     * Uses LocationService to manage shared location data
      */
     async detectLocation() {
-      if (!navigator.geolocation) {
-        console.warn("Geolocation is not supported by this browser");
-        return;
-      }
-
       try {
-        const position = await this.getCurrentPosition();
-        this.userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-        console.log("Location detected:", this.userLocation);
+        await window.LocationService.detectLocation();
+
+        // Update local data from the service
+        this.userLocation = window.LocationService.getUserLocation();
+        this.restaurantLocation =
+          window.LocationService.getRestaurantLocation();
+
+        console.log("Location updated from LocationService");
       } catch (error) {
-        console.warn("Location detection failed:", error);
+        console.warn("Location detection failed, using defaults");
         this.userLocation = null;
+        this.restaurantLocation =
+          window.LocationService.getRestaurantLocation();
       }
     },
 

@@ -1615,13 +1615,7 @@ const ShoppingCart = {
             ...baseDelivery,
             details: {
               tableNumber: this.tableNumber,
-              restaurantAddress: {
-                line1: "123 Food Street, Foodville",
-                city: "Kuala Lumpur",
-                state: "Kuala Lumpur",
-                postcode: "50000",
-                country: "Malaysia",
-              },
+              restaurantAddress: this.getRestaurantAddress(),
             },
           };
 
@@ -1631,13 +1625,7 @@ const ShoppingCart = {
             details: {
               phoneNumber: this.phoneNumber,
               pickupTime: this.estimatedTime,
-              restaurantAddress: {
-                line1: "123 Food Street, Foodville",
-                city: "Kuala Lumpur",
-                state: "Kuala Lumpur",
-                postcode: "50000",
-                country: "Malaysia",
-              },
+              restaurantAddress: this.getRestaurantAddress(),
             },
           };
 
@@ -1655,6 +1643,36 @@ const ShoppingCart = {
         default:
           return baseDelivery;
       }
+    },
+
+    // ---------------------------------------------
+    // LOCATION METHODS
+    // ---------------------------------------------
+
+    /**
+     * Get restaurant address from LocationService
+     * @returns {Object} Restaurant address object
+     */
+    getRestaurantAddress() {
+      try {
+        if (window.LocationService) {
+          return window.LocationService.getRestaurantAddress();
+        }
+      } catch (error) {
+        console.warn(
+          "Failed to get restaurant address from LocationService:",
+          error
+        );
+      }
+
+      // Fallback to default address
+      return {
+        line1: "123 Food Street, Foodville",
+        city: "Kuala Lumpur",
+        state: "Kuala Lumpur",
+        postcode: "50000",
+        country: "Malaysia",
+      };
     },
   },
 };

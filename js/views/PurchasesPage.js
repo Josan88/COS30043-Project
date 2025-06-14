@@ -298,8 +298,7 @@ const PurchasesPage = {
                         </p>
                         <p class="mb-1" v-if="order.tableNumber">
                           <strong>Table Number:</strong> {{ order.tableNumber }}
-                        </p>
-                        <p class="mb-1"><strong>Restaurant Address:</strong></p>
+                        </p>                        <p class="mb-1"><strong>Restaurant Address:</strong></p>
                         <p class="mb-0">
                           <span v-if="order.delivery.details.restaurantAddress">
                             {{ order.delivery.details.restaurantAddress.line1 }}<br>
@@ -307,9 +306,9 @@ const PurchasesPage = {
                             {{ order.delivery.details.restaurantAddress.country }}
                           </span>
                           <span v-else>
-                            123 Food Street, Foodville<br>
-                            Kuala Lumpur, 50000<br>
-                            Malaysia
+                            {{ getRestaurantAddress().line1 }}<br>
+                            {{ getRestaurantAddress().city }}, {{ getRestaurantAddress().postcode }}<br>
+                            {{ getRestaurantAddress().country }}
                           </span>
                         </p>
                       </div>
@@ -324,8 +323,7 @@ const PurchasesPage = {
                         </p>
                         <p class="mb-1" v-else-if="order.estimatedDeliveryTime">
                           <strong>Estimated Pickup Time:</strong> {{ formatDateTime(order.estimatedDeliveryTime) }}
-                        </p>
-                        <p class="mb-1"><strong>Restaurant Address:</strong></p>
+                        </p>                        <p class="mb-1"><strong>Restaurant Address:</strong></p>
                         <p class="mb-0">
                           <span v-if="order.delivery.details.restaurantAddress">
                             {{ order.delivery.details.restaurantAddress.line1 }}<br>
@@ -333,9 +331,9 @@ const PurchasesPage = {
                             {{ order.delivery.details.restaurantAddress.country }}
                           </span>
                           <span v-else>
-                            123 Food Street, Foodville<br>
-                            Kuala Lumpur, 50000<br>
-                            Malaysia
+                            {{ getRestaurantAddress().line1 }}<br>
+                            {{ getRestaurantAddress().city }}, {{ getRestaurantAddress().postcode }}<br>
+                            {{ getRestaurantAddress().country }}
                           </span>
                         </p>
                       </div>
@@ -1188,6 +1186,20 @@ const PurchasesPage = {
     this.componentState.performanceMetrics.renderTime =
       Date.now() - this.componentState.performanceMetrics.loadStartTime;
     this.performance.componentMountTime = Date.now();
+
+    // Initialize LocationService if available
+    if (
+      window.LocationService &&
+      !window.LocationService.getRestaurantLocation()
+    ) {
+      // Try to detect location for dynamic restaurant address
+      window.LocationService.detectLocation().catch(() => {
+        // Silently handle location detection failure - fallback is already in place
+        console.log(
+          "Location detection not available, using default restaurant address"
+        );
+      });
+    }
 
     // Apply custom styles for timeline and rating
     this.applyCustomStyles(); // Setup event listeners
@@ -2842,26 +2854,14 @@ const PurchasesPage = {
         case "dine-in":
           return {
             tableNumber: order.tableNumber,
-            restaurantAddress: {
-              line1: "123 Food Street, Foodville",
-              city: "Kuala Lumpur",
-              state: "Kuala Lumpur",
-              postcode: "50000",
-              country: "Malaysia",
-            },
+            restaurantAddress: this.getRestaurantAddress(),
           };
 
         case "pickup":
           return {
             phoneNumber: order.phoneNumber,
             pickupTime: order.estimatedDeliveryTime,
-            restaurantAddress: {
-              line1: "123 Food Street, Foodville",
-              city: "Kuala Lumpur",
-              state: "Kuala Lumpur",
-              postcode: "50000",
-              country: "Malaysia",
-            },
+            restaurantAddress: this.getRestaurantAddress(),
           };
 
         case "delivery":
@@ -2875,6 +2875,32 @@ const PurchasesPage = {
         default:
           return {};
       }
+    },
+
+    /**
+     * Get restaurant address from LocationService
+     * @returns {Object} Restaurant address object
+     */
+    getRestaurantAddress() {
+      try {
+        if (window.LocationService) {
+          return window.LocationService.getRestaurantAddress();
+        }
+      } catch (error) {
+        console.warn(
+          "Failed to get restaurant address from LocationService:",
+          error
+        );
+      }
+
+      // Fallback to default address
+      return {
+        line1: "123 Food Street, Foodville",
+        city: "Kuala Lumpur",
+        state: "Kuala Lumpur",
+        postcode: "50000",
+        country: "Malaysia",
+      };
     },
   },
 };
