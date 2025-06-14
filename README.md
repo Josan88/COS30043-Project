@@ -10,6 +10,99 @@
 
 FoodNow is a comprehensive Vue.js food ordering web application that demonstrates all required COS30043 project requirements. This application showcases modern web development practices with full accessibility support, responsive design, and advanced Vue.js features.
 
+## Brief Application Overview with Screenshots
+
+### 🏠 Homepage - Modern Food Ordering Interface
+
+The homepage features a clean, modern design with featured products, categories, and how-it-works sections. The responsive layout adapts seamlessly across all device sizes.
+
+**Desktop View:**
+![Homepage Desktop](screenshots/Desktop%20Screenshots/homepage-desktop.png)
+
+**Mobile Portrait View:**
+![Homepage Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/homepage-mobile-portrait.png)
+
+**Mobile Landscape View:**
+![Homepage Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/homepage-mobile-landscape.png)
+
+### 🛍️ Product Page - Advanced Filtering & Search
+
+Interactive product browsing with real-time filtering, search functionality, and detailed product information with customization options.
+
+**Desktop View:**
+![Product Page Desktop](screenshots/Desktop%20Screenshots/product-page-desktop.png)
+
+**Mobile Portrait View:**
+![Product Page Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/product-page-mobile-portrait.png)
+
+**Mobile Landscape View:**
+![Product Grid Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/product-grid-mobile-landscape.png)
+![Product Page Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/product-page-mobile-landscape.png)
+
+### 🛒 Shopping Cart - Streamlined Checkout
+
+Intuitive shopping cart interface with item management, order summary, and seamless checkout process.
+
+**Desktop View:**
+![Shopping Cart Desktop](screenshots/Desktop%20Screenshots/shopping-cart-desktop.png)
+
+**Mobile Portrait View:**
+![Shopping Cart Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/shopping-cart-mobile-portrait.png)
+
+**Mobile Landscape View:**
+![Shopping Cart Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/shopping-cart-mobile-landscape.png)
+
+### 👤 User Authentication - Secure Login/Registration
+
+Clean authentication interface with form validation and responsive design.
+
+**Login Page:**
+
+- Desktop: ![Login Desktop](screenshots/Desktop%20Screenshots/login-desktop.png)
+- Mobile Portrait: ![Login Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/login-mobile-portrait.png)
+- Mobile Landscape: ![Login Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/login-mobile-landscape.png)
+
+**Registration Page:**
+
+- Desktop: ![Registration Desktop](screenshots/Desktop%20Screenshots/registration-desktop.png)
+- Mobile Portrait: ![Registration Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/registration-mobile-portrait.png)
+- Mobile Landscape: ![Registration Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/registration-mobile-landscape.png)
+
+### 📱 Mobile Navigation - Optimized User Experience
+
+Responsive navigation system that provides excellent usability across all device types.
+
+**Mobile Portrait Navigation:**
+![Mobile Navigation Portrait](screenshots/Mobile%20Portrait%20Screenshots/mobile-navigation-portrait.png)
+
+**Mobile Landscape Navigation:**
+![Mobile Navigation Landscape](screenshots/Mobile%20Landscape%20Screenshots/mobile-navigation-landscape.png)
+
+### 👤 Account Management - User Profile & Order History
+
+Comprehensive account management with order history and user profile features.
+
+**Account Page:**
+
+- Desktop: ![Account Desktop](screenshots/Desktop%20Screenshots/account-desktop.png)
+- Mobile Portrait: ![Account Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/account-mobile-portrait.png)
+- Mobile Landscape: ![Account Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/account-mobile-landscape.png)
+
+**Purchase History:**
+
+- Desktop: ![Purchases Desktop](screenshots/Desktop%20Screenshots/purchases-desktop.png)
+- Mobile Portrait: ![Purchases Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/purchases-mobile-portrait.png)
+- Mobile Landscape: ![Purchases Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/purchases-mobile-landscape.png)
+
+### ✨ Key Features Demonstrated
+
+- **Complete Responsive Design**: Seamless experience across desktop, mobile portrait, and mobile landscape orientations
+- **Advanced Vue.js Implementation**: Comprehensive use of components, directives, and filters
+- **Modern UI/UX**: Clean, intuitive interface with smooth animations and transitions
+- **Accessibility Compliance**: Full WCAG guidelines implementation
+- **Location-Aware Services**: Dynamic restaurant positioning and address mapping
+- **Cross-Device Compatibility**: Consistent functionality across all screen sizes and orientations
+
 ## Key Innovation: Location-Aware Restaurant System
 
 **Core Assumption:** This application operates under the assumption that **the user's current location represents the restaurant location**. This design approach is specifically tailored for in-restaurant ordering scenarios where customers use the system while physically present at the restaurant.
