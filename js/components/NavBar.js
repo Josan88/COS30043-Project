@@ -121,7 +121,8 @@ window.app.component("nav-bar", {
           shouldShow: true,
           badge: true,
           badgeValue: 0,
-        },        {
+        },
+        {
           name: "Account",
           path: "/account",
           icon: "fas fa-user",
@@ -129,7 +130,8 @@ window.app.component("nav-bar", {
           shouldShow: true, // Show for logged in users on all devices
           badge: false,
           requiresAuth: true, // Only show when authenticated
-        },        {
+        },
+        {
           name: "Orders",
           path: "/purchases",
           icon: "fas fa-history",
@@ -137,7 +139,8 @@ window.app.component("nav-bar", {
           shouldShow: true, // Show for logged in users on all devices
           badge: false,
           requiresAuth: true, // Only show when authenticated
-        },        {
+        },
+        {
           name: "Sign Out",
           path: "#",
           icon: "fas fa-sign-out-alt",
@@ -189,7 +192,8 @@ window.app.component("nav-bar", {
       ],
     };
   },
-  computed: {    /**
+  computed: {
+    /**
      * Filter navigation items based on authentication state and device type
      */
     filteredNavigationItems() {
@@ -222,10 +226,11 @@ window.app.component("nav-bar", {
 
         return item.shouldShow;
       });
-    },    /**
+    }
+    /**
      * Determine if user dropdown should be shown
      * Show for authenticated users on desktop/tablet, and also on mobile when space is limited
-     */
+     */,
     showUserDropdown() {
       return this.isLoggedIn;
     },
@@ -323,11 +328,10 @@ window.app.component("nav-bar", {
       if (this.isNavOpen) {
         this.isUserDropdownOpen = false;
       }
-    }
+    },
     /**
      * Detect if current device is mobile
-     */,
-    isMobileDevice() {
+     */ isMobileDevice() {
       // Check for mobile user agent
       const isMobileUserAgent =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -398,11 +402,10 @@ window.app.component("nav-bar", {
         console.warn("Bootstrap dropdown initialization failed:", error);
         // Fallback to manual toggle
       }
-    }
+    },
     /**
      * Toggle user dropdown menu
-     */,
-    toggleUserDropdown(event) {
+     */ toggleUserDropdown(event) {
       event?.preventDefault();
 
       // Try to use Bootstrap dropdown if available
@@ -417,11 +420,10 @@ window.app.component("nav-bar", {
       if (this.isUserDropdownOpen) {
         this.isNavOpen = false;
       }
-    }
+    },
     /**
      * Handle navigation action clicks (for action items like logout)
-     */,
-    handleNavAction(item) {
+     */ handleNavAction(item) {
       try {
         // Close mobile navigation after click
         this.isNavOpen = false;
@@ -525,11 +527,10 @@ window.app.component("nav-bar", {
       if (!event.target.closest(".navbar") && this.isNavOpen) {
         this.isNavOpen = false;
       }
-    }
+    },
     /**
      * Handle window resize events
-     */,
-    handleResize() {
+     */ handleResize() {
       this.windowWidth = window.innerWidth;
     },
 
