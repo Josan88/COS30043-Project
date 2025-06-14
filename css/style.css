@@ -3237,7 +3237,8 @@ img {
 }
 
 .regular-price {
-  color: #2c3e50;
+  color: #1a252f;
+  font-weight: 700;
 }
 
 .discounted-price {
@@ -3767,5 +3768,27 @@ img {
   .product-grid-enhanced > * {
     flex: 1 1 280px;
     margin: 0.5rem;
+  }
+}
+
+/* Desktop-specific price visibility improvements */
+@media (min-width: 768px) {
+  /* Enhanced regular price visibility for desktop */
+  .regular-price {
+    color: #0d1117 !important;
+    font-weight: 800 !important;
+    font-size: 1.3rem !important;
+  }
+  
+  .current-price {
+    font-size: 1.3rem !important;
+    font-weight: 800 !important;
+  }
+  
+  /* Ensure product card prices are visible */
+  .product-card .regular-price,
+  .modern-card .regular-price {
+    color: #0d1117 !important;
+    font-weight: 800 !important;
   }
 }
