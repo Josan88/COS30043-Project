@@ -201,8 +201,7 @@ const PurchasesPage = {
                     <tr v-if="order.bulkDiscount">
                       <td colspan="4" class="text-end text-success"><strong>Bulk Order Discount:</strong></td>
                       <td class="text-success">-{{ formatCurrency(order.bulkDiscount.amount) }}</td>
-                    </tr>
-                    <tr>
+                    </tr>                    <tr v-if="order.delivery?.method === 'delivery' || order.delivery?.method === 'express' || (order.serviceMethod && ['delivery', 'express'].includes(order.serviceMethod))">
                       <td colspan="4" class="text-end"><strong>{{ getDeliveryLabel(order) }}:</strong></td>
                       <td>
                         <span v-if="order.totals.deliveryFee > 0">{{ formatCurrency(order.totals.deliveryFee) }}</span>
@@ -257,8 +256,7 @@ const PurchasesPage = {
                     <div v-if="order.bulkDiscount" class="d-flex justify-content-between mb-2 text-success">
                       <span>Bulk Order Discount:</span>
                       <span>-{{ $currency(order.bulkDiscount.amount) }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-2">
+                    </div>                    <div v-if="order.delivery?.method === 'delivery' || order.delivery?.method === 'express' || (order.serviceMethod && ['delivery', 'express'].includes(order.serviceMethod))" class="d-flex justify-content-between mb-2">
                       <span>{{ getDeliveryLabel(order) }}:</span>
                       <span v-if="order.totals.deliveryFee > 0">{{ $currency(order.totals.deliveryFee) }}</span>
                       <span v-else class="text-success">FREE</span>
@@ -405,8 +403,7 @@ const PurchasesPage = {
                             </p>
                           </div>
                         </div>
-                        
-                        <div v-if="order.delivery.method !== 'pickup'" class="timeline-item" :class="{'completed': isStatusReached(order.status, 'out-for-delivery')}">
+                          <div v-if="order.delivery.method === 'delivery' || order.delivery.method === 'express'" class="timeline-item" :class="{'completed': isStatusReached(order.status, 'out-for-delivery')}">
                           <div class="timeline-icon">
                             <i class="fas" :class="isStatusReached(order.status, 'out-for-delivery') ? 'fa-check-circle' : 'fa-circle'"></i>
                           </div>
@@ -418,7 +415,7 @@ const PurchasesPage = {
                           </div>
                         </div>
                         
-                        <div v-else class="timeline-item" :class="{'completed': isStatusReached(order.status, 'ready')}">
+                        <div v-else-if="order.delivery.method === 'pickup'" class="timeline-item" :class="{'completed': isStatusReached(order.status, 'ready')}">
                           <div class="timeline-icon">
                             <i class="fas" :class="isStatusReached(order.status, 'ready') ? 'fa-check-circle' : 'fa-circle'"></i>
                           </div>
@@ -430,12 +427,27 @@ const PurchasesPage = {
                           </div>
                         </div>
                         
-                        <div class="timeline-item" :class="{'completed': isStatusReached(order.status, 'delivered')}">
+                        <div v-else-if="order.delivery.method === 'dine-in'" class="timeline-item" :class="{'completed': isStatusReached(order.status, 'ready')}">
+                          <div class="timeline-icon">
+                            <i class="fas" :class="isStatusReached(order.status, 'ready') ? 'fa-check-circle' : 'fa-circle'"></i>
+                          </div>
+                          <div class="timeline-content">
+                            <p class="mb-0"><strong>Ready to Serve</strong></p>
+                            <p class="text-muted mb-0 small" v-if="order.statusUpdates && order.statusUpdates.ready">
+                              {{ formatDateTime(order.statusUpdates.ready) }}
+                            </p>
+                          </div>
+                        </div>
+                          <div class="timeline-item" :class="{'completed': isStatusReached(order.status, 'delivered')}">
                           <div class="timeline-icon">
                             <i class="fas" :class="isStatusReached(order.status, 'delivered') ? 'fa-check-circle' : 'fa-circle'"></i>
                           </div>
                           <div class="timeline-content">
-                            <p class="mb-0"><strong>{{ order.delivery.method === 'pickup' ? 'Picked Up' : 'Delivered' }}</strong></p>
+                            <p class="mb-0"><strong>
+                              <span v-if="order.delivery.method === 'pickup'">Picked Up</span>
+                              <span v-else-if="order.delivery.method === 'dine-in'">Served</span>
+                              <span v-else>Delivered</span>
+                            </strong></p>
                             <p class="text-muted mb-0 small" v-if="order.statusUpdates && order.statusUpdates.delivered">
                               {{ formatDateTime(order.statusUpdates.delivered) }}
                             </p>
@@ -563,15 +575,43 @@ const PurchasesPage = {
                     </div>
                   </div>
                 </div>
-                
-                <!-- Delivery Rating (if applicable) -->
-                <div class="mb-4" v-if="ratedOrder.delivery.method !== 'pickup'">
+                  <!-- Delivery Rating (if applicable) -->
+                <div class="mb-4" v-if="ratedOrder.delivery.method === 'delivery' || ratedOrder.delivery.method === 'express'">
                   <label class="form-label">Delivery Speed</label>
                   <div class="d-flex align-items-center">
                     <div class="rating-small me-2">
                       <template v-for="n in 5" :key="n">
                         <input type="radio" :id="'delivery' + n" name="delivery" :value="n" v-model="rating.deliverySpeed">
                         <label :for="'delivery' + n" :title="n + ' stars'">
+                          <i class="fas fa-star"></i>
+                        </label>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Service Rating (for pickup and dine-in) -->
+                <div class="mb-4" v-else-if="ratedOrder.delivery.method === 'pickup'">
+                  <label class="form-label">Pickup Experience</label>
+                  <div class="d-flex align-items-center">
+                    <div class="rating-small me-2">
+                      <template v-for="n in 5" :key="n">
+                        <input type="radio" :id="'service' + n" name="service" :value="n" v-model="rating.serviceExperience">
+                        <label :for="'service' + n" :title="n + ' stars'">
+                          <i class="fas fa-star"></i>
+                        </label>
+                      </template>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="mb-4" v-else-if="ratedOrder.delivery.method === 'dine-in'">
+                  <label class="form-label">Dining Experience</label>
+                  <div class="d-flex align-items-center">
+                    <div class="rating-small me-2">
+                      <template v-for="n in 5" :key="n">
+                        <input type="radio" :id="'dining' + n" name="dining" :value="n" v-model="rating.diningExperience">
+                        <label :for="'dining' + n" :title="n + ' stars'">
                           <i class="fas fa-star"></i>
                         </label>
                       </template>
@@ -771,6 +811,8 @@ const PurchasesPage = {
         overall: 5,
         foodQuality: 5,
         deliverySpeed: 5,
+        serviceExperience: 5,
+        diningExperience: 5,
         comment: "",
         items: [],
         isSubmitting: false,
@@ -2696,10 +2738,12 @@ const PurchasesPage = {
           return method;
       }
     },
-
     getDeliveryLabel(order) {
       const method = order.delivery?.method || order.serviceMethod;
-      return method === "pickup" ? "Pickup Fee" : "Delivery Fee";
+      if (method === "pickup" || method === "dine-in") {
+        return "Service Fee";
+      }
+      return "Delivery Fee";
     },
 
     isStatusReached(currentStatus, checkStatus) {
