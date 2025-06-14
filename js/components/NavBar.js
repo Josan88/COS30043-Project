@@ -22,10 +22,9 @@ window.app.component("nav-bar", {
         </button>
         
         <div class="collapse navbar-collapse" :class="{ 'd-block': isNavOpen }">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item" v-for="item in navigationItems" :key="item.name">
+          <ul class="navbar-nav ms-auto">            <li class="nav-item" v-for="item in filteredNavigationItems" :key="item.name">
               <router-link 
-                v-if="item.shouldShow" 
+                v-if="!item.isAction"
                 :to="item.path" 
                 class="nav-link" 
                 :aria-label="item.ariaLabel"
@@ -36,27 +35,37 @@ window.app.component("nav-bar", {
                   {{ item.badgeValue }}
                 </span>
               </router-link>
+              <a 
+                v-else
+                href="#" 
+                class="nav-link" 
+                :aria-label="item.ariaLabel"
+                @click.prevent="handleNavAction(item)"
+              >
+                <i :class="item.icon"></i> {{ item.name }}
+              </a>
             </li>
-            
-            <!-- User dropdown for authenticated users -->
-            <li class="nav-item dropdown" v-if="isLoggedIn">
+              <!-- User dropdown for authenticated users -->
+            <li class="nav-item dropdown" v-if="showUserDropdown">
               <a 
                 class="nav-link dropdown-toggle" 
                 href="#" 
                 id="userDropdown" 
                 role="button" 
                 data-bs-toggle="dropdown" 
+                data-bs-auto-close="true"
                 :aria-expanded="isUserDropdownOpen"
                 @click="toggleUserDropdown"
               >
                 <i class="fas fa-user-circle"></i> {{ userDisplayName }}
               </a>
-              <ul class="dropdown-menu" aria-labelledby="userDropdown">
+              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                 <li v-for="menuItem in userMenuItems" :key="menuItem.name">
                   <router-link 
                     v-if="!menuItem.isAction" 
                     :to="menuItem.path" 
                     class="dropdown-item"
+                    @click="handleDropdownItemClick"
                   >
                     <i :class="menuItem.icon"></i> {{ menuItem.name }}
                   </router-link>
@@ -64,7 +73,7 @@ window.app.component("nav-bar", {
                     v-else 
                     class="dropdown-item" 
                     href="#" 
-                    @click.prevent="menuItem.action"
+                    @click.prevent="handleDropdownAction(menuItem)"
                   >
                     <i :class="menuItem.icon"></i> {{ menuItem.name }}
                   </a>
@@ -88,7 +97,8 @@ window.app.component("nav-bar", {
       userDisplayName: "My Account",
 
       // Cart State
-      cartItemCount: 0,
+      cartItemCount: 0, // Data for mobile detection
+      windowWidth: window.innerWidth,
 
       // Configuration
       brandName: window.APP_CONSTANTS?.UI?.BRAND_NAME || "FoodNow",
@@ -111,6 +121,35 @@ window.app.component("nav-bar", {
           shouldShow: true,
           badge: true,
           badgeValue: 0,
+        },
+        {
+          name: "Account",
+          path: "/account",
+          icon: "fas fa-user",
+          ariaLabel: "My Account",
+          shouldShow: false, // Will be shown only for mobile when logged in
+          badge: false,
+          mobileOnly: true,
+        },
+        {
+          name: "Orders",
+          path: "/purchases",
+          icon: "fas fa-history",
+          ariaLabel: "Order History",
+          shouldShow: false, // Will be shown only for mobile when logged in
+          badge: false,
+          mobileOnly: true,
+        },
+        {
+          name: "Sign Out",
+          path: "#",
+          icon: "fas fa-sign-out-alt",
+          ariaLabel: "Sign Out",
+          shouldShow: false, // Will be shown only for mobile when logged in
+          badge: false,
+          mobileOnly: true,
+          isAction: true,
+          action: () => this.logout(),
         },
         {
           name: "Sign In",
@@ -155,24 +194,40 @@ window.app.component("nav-bar", {
   },
   computed: {
     /**
-     * Filter navigation items based on authentication state
+     * Filter navigation items based on authentication state and device type
      */
     filteredNavigationItems() {
       return this.navigationItems.filter((item) => {
-        if (
-          !this.isLoggedIn &&
-          (item.name === "Sign In" || item.name === "Register")
-        ) {
-          return true;
+        // Handle mobile-only items
+        if (item.mobileOnly) {
+          return this.isLoggedIn && this.isMobileDevice();
         }
+
+        // Hide sign in/register when logged in
         if (
           this.isLoggedIn &&
           (item.name === "Sign In" || item.name === "Register")
         ) {
           return false;
         }
+
+        // Show sign in/register when not logged in
+        if (
+          !this.isLoggedIn &&
+          (item.name === "Sign In" || item.name === "Register")
+        ) {
+          return true;
+        }
+
         return item.shouldShow;
       });
+    },
+
+    /**
+     * Determine if user dropdown should be shown (desktop/tablet only)
+     */
+    showUserDropdown() {
+      return this.isLoggedIn && !this.isMobileDevice();
     },
   },
   watch: {
@@ -240,10 +295,13 @@ window.app.component("nav-bar", {
         // Load user info if logged in
         if (this.isLoggedIn) {
           this.loadUserInfo();
-        }
-
-        // Initialize cart count
+        } // Initialize cart count
         this.updateCartCount();
+
+        // Initialize Bootstrap dropdown if user is logged in
+        if (this.isLoggedIn) {
+          this.initializeBootstrapDropdown();
+        }
 
         // Mark component as initialized
         this.isInitialized = true;
@@ -265,15 +323,122 @@ window.app.component("nav-bar", {
       if (this.isNavOpen) {
         this.isUserDropdownOpen = false;
       }
+    }
+    /**
+     * Detect if current device is mobile
+     */,
+    isMobileDevice() {
+      // Check for mobile user agent
+      const isMobileUserAgent =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+
+      // Check for small screen size (mobile breakpoint) - use reactive windowWidth
+      const isMobileScreen = this.windowWidth < 768;
+
+      // Check for touch device
+      const isTouchDevice =
+        "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+      return isMobileUserAgent || (isMobileScreen && isTouchDevice);
     },
+
+    /**
+     * Handle dropdown item clicks (for navigation items)
+     */
+    handleDropdownItemClick() {
+      // Close dropdown after navigation
+      this.isUserDropdownOpen = false;
+      this.isNavOpen = false;
+    },
+
+    /**
+     * Handle dropdown action clicks (for non-navigation items like logout)
+     */
+    handleDropdownAction(menuItem) {
+      // Execute the action
+      if (menuItem.action) {
+        menuItem.action();
+      }
+
+      // Close dropdown
+      this.isUserDropdownOpen = false;
+      this.isNavOpen = false;
+    },
+
+    /**
+     * Initialize Bootstrap dropdown manually for better control
+     */
+    initializeBootstrapDropdown() {
+      try {
+        this.$nextTick(() => {
+          const dropdownElement = document.getElementById("userDropdown");
+          if (dropdownElement && window.bootstrap) {
+            // Initialize Bootstrap dropdown
+            this.bootstrapDropdown = new window.bootstrap.Dropdown(
+              dropdownElement,
+              {
+                autoClose: true,
+                boundary: "viewport",
+              }
+            );
+
+            // Add event listeners for Bootstrap dropdown events
+            dropdownElement.addEventListener("show.bs.dropdown", () => {
+              this.isUserDropdownOpen = true;
+            });
+
+            dropdownElement.addEventListener("hide.bs.dropdown", () => {
+              this.isUserDropdownOpen = false;
+            });
+          }
+        });
+      } catch (error) {
+        console.warn("Bootstrap dropdown initialization failed:", error);
+        // Fallback to manual toggle
+      }
+    }
     /**
      * Toggle user dropdown menu
-     */ toggleUserDropdown() {
-      this.isUserDropdownOpen = !this.isUserDropdownOpen;
+     */,
+    toggleUserDropdown(event) {
+      event?.preventDefault();
+
+      // Try to use Bootstrap dropdown if available
+      if (this.bootstrapDropdown) {
+        this.bootstrapDropdown.toggle();
+      } else {
+        // Fallback to manual toggle
+        this.isUserDropdownOpen = !this.isUserDropdownOpen;
+      }
 
       // Close mobile nav when opening user dropdown
       if (this.isUserDropdownOpen) {
         this.isNavOpen = false;
+      }
+    }
+    /**
+     * Handle navigation action clicks (for action items like logout)
+     */,
+    handleNavAction(item) {
+      try {
+        // Close mobile navigation after click
+        this.isNavOpen = false;
+
+        // Execute the action
+        if (item.action) {
+          item.action();
+        }
+
+        console.log("Navigation action executed:", item.name);
+      } catch (error) {
+        console.error("Error handling navigation action:", error);
+        window.ErrorHandler?.logError(error, {
+          component: "NavBar",
+          method: "handleNavAction",
+          item: item.name,
+        });
       }
     },
 
@@ -331,6 +496,9 @@ window.app.component("nav-bar", {
 
       // Keyboard navigation
       document.addEventListener("keydown", this.handleKeydown);
+
+      // Window resize for mobile detection
+      window.addEventListener("resize", this.handleResize);
     },
 
     /**
@@ -341,6 +509,7 @@ window.app.component("nav-bar", {
       window.removeEventListener("cart-updated", this.updateCartCount);
       document.removeEventListener("click", this.handleGlobalClick);
       document.removeEventListener("keydown", this.handleKeydown);
+      window.removeEventListener("resize", this.handleResize);
     },
 
     /**
@@ -356,6 +525,12 @@ window.app.component("nav-bar", {
       if (!event.target.closest(".navbar") && this.isNavOpen) {
         this.isNavOpen = false;
       }
+    }
+    /**
+     * Handle window resize events
+     */,
+    handleResize() {
+      this.windowWidth = window.innerWidth;
     },
 
     /**
@@ -367,11 +542,10 @@ window.app.component("nav-bar", {
         this.isUserDropdownOpen = false;
         this.isNavOpen = false;
       }
-    }
+    },
     /**
      * Update cart item count from CartService
-     */,
-    updateCartCount() {
+     */ updateCartCount() {
       try {
         // Use CartService to get the current cart count
         if (window.CartService) {
@@ -425,6 +599,9 @@ window.app.component("nav-bar", {
         }
 
         console.log("User info loaded:", this.userDisplayName);
+
+        // Initialize Bootstrap dropdown after user info is loaded
+        this.initializeBootstrapDropdown();
       } catch (error) {
         console.error("Error loading user info:", error);
         this.userDisplayName = "My Account";
@@ -586,6 +763,9 @@ window.app.component("nav-bar", {
 
       // Keyboard navigation
       document.addEventListener("keydown", this.handleKeydown);
+
+      // Window resize for mobile detection
+      window.addEventListener("resize", this.handleResize);
     },
 
     /**
@@ -596,6 +776,7 @@ window.app.component("nav-bar", {
       window.removeEventListener("cart-updated", this.updateCartCount);
       document.removeEventListener("click", this.handleGlobalClick);
       document.removeEventListener("keydown", this.handleKeydown);
+      window.removeEventListener("resize", this.handleResize);
     },
 
     /**
