@@ -780,29 +780,25 @@ body {
   /* Container Adjustments */
   .container {
     max-width: var(--container-md);
+  }  /* Keep mobile navigation for landscape due to limited vertical space */
+  .navbar {
+    min-height: calc(var(--navbar-height-mobile) - 10px); /* Reduce height slightly */
+    padding: calc(var(--spacing-sm) - 2px) 0; /* Reduce padding */
   }
-
-  /* Navigation Improvements */
+  
   .navbar-collapse {
-    position: static;
-    width: auto;
-    background: none;
-    box-shadow: none;
-    padding: 0;
+    max-height: 50vh; /* Limit to half viewport height */
+    overflow-y: auto; /* Allow scrolling if needed */
+    padding: var(--spacing-sm) var(--spacing-md); /* Reduce padding */
   }
 
   .navbar-nav {
-    flex-direction: row;
-    gap: var(--spacing-lg);
+    gap: calc(var(--spacing-sm) - 2px); /* Reduce spacing between nav items */
   }
 
-  .navbar-toggler {
-    display: none;
-  }
-
-  .navbar-collapse {
-    display: flex !important;
-    justify-content: flex-end;
+  .nav-link {
+    padding: calc(var(--spacing-sm) - 2px) var(--spacing-md); /* Reduce link padding */
+    font-size: var(--font-size-sm); /* Slightly smaller font */
   }
 
   /* Hero Section - Landscape Layout */
@@ -839,11 +835,35 @@ body {
   .container {
     max-width: var(--container-lg);
   }
-
   /* Enhanced spacing */
   :root {
     --spacing-xl: 2.5rem;
     --spacing-xxl: 4rem;
+  }
+
+  /* Navigation - Switch to horizontal layout on tablets */
+  .navbar-collapse {
+    position: static;
+    width: auto;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .navbar-nav {
+    flex-direction: row;
+    gap: var(--spacing-lg);
+  }
+
+  .navbar-toggler {
+    display: none;
+  }
+
+  .navbar-collapse {
+    display: flex !important;
+    justify-content: flex-end;
   }
 
   /* Card Grid - 3 Columns */
@@ -1452,51 +1472,6 @@ img {
     background: linear-gradient(90deg, #f8f9fa 25%, #e9ecef 50%, #f8f9fa 75%);
     background-size: 200% 100%;
     animation: loading-shimmer 2s infinite;
-  }
-}
-
-/* Mobile Landscape Adjustments */
-@media (min-width: 576px) and (max-width: 767.98px) and (orientation: landscape) {
-
-  /* Maintain 4:3 aspect ratio for landscape */
-  .card-image-container,
-  .image-aspect-container {
-    aspect-ratio: 4/3;
-  }
-
-  /* Hero images - 16:9 for landscape */
-  .hero-image-container {
-    aspect-ratio: 16/9;
-  }
-  
-  /* Category images - maintain square */
-  .category-image-container {
-    aspect-ratio: 1;
-  }
-}
-
-/* Tablet and Desktop Enhancements */
-@media (min-width: 768px) {
-
-  /* Standard aspect ratios for larger screens */
-  .card-image-container,
-  .image-aspect-container {
-    aspect-ratio: 4/3;
-  }
-
-  /* Enhanced hero image dimensions */
-  .hero-image-container {
-    aspect-ratio: 21/9; /* Wider cinematic ratio for desktop */
-  }
-
-  /* Re-enable hover effects for non-touch devices */
-  .card:hover .food-image {
-    transform: scale(1.05);
-  }
-  
-  /* Enhanced hover overlay */
-  .card:hover .image-overlay {
-    opacity: 1;
   }
 }
 
@@ -3790,5 +3765,45 @@ img {
   .modern-card .regular-price {
     color: #0d1117 !important;
     font-weight: 800 !important;
+  }
+}
+
+/* ===========================================
+     MOBILE LANDSCAPE ORIENTATION SPECIFIC
+     =========================================== */
+
+/* Optimize for mobile devices in landscape mode with limited height */
+@media (max-width: 767px) and (orientation: landscape) {
+  .navbar {
+    min-height: 45px; /* Further reduce navbar height */
+    padding: 4px 0; /* Minimal padding */
+  }
+  
+  .navbar-brand {
+    font-size: var(--font-size-lg); /* Smaller brand text */
+  }
+  
+  .navbar-brand i {
+    font-size: var(--font-size-xl); /* Smaller icon */
+  }
+  
+  .navbar-toggler {
+    padding: 4px 8px; /* Smaller toggle button */
+    font-size: var(--font-size-sm);
+  }
+  
+  .navbar-collapse {
+    max-height: 60vh; /* Increase to 60% of viewport height */
+    padding: var(--spacing-sm); /* Reduce padding further */
+  }
+  
+  .nav-link {
+    padding: 4px var(--spacing-sm); /* Minimal padding for nav links */
+    font-size: var(--font-size-sm);
+  }
+  
+  /* Ensure main content is not blocked */
+  main.container {
+    padding-top: var(--spacing-sm);
   }
 }
