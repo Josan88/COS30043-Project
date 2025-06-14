@@ -481,417 +481,449 @@ getRestaurantAddress() {
 ### 10. Documentation - **10 Marks**
 
 **Requirements:**
-
 - Wireframe design diagrams
 - Brief explanation with screenshots
 
 #### Implementation:
 
-**Screenshots with Brief Explanations:**
+This documentation section provides comprehensive screenshots and explanations demonstrating the FoodNow application's implementation of all COS30043 requirements across desktop, mobile portrait, and mobile landscape views.
 
-The following screenshots demonstrate the FoodNow application's implementation of all COS30043 requirements across different devices and browsers.
+---
 
-##### 1. Main Page (Index Page) - Context View Grouping & Grid System
+## Application Screenshots with Detailed Explanations
 
-![Homepage Desktop Screenshot](screenshots/homepage-desktop.png)
-![Homepage Mobile Screenshot](screenshots/homepage-mobile.png)
+### 1. Homepage (Index Page) - Context View Grouping & Grid System
 
-**Brief Explanation:**
+#### Desktop View
+![Homepage Desktop](screenshots/Desktop%20Screenshots/homepage-desktop.png)
 
-- **Context View Grouping**: The homepage demonstrates clear content organization with products grouped by categories (Featured Items, Popular Dishes, New Arrivals)
-- **Row-Column Grid System**: Responsive grid implementation adapting from single-column mobile layout to 4-column desktop layout
-- **Bootstrap Integration**: Utilizes Bootstrap's grid system with custom CSS for enhanced responsive behavior
-- **Navigation**: Professional navbar with responsive mobile hamburger menu
+#### Mobile Portrait View
+![Homepage Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/homepage-mobile-portrait.png)
 
-**Key Features Shown:**
+#### Mobile Landscape View
+![Homepage Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/homepage-mobile-landscape.png)
 
-- Hero section with promotional content and call-to-action buttons
-- Featured products displayed in responsive card grid
-- Category-based content grouping with visual separation
-- Mobile-first responsive design with smooth breakpoint transitions
+**Technical Implementation:**
 
-##### 2. Product Page - Arrays, Directives, Filters & Pagination
+- **Context View Grouping**: Products are strategically organized into distinct sections:
+  - **Featured Products**: Highlighted promotional items with enhanced visual presentation
+  - **Popular Categories**: Food categories grouped by cuisine type and popularity
+  - **How It Works**: Process explanation with numbered steps and icons
+  - **Customer Reviews**: Social proof section with testimonials and ratings
 
-![Product Page Desktop Screenshot](screenshots/product-page-desktop.png)
-![Product Page Mobile Screenshot](screenshots/product-page-mobile.png)
-![Product Filters Screenshot](screenshots/product-filters.png)
+- **Row-Column Grid System**: 
+  - **Desktop (≥992px)**: 4-column responsive grid with consistent card sizing
+  - **Mobile Landscape (576px-767px)**: 2-column layout for optimal viewing
+  - **Mobile Portrait (≤575px)**: Single-column stacked layout for touch navigation
 
-**Brief Explanation:**
+- **Bootstrap Integration**: Utilizes Bootstrap's grid system with custom CSS enhancements for responsive behavior and visual consistency
 
-- **Arrays Usage**: Dynamic product listing using Vue.js arrays with complex filtering and sorting operations
-- **Directives Implementation**:
-  - `v-for` for product iteration
-  - `v-if/v-show` for conditional filter display
-  - `v-model` for two-way data binding in search and filters
-- **Custom Filters**: formatCurrency, truncate, formatStars for data presentation
-- **Pagination**: Professional pagination controls with configurable items per page (12, 24, 36)
-- **JSON Data**: Products loaded dynamically from products.json file
+**Key Features Demonstrated:**
+- Hero section with compelling call-to-action and promotional banners
+- Responsive navigation with collapsible mobile menu
+- Category-based content organization with visual hierarchy
+- Mobile-first design approach with progressive enhancement
 
-**Key Features Shown:**
+---
 
-- Advanced search and filtering panel with multiple criteria
-- Product grid with responsive card layout
-- Pagination controls with page navigation
-- Sort dropdown with multiple sorting options
-- Category-based filtering and search functionality
+### 2. Product Page - Arrays, Directives, Filters & Pagination
 
-##### 3. Shopping Cart - Data Manipulation & Calculations
+#### Desktop View
+![Product Page Desktop](screenshots/Desktop%20Screenshots/product-page-desktop.png)
+![Product Filters Desktop](screenshots/Desktop%20Screenshots/product-filters-desktop.png)
 
-![Shopping Cart Desktop Screenshot](screenshots/shopping-cart-desktop.png)
-![Shopping Cart Mobile Screenshot](screenshots/shopping-cart-mobile.png)
-![Cart Calculations Screenshot](screenshots/cart-calculations.png)
+#### Mobile Portrait View
+![Product Page Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/product-page-mobile-portrait.png)
+![Product Grid Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/product-grid-mobile-portrait.png)
 
-**Brief Explanation:**
+#### Mobile Landscape View
+![Product Page Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/product-page-mobile-landscape.png)
+![Product Grid Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/product-grid-mobile-landscape.png)
 
-- **Cart Population**: Items added from product page with customization options preserved
-- **Data Manipulation**: Real-time calculations for subtotal, tax (6% GST), and shipping costs
-- **Local Storage**: Cart persistence across browser sessions
-- **Quantity Management**: Increase/decrease quantity with automatic total updates
-- **Checkout Process**: Comprehensive order summary with all cost breakdowns
+**Technical Implementation:**
 
-**Key Features Shown:**
+- **Arrays Usage**: Dynamic product management using Vue.js reactive arrays
+  ```javascript
+  // Dynamic filtering and sorting of product arrays
+  filteredProducts: computed(() => {
+    return this.products.filter(product => 
+      this.matchesFilters(product)
+    ).sort((a, b) => this.applySorting(a, b))
+  })
+  ```
 
-- Cart items list with product images, names, and customizations
-- Quantity controls with real-time price updates
-- Order summary section with detailed cost breakdown
-- Responsive design adapting to mobile and desktop layouts
-- Remove item functionality with confirmation dialogs
+- **Vue.js Directives Implementation**:
+  - **v-for**: Efficient product iteration with key binding for optimal rendering
+  - **v-if/v-show**: Conditional display of filters, loading states, and empty results
+  - **v-model**: Two-way data binding for search inputs, filter checkboxes, and sort options
 
-##### 4. Registration Page - Database Tables & User Storage
+- **Custom Filters**: 
+  - **formatCurrency**: Displays prices in Malaysian Ringgit with proper formatting
+  - **truncateText**: Limits product descriptions to maintain card consistency
+  - **formatRating**: Converts numeric ratings to star displays
 
-![Registration Page Desktop Screenshot](screenshots/registration-desktop.png)
-![Registration Mobile Screenshot](screenshots/registration-mobile.png)
-![Registration Validation Screenshot](screenshots/registration-validation.png)
+- **Pagination System**: Professional pagination with configurable items per page (12, 24, 36 options)
 
-**Brief Explanation:**
+- **JSON Data Integration**: Products dynamically loaded from `products.json` with category-based organization
 
-- **Database Schema**: User table structure with proper field validation and constraints
-- **Data Storage**: User information stored in LocalStorage (simulating database operations)
-- **Form Validation**: Comprehensive client-side validation with real-time feedback
-- **Security**: Password hashing simulation and data sanitization
-- **Responsive Forms**: Mobile-optimized form layout with accessibility features
+**Key Features Demonstrated:**
+- Advanced search functionality with real-time filtering
+- Multi-criteria filtering (category, price range, dietary preferences, ratings)
+- Sort options (price ascending/descending, rating, popularity, newest)
+- Responsive product grid with consistent card layouts
+- Loading states and empty result handling
 
-**Key Features Shown:**
+---
 
+### 3. Shopping Cart - Data Manipulation & Calculations
+
+#### Desktop View
+![Shopping Cart Desktop](screenshots/Desktop%20Screenshots/shopping-cart-desktop.png)
+
+#### Mobile Portrait View
+![Shopping Cart Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/shopping-cart-mobile-portrait.png)
+
+#### Mobile Landscape View
+![Shopping Cart Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/shopping-cart-mobile-landscape.png)
+
+**Technical Implementation:**
+
+- **Dynamic Cart Management**: 
+  - Items added from product pages with full customization preservation
+  - Real-time quantity updates with immediate total recalculation
+  - Remove item functionality with confirmation dialogs
+
+- **Advanced Calculations**:
+  ```javascript
+  // Comprehensive pricing calculations
+  subtotal: computed(() => 
+    this.cartItems.reduce((total, item) => 
+      total + (item.price * item.quantity), 0)
+  ),
+  gstAmount: computed(() => this.subtotal * 0.06),
+  shippingCost: computed(() => this.calculateShipping()),
+  finalTotal: computed(() => 
+    this.subtotal + this.gstAmount + this.shippingCost)
+  ```
+
+- **Data Persistence**: LocalStorage integration for cart persistence across browser sessions
+
+- **Order Summary**: Detailed breakdown showing subtotal, 6% GST, shipping costs, and final total
+
+**Key Features Demonstrated:**
+- Cart item management with quantity controls
+- Real-time price calculations and updates
+- Customization options display (size, extras, special instructions)
+- Responsive checkout process with order summary
+- Persistent cart storage across sessions
+
+---
+
+### 4. Registration Page - Database Tables & User Storage
+
+#### Desktop View
+![Registration Desktop](screenshots/Desktop%20Screenshots/registration-desktop.png)
+
+#### Mobile Portrait View
+![Registration Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/registration-mobile-portrait.png)
+
+#### Mobile Landscape View
+![Registration Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/registration-mobile-landscape.png)
+
+**Technical Implementation:**
+
+- **Database Schema Simulation**:
+  ```javascript
+  // User table structure implemented in LocalStorage
+  const userSchema = {
+    id: 'unique_identifier',
+    email: 'user@example.com',
+    password: 'hashed_password',
+    firstName: 'string',
+    lastName: 'string',
+    phone: 'string',
+    address: 'string',
+    dateOfBirth: 'date',
+    preferences: 'object',
+    createdAt: 'timestamp',
+    updatedAt: 'timestamp'
+  }
+  ```
+
+- **Comprehensive Form Validation**:
+  - Real-time validation with immediate feedback
+  - Email format verification and uniqueness check
+  - Password strength requirements with visual indicator
+  - Phone number format validation
+  - Date of birth validation with age restrictions
+
+- **Security Features**:
+  - Password hashing simulation before storage
+  - Input sanitization to prevent XSS attacks
+  - CSRF protection considerations
+
+**Key Features Demonstrated:**
 - Complete user registration form with all required fields
 - Real-time validation feedback with error/success states
 - Password strength indicator with security requirements
 - Terms and conditions acceptance with legal compliance
-- Mobile-friendly form design with touch-optimized inputs
+- Mobile-optimized form layout with accessibility features
 
-##### 5. Login Page - Form Validation
+---
 
-![Login Page Desktop Screenshot](screenshots/login-desktop.png)
-![Login Mobile Screenshot](screenshots/login-mobile.png)
-![Login Validation Screenshot](screenshots/login-validation.png)
+### 5. Login Page - Form Validation
 
-**Brief Explanation:**
+#### Desktop View
+![Login Desktop](screenshots/Desktop%20Screenshots/login-desktop.png)
 
-- **Form Validation**: Email format validation, required field checks, and error handling
-- **Security Features**: Password masking, login attempt monitoring, and session management
-- **User Experience**: "Remember Me" functionality and "Forgot Password" link
-- **Accessibility**: ARIA labels, keyboard navigation, and screen reader support
-- **Responsive Design**: Optimal layout for all device sizes
+#### Mobile Portrait View
+![Login Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/login-mobile-portrait.png)
 
-**Key Features Shown:**
-
-- Clean, professional login interface with brand consistency
-- Validation error messages with proper styling and positioning
-- Social login options (for future implementation)
-- Forgot password functionality with email recovery
-- Registration link for new users
-
-##### 6. My Account Page - User Details & Edit Functionality
-
-![Account Page Desktop Screenshot](screenshots/account-desktop.png)
-![Account Edit Mode Screenshot](screenshots/account-edit.png)
-![Account Mobile Screenshot](screenshots/account-mobile.png)
-
-**Brief Explanation:**
-
-- **User Details Display**: Complete profile information with organized sections
-- **Edit Functionality**: Inline editing for all user fields with save/cancel options
-- **Profile Management**: Avatar upload, password change, and preference settings
-- **Order History**: Recent purchases summary with quick access to detailed views
-- **Settings Panel**: Account preferences and notification management
-
-**Key Features Shown:**
-
-- Comprehensive user profile with editable fields
-- Profile image upload with preview functionality
-- Account settings organized in logical sections
-- Order history summary with status indicators
-- Mobile-responsive profile management interface
-
-##### 7. My Purchase Page - CRUD Operations
-
-![Purchases Page Desktop Screenshot](screenshots/purchases-desktop.png)
-![Purchase Details Screenshot](screenshots/purchase-details.png)
-![Purchase Actions Screenshot](screenshots/purchase-actions.png)
-
-**Brief Explanation:**
-
-- **Purchase Display**: Complete order history with filtering and search capabilities
-- **CRUD Operations**:
-  - **Create**: Reorder functionality for previous purchases
-  - **Read**: Detailed order information with item breakdown
-  - **Update**: Modify pending orders and delivery details
-  - **Delete**: Cancel orders within allowed timeframe
-- **Order Management**: Status tracking, invoice generation, and customer support
-
-**Key Features Shown:**
-
-- Order history table with sortable columns and filters
-- Detailed order view with item breakdown and pricing
-- Order status indicators with timeline tracking
-- Action buttons for reorder, cancel, and view details
-- Search and filter functionality for order management
-
-##### Responsive Design Demonstration
-
-![Responsive Breakpoints Screenshot](screenshots/responsive-breakpoints.png)
-![Mobile Navigation Screenshot](screenshots/mobile-navigation.png)
-![Desktop Features Screenshot](screenshots/desktop-features.png)
-
-**Brief Explanation:**
-
-- **Mobile Portrait (320px-575px)**: Single-column layout with touch-optimized controls
-- **Mobile Landscape (576px-767px)**: Two-column grid with expanded navigation
-- **Desktop (992px+)**: Multi-column layout with advanced features and hover effects
-- **Grid System**: CSS Grid and Flexbox implementation for responsive behavior
-- **Navigation**: Adaptive navigation system with mobile hamburger menu
-
-##### Accessibility Features Demonstration
-
-![Accessibility Features Screenshot](screenshots/accessibility-demo.png)
-![Keyboard Navigation Screenshot](screenshots/keyboard-navigation.png)
-![Screen Reader Support Screenshot](screenshots/screen-reader.png)
-
-**Brief Explanation:**
-
-- **ARIA Implementation**: Proper ARIA labels, roles, and properties for screen readers
-- **Keyboard Navigation**: Full keyboard accessibility with visible focus indicators
-- **Form Accessibility**: Error announcements and field descriptions for assistive technology
-- **Color Contrast**: WCAG 2.1 AA compliant color schemes for visual accessibility
-- **Focus Management**: Logical tab order and focus trapping in modals
-
-**Wireframe Designs:**
-
-The FoodNow application features comprehensive wireframe designs for all 7 required pages, demonstrating the context view grouping and row-column grid system implementation.
-
-##### 1. Index Page (Main Page) - **Context View Grouping & Grid System**
-
-![Index Page Wireframe](wireframes/Index%20Page.png)
-
-**Design Features:**
-
-- **Hero Section**: Featured promotional content with call-to-action
-- **Context Grouping**: Products organized by categories (Featured, Popular, New Items)
-- **Row-Column Grid**: Responsive grid system adapting from 1-column (mobile) to 4-column (desktop)
-- **Navigation**: Bootstrap navbar with responsive mobile menu
-- **Footer**: Contact information and quick links
-
-**Grid Implementation:**
-
-- Mobile Portrait: Single column layout for easy scrolling
-- Mobile Landscape: 2-column grid for better space utilization
-- Desktop: 4-column grid with category-based grouping
-
-##### 2. Product Page - **Arrays, Directives, Filters & Pagination**
-
-![Product Page Wireframe](wireframes/Product%20Page.png)
-
-**Design Features:**
-
-- **Product Grid**: Dynamic array-based product display with filtering
-- **Search & Filter Panel**: Advanced filtering using custom directives
-- **Pagination Controls**: Page navigation with configurable items per page
-- **Category Sidebar**: Context grouping by food categories
-- **Sort Options**: Dropdown with custom filters (price, rating, popularity)
+#### Mobile Landscape View
+![Login Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/login-mobile-landscape.png)
 
 **Technical Implementation:**
 
-- **v-for Directive**: Product listing iteration
-- **v-if/v-show**: Conditional filter panel display
-- **Custom Filters**: formatCurrency, truncate, formatStars
-- **JSON Data**: Products loaded from products.json
-- **Pagination**: 12, 24, 36 items per page options
+- **Authentication System**:
+  - Email/password validation against stored user data
+  - Session management with "Remember Me" functionality
+  - Password masking with toggle visibility option
 
-##### 3. Shopping Cart - **Data Manipulation & Calculations**
+- **Form Validation Features**:
+  - Real-time email format validation
+  - Required field validation with visual indicators
+  - Login attempt monitoring and temporary lockout simulation
+  - Error handling with user-friendly messages
 
+- **Security Considerations**:
+  - Client-side validation with server-side simulation
+  - Secure password handling
+  - Session timeout management
+
+**Key Features Demonstrated:**
+- Clean, professional login interface with brand consistency
+- Comprehensive form validation with immediate feedback
+- "Forgot Password" functionality for account recovery
+- "Remember Me" option for session persistence
+- Mobile-responsive design with touch-friendly controls
+
+---
+
+### 6. My Account Page - User Details & Edit Functionality
+
+#### Desktop View
+![Account Desktop](screenshots/Desktop%20Screenshots/account-desktop.png)
+
+#### Mobile Portrait View
+![Account Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/account-mobile-portrait.png)
+
+#### Mobile Landscape View
+![Account Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/account-mobile-landscape.png)
+
+**Technical Implementation:**
+
+- **Profile Management System**:
+  - Complete user profile display with organized sections
+  - Inline editing functionality for all user fields
+  - Profile image upload with preview capabilities
+  - Password change functionality with security verification
+
+- **Edit Functionality**:
+  ```javascript
+  // Inline editing implementation
+  editField(fieldName) {
+    this.editMode[fieldName] = true;
+    this.tempValues[fieldName] = this.user[fieldName];
+  },
+  saveField(fieldName) {
+    if (this.validateField(fieldName)) {
+      this.user[fieldName] = this.tempValues[fieldName];
+      this.updateUserData();
+      this.editMode[fieldName] = false;
+    }
+  }
+  ```
+
+- **Account Settings**: Preference management including notification settings, privacy options, and dietary restrictions
+
+**Key Features Demonstrated:**
+- Comprehensive user profile with editable fields
+- Order history summary with quick access to detailed views
+- Account settings organized in logical sections
+- Mobile-responsive profile management interface
+- Real-time updates and data persistence
+
+---
+
+### 7. My Purchase Page - CRUD Operations
+
+#### Desktop View
+![Purchases Desktop](screenshots/Desktop%20Screenshots/purchases-desktop.png)
+
+#### Mobile Portrait View
+![Purchases Mobile Portrait](screenshots/Mobile%20Portrait%20Screenshots/purchases-mobile-portrait.png)
+
+#### Mobile Landscape View
+![Purchases Mobile Landscape](screenshots/Mobile%20Landscape%20Screenshots/purchases-mobile-landscape.png)
+
+**Technical Implementation:**
+
+- **Complete CRUD Operations**:
+  - **Create**: Reorder functionality duplicating previous purchases
+  - **Read**: Comprehensive order history with detailed breakdown
+  - **Update**: Modify pending orders within allowed timeframe
+  - **Delete**: Cancel orders with confirmation and refund processing
+
+- **Order Management Features**:
+  ```javascript
+  // CRUD operations implementation
+  createReorder(orderId) {
+    const originalOrder = this.getOrderById(orderId);
+    const newOrder = this.duplicateOrder(originalOrder);
+    this.orders.push(newOrder);
+    this.saveOrders();
+  },
+  updateOrder(orderId, updates) {
+    const order = this.getOrderById(orderId);
+    Object.assign(order, updates);
+    this.saveOrders();
+  },
+  deleteOrder(orderId) {
+    this.orders = this.orders.filter(order => order.id !== orderId);
+    this.saveOrders();
+  }
+  ```
+
+- **Advanced Filtering**: Search by date range, order status, amount, and product name
+
+**Key Features Demonstrated:**
+- Order history table with sortable columns and comprehensive filters
+- Detailed order view with item breakdown and pricing information
+- Order status tracking with visual indicators and timeline
+- Action buttons for reorder, cancel, and view details functionality
+- Search and filter capabilities for efficient order management
+
+---
+
+## Responsive Design Implementation
+
+### Mobile Navigation Demonstration
+
+#### Mobile Portrait Navigation
+![Mobile Navigation Portrait](screenshots/Mobile%20Portrait%20Screenshots/mobile-navigation-portrait.png)
+
+#### Mobile Landscape Navigation
+![Mobile Navigation Landscape](screenshots/Mobile%20Landscape%20Screenshots/mobile-navigation-landscape.png)
+
+**Technical Implementation:**
+
+- **Responsive Breakpoints**:
+  - **Mobile Portrait (320px-575px)**: Hamburger menu with full-screen navigation overlay
+  - **Mobile Landscape (576px-767px)**: Collapsible navigation with optimized spacing
+  - **Desktop (992px+)**: Full horizontal navigation bar with dropdown menus
+
+- **Navigation Features**:
+  - Touch-friendly menu items with adequate spacing
+  - Smooth transitions and animations
+  - Accessibility support with proper ARIA labels
+  - Active page indicators and breadcrumb navigation
+
+---
+
+## Wireframe Design Documentation
+
+The FoodNow application features comprehensive wireframe designs for all 7 required pages, demonstrating proper planning and design methodology before implementation.
+
+### 1. Index Page Wireframe - Context View Grouping & Grid System
+![Index Page Wireframe](wireframes/Index%20Page.png)
+
+**Design Planning:**
+- **Hero Section**: Promotional content with clear call-to-action placement
+- **Context Grouping**: Products organized by Featured Items, Popular Categories, Customer Reviews
+- **Grid Implementation**: 4-column desktop, 2-column tablet, 1-column mobile progression
+- **Navigation Structure**: Bootstrap navbar with responsive mobile hamburger menu
+
+### 2. Product Page Wireframe - Arrays, Directives, Filters & Pagination
+![Product Page Wireframe](wireframes/Product%20Page.png)
+
+**Design Planning:**
+- **Filter Panel**: Left sidebar with category, price, and rating filters
+- **Product Grid**: Responsive card layout with pagination controls
+- **Search Functionality**: Header search bar with real-time filtering
+- **Sort Options**: Dropdown with multiple sorting criteria
+
+### 3. Shopping Cart Wireframe - Data Manipulation & Calculations
 ![Shopping Cart Wireframe](wireframes/Shopping%20Cart.png)
 
-**Design Features:**
+**Design Planning:**
+- **Cart Items Section**: Product list with quantity controls and customization display
+- **Order Summary**: Detailed pricing breakdown with tax and shipping calculations
+- **Checkout Process**: Customer information and payment method selection
+- **Responsive Layout**: Single-column mobile, two-column desktop arrangement
 
-- **Cart Items List**: Added products with quantity controls
-- **Price Calculations**: Subtotal, tax (6% GST), shipping calculation
-- **Customization Options**: Item modifications and add-ons
-- **Order Summary**: Total breakdown with all fees
-- **Checkout Process**: Customer information and payment details
-
-**Data Manipulation:**
-
-- **Real-time Updates**: Cart totals recalculated on quantity changes
-- **Local Storage**: Cart persistence across sessions
-- **Tax Calculation**: Automatic GST computation
-- **Shipping Logic**: Zone-based postage calculation
-
-##### 4. Registration Page - **Database Tables & User Storage**
-
+### 4. Registration Page Wireframe - Database Schema & User Storage
 ![Registration Page Wireframe](wireframes/Registration%20Page.png)
 
-**Design Features:**
+**Design Planning:**
+- **Form Structure**: Multi-section registration form with logical field grouping
+- **Validation Display**: Real-time feedback positioning and error message placement
+- **Security Elements**: Password strength indicator and terms acceptance
+- **Mobile Optimization**: Stacked form layout for touch-friendly interaction
 
-- **User Information Form**: Comprehensive user data collection
-- **Validation Feedback**: Real-time form validation with error messages
-- **Password Strength**: Visual password strength indicator
-- **Terms & Conditions**: Checkbox for agreement acceptance
-- **Responsive Layout**: Mobile-friendly form design
-
-**Database Schema:**
-
-```javascript
-User Table Structure:
-- id (Primary Key)
-- email (Unique, Not Null)
-- password (Hashed)
-- firstName, lastName
-- phone, address
-- dateOfBirth
-- createdAt, updatedAt
-```
-
-##### 5. Login Page - **Form Validation**
-
+### 5. Login Page Wireframe - Form Validation
 ![Login Page Wireframe](wireframes/Login%20Page.png)
 
-**Design Features:**
+**Design Planning:**
+- **Minimal Design**: Clean login form with essential elements only
+- **Security Features**: Password visibility toggle and "Remember Me" option
+- **Navigation Links**: Registration and password recovery links placement
+- **Brand Consistency**: Logo and color scheme integration
 
-- **Clean Login Form**: Email and password fields with validation
-- **Remember Me**: Session persistence option
-- **Forgot Password**: Password recovery link
-- **Social Login**: Alternative authentication methods
-- **Registration Link**: Easy navigation to sign-up
-
-**Validation Features:**
-
-- **Email Format**: Real-time email validation
-- **Required Fields**: Visual indicators for mandatory fields
-- **Error Handling**: Clear error messages with ARIA support
-- **Security**: Client-side validation with server-side simulation
-
-##### 6. My Account Page - **User Details & Edit Functionality**
-
+### 6. My Account Page Wireframe - User Profile Management
 ![My Account Page Wireframe](wireframes/My%20account%20page.png)
 
-**Design Features:**
+**Design Planning:**
+- **Profile Section**: User information display with inline editing capabilities
+- **Navigation Tabs**: Account settings, order history, and preferences organization
+- **Edit Functionality**: Click-to-edit fields with save/cancel actions
+- **Image Upload**: Profile picture management with preview functionality
 
-- **Profile Information**: Complete user profile display
-- **Edit Mode**: Inline editing for all user fields
-- **Profile Image**: Avatar upload and management
-- **Account Settings**: Preferences and notification settings
-- **Order History Summary**: Recent purchases overview
-
-**Edit Functionality:**
-
-- **Inline Editing**: Click-to-edit fields with save/cancel options
-- **Profile Image Upload**: Drag-and-drop image upload
-- **Password Change**: Secure password update with confirmation
-- **Address Management**: Multiple address storage and selection
-
-##### 7. My Purchase Page - **CRUD Operations**
-
+### 7. My Purchase Page Wireframe - CRUD Operations
 ![My Purchase Page Wireframe](wireframes/My%20Purchase%20Page.png)
 
-**Design Features:**
+**Design Planning:**
+- **Order Table**: Comprehensive purchase history with sortable columns
+- **Filter Controls**: Date range, status, and amount filtering options
+- **Action Buttons**: Reorder, cancel, and view details functionality
+- **Expandable Rows**: Order details display without navigation
 
-- **Order History Table**: Comprehensive purchase listing with filters
-- **Order Details**: Expandable order information with item breakdown
-- **Order Status**: Visual status indicators (Pending, Processing, Delivered)
-- **Action Buttons**: Edit, Cancel, Reorder functionality
-- **Search & Filter**: Find orders by date, status, or amount
+---
 
-**CRUD Operations:**
+## Technical Implementation Summary
 
-- **Create**: Reorder functionality for previous purchases
-- **Read**: Order history display with detailed breakdown
-- **Update**: Modify pending orders and delivery information
-- **Delete**: Cancel orders within cancellation window
+### Bootstrap Integration & Grid System
+- **Responsive Grid**: 12-column Bootstrap grid system with custom breakpoints
+- **Component Usage**: Cards, modals, forms, navigation, and utility classes
+- **Custom Theme**: Brand-specific color variables and component modifications
+- **Mobile-First**: Progressive enhancement approach with mobile optimization
 
-**Screenshots and Explanations:**
+### Accessibility Standards Compliance
+- **WCAG 2.1 AA**: Color contrast ratios and visual accessibility standards
+- **ARIA Implementation**: Proper labels, roles, and properties for screen readers
+- **Keyboard Navigation**: Full keyboard accessibility with visible focus management
+- **Form Accessibility**: Error announcements and field descriptions for assistive technology
 
-##### Responsive Design Implementation
+### Context View Grouping Examples
+- **Product Categories**: Visual separation using cards, spacing, and category headers
+- **User Dashboard**: Account information grouped by function and importance
+- **Navigation Structure**: Logical menu organization with clear hierarchy
+- **Content Sections**: Related information grouped with appropriate visual cues
 
-**Mobile-First Approach:**
-
-The application implements a comprehensive responsive design system with three main breakpoints:
-
-1. **Mobile Portrait (320px - 575px)**
-
-   - Single-column layout optimized for thumb navigation
-   - Collapsible navigation menu
-   - Stacked form elements
-   - Touch-friendly button sizes (min 44px)
-
-2. **Mobile Landscape (576px - 767px)**
-
-   - Two-column product grid
-   - Side-by-side form fields where appropriate
-   - Expanded navigation options
-
-3. **Desktop (992px+)**
-   - Multi-column layouts (3-6 columns)
-   - Advanced hover effects
-   - Full navigation bar
-   - Comprehensive filtering panels
-
-##### Context View Grouping Examples
-
-**Product Categories:**
-
-- Products grouped by categories (Appetizers, Mains, Desserts, Beverages)
-- Visual separation using cards and spacing
-- Category headers with item counts
-- Responsive grid adaptation
-
-**User Dashboard:**
-
-- Account information grouped by sections
-- Order history organized by status
-- Profile settings categorized by type
-- Quick action buttons grouped logically
-
-##### Accessibility Features Implemented
-
-**Form Accessibility:**
-
-- ARIA labels on all form elements
-- Error messages with live regions
-- Keyboard navigation support
-- High contrast focus indicators
-
-**Table Accessibility:**
-
-- Column headers properly associated
-- Sortable columns with ARIA sort states
-- Row selection with keyboard support
-- Screen reader friendly table captions
-
-##### Bootstrap Integration Examples
-
-**Component Usage:**
-
-- Responsive grid system for layout structure
-- Card components for product display
-- Modal dialogs for customization options
-- Form validation styling and feedback
-- Navigation components with mobile toggle
-
-**Custom Theme:**
-
-- Custom CSS variables for brand colors
-- Extended utility classes for spacing
-- Custom component styling while maintaining Bootstrap structure
+### Data Management & Persistence
+- **LocalStorage Integration**: User data, cart contents, and preferences persistence
+- **JSON Data Handling**: Product information loaded from structured JSON files
+- **State Management**: Vue.js reactive data with computed properties for real-time updates
+- **CRUD Operations**: Complete Create, Read, Update, Delete functionality for orders and user data
 
 ---
 
